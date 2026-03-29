@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String          @id @default(uuid())
+  name              String
+  email             String          @unique
+  role              String          // "seeker", "company", "admin"
+  passwordHash      String
+  status            String          @default("active")
+  profileCompletion Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  settings          UserSettings?
+  seekerProfile     SeekerProfile?
+  companyProfile    CompanyProfile?
+  applications      Application[]
+  sentMessages      Message[]       @relation("SentMessages")
+  receivedMessages  Message[]       @relation("ReceivedMessages")
+  notifications     Notification[]
+  savedJobs         SavedJob[]
+  refreshTokens     RefreshToken[]
+}
+
+model UserSettings {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailNotifications Boolean @default(true)
+  marketingEmails    Boolean @default(false)
+  darkMode           Boolean @default(false)
+}
+
+model SeekerProfile {
+  userId          String   @id
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline        String   @default("")
+  location        String   @default("")
+  phone           String   @default("")
+  avatarUrl       String?
+  skillsRaw       String   @default("[]") // JSON array of strings
+  resumeUrl       String?
+  profileStrength Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  experiences     SeekerExperience[]
+}
+
+model SeekerExperience {
+  id              String         @id @default(uuid())
+  seekerProfileId String
+  seekerProfile   SeekerProfile  @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
+  title           String
+  company         String
+  period          String
+}
+
+model CompanyProfile {
+  companyId            String   @id @default(uuid())
+  ownerUserId          String   @unique
+  ownerUser            User     @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  name                 String
+  logo                 String   @default("")
+  tagline              String   @default("")
+  about                String   @default("")
+  industry             String   @default("")
+  size                 String   @default("")
+  founded              Int      @default(0)
+  headquarters         String   @default("")
+  website              String   @default("")
+  email                String   @default("")
+  phone                String   @default("")
+  linkedin             String?
+  twitter              String?
+  instagram            String?
+  recruiterName        String   @default("")
+  recruiterDesignation String   @default("")
+  isHiring             Boolean  @default(true)
+  openPositions        Int      @default(0)
+  onboardingCompleted  Boolean  @default(false)
+  updatedAt            DateTime @updatedAt
+
+  jobs                 Job[]
+}
+
+model Job {
+  id               String   @id @default(uuid())
+  title            String
+  companyId        String
+  company          CompanyProfile @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
+  location         String
+  salaryMin        Int
+  salaryMax        Int
+  type             String   // "full-time", "part-time", "contract"
+  remote           Boolean  @default(false)
+  skillsRaw        String   @default("[]") // JSON array of strings
+  description      String
+  responsibilitiesRaw String @default("[]") // JSON array of strings
+  applicantsCount  Int      @default(0)
+  postedAt         DateTime @default(now())
+  active           Boolean  @default(true)
+
+  applications     Application[]
+  savedBy          SavedJob[]
+}
+
+model Application {
+  id              String   @id @default(uuid())
+  seekerId        String
+  seeker          User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
+  jobId           String
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  // Duplicated data for faster snapshot access, common in this kind of app:
+  jobTitle        String
+  company         String
+  companyLogo     String
+  
+  status          String   @default("applied") // "applied", "shortlisted", "interview", "hired", "rejected"
+  appliedAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  matchScore      Int      @default(0)
+  recruiterRating Float?
+  recruiterNote   String?
+}
+
+model SavedJob {
+  id        String   @id @default(uuid())
+  seekerId  String
+  seeker    User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  savedAt   DateTime @default(now())
+
+  @@unique([seekerId, jobId])
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  senderId      String
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId    String
+  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  applicationId String?
+  content       String
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      String   // "application", "message", "system"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model RefreshToken {
+  token     String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
