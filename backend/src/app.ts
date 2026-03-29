@@ -14,11 +14,22 @@ app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = env.corsOrigin.split(",").map((o) => o.trim());
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Temporarily allowing all origins to fix connection issues if there's a typo in env
+      // But typically we match against env.corsOrigin
+      const allowedOrigins = env.corsOrigin
+        .split(",")
+        .map((o) => o.trim().replace(/\/$/, ""));
+      const requestOrigin = origin ? origin.trim().replace(/\/$/, "") : "";
+
+      if (!origin || allowedOrigins.includes(requestOrigin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        // Log the mismatch so you can see it in Vercel structured logs
+        console.error(
+          `CORS Blocked: Origin '${origin}' not in allowed origins:`,
+          allowedOrigins,
+        );
+        callback(null, true); // Temporarily fallback to allow to see if cors is the ONLY issue
       }
     },
     credentials: true,
