@@ -1,7 +1,9 @@
 import { app } from "./app";
 import { env } from "./config/env";
 
-if (process.env.NODE_ENV !== "production") {
+// Vercel serverless functions do not need to listen on a port
+// locally, or if we are not on Vercel, we can start the server.
+if (!process.env.VERCEL) {
   app.listen(env.port, () => {
     // eslint-disable-next-line no-console
     console.log(`JobSeva backend listening on port ${env.port}`);
@@ -10,3 +12,4 @@ if (process.env.NODE_ENV !== "production") {
 
 // Export the Express API for Vercel
 export default app;
+module.exports = app;
