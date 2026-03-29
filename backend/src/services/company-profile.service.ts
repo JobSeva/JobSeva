@@ -243,9 +243,9 @@ export const companyProfileService = {
 
     // Calculate actual applications per day of week (last 7 days approx)
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const chartDataMap = new Map(days.map((d) => [d, 0]));
+    const chartDataMap = new Map<string, number>(days.map((d) => [d, 0]));
     allApplications.forEach((app) => {
-      const dayName = days[app.createdAt.getDay()];
+      const dayName = days[app.appliedAt.getDay()] as string;
       chartDataMap.set(dayName, chartDataMap.get(dayName)! + 1);
     });
     // Let's sort them starting from Monday
