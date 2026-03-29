@@ -1,3 +1,6 @@
-# Welcome to your Lovable project
+#JobSeva 
+Find the Right Job,
+Faster with JobSeva
+Connecting talent with real opportunities through smart matching and verified companies.
 
-TODO: Document your project here
+
