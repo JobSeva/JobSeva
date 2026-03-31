@@ -9,14 +9,71 @@ import {
   Shield,
   Globe,
   Mail,
+  Loader2,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
+import { getSeekerProfile, getNgoProfile, updateSeekerProfile, updateNgoProfile } from "@/services/api";
+import { toast } from "sonner";
 
 export default function Settings() {
-  const { user } = useAppContext();
+  const { user, role } = useAppContext();
   const [activeTab, setActiveTab] = useState("profile");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profileData, setProfileData] = useState<any>({
+    name: user?.name || "",
+    email: user?.email || "",
+    headline: "",
+    location: "",
+    description: "",
+  });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = role === "ngo" ? await getNgoProfile() : await getSeekerProfile();
+        const data = res.data;
+        setProfileData({
+          name: user?.name || "",
+          email: user?.email || "",
+          headline: data.headline || "",
+          location: data.location || "",
+          description: data.description || "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch profile settings", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [role, user]);
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    try {
+      if (role === "ngo") {
+        await updateNgoProfile({
+          description: profileData.description,
+          location: profileData.location,
+          phone: profileData.phone, // Assuming phone might be added to state
+        });
+      } else {
+        await updateSeekerProfile({
+          headline: profileData.headline,
+          location: profileData.location,
+        });
+      }
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile");
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const tabs = [
     { id: "profile", label: "Profile Settings", icon: User },
@@ -24,6 +81,14 @@ export default function Settings() {
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "appearance", label: "Appearance", icon: Moon },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -34,7 +99,7 @@ export default function Settings() {
         <h1 className="text-2xl sm:text-3xl font-heading font-bold">
           Account <span className="text-primary">Settings</span>
         </h1>
-        <p className="text-muted-foreground text-sm sm:text-base mt-2">
+        <p className="text-muted-foreground text-sm sm:text-base mt-2 font-medium">
           Manage your account preferences and security settings.
         </p>
       </motion.div>
@@ -46,11 +111,10 @@ export default function Settings() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === tab.id
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                   : "hover:bg-muted text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <tab.icon className="w-4.5 h-4.5" />
               {tab.label}
@@ -62,7 +126,7 @@ export default function Settings() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1">
+        <div className="flex-1 w-full">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, x: 20 }}
@@ -77,38 +141,92 @@ export default function Settings() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                       Full Name
                     </label>
                     <input
                       type="text"
-                      defaultValue={user?.name || ""}
-                      className="w-full px-4 py-2.5 rounded-xl bg-muted border border-border outline-none focus:border-primary transition-colors text-sm"
+                      value={profileData.name}
+                      readOnly
+                      className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border outline-none text-muted-foreground cursor-not-allowed text-sm font-semibold"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                       Email Address
                     </label>
                     <input
                       type="email"
-                      defaultValue={user?.email || ""}
-                      className="w-full px-4 py-2.5 rounded-xl bg-muted border border-border outline-none focus:border-primary transition-colors text-sm"
+                      value={profileData.email}
+                      readOnly
+                      className="w-full px-4 py-2.5 rounded-xl bg-muted/50 border border-border outline-none text-muted-foreground cursor-not-allowed text-sm font-semibold"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Bio
-                  </label>
-                  <textarea
-                    rows={3}
-                    defaultValue="Senior Software Engineer passionate about building scalable web applications."
-                    className="w-full px-4 py-2.5 rounded-xl bg-muted border border-border outline-none focus:border-primary transition-colors text-sm"
-                  />
-                </div>
-                <button className="btn-primary py-2.5 px-8 text-sm font-bold">
-                  Save Changes
+
+                {role === "seeker" ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        Professional Headline
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.headline}
+                        onChange={(e) => setProfileData({ ...profileData, headline: e.target.value })}
+                        placeholder="e.g. Senior Software Engineer"
+                        className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border outline-none focus:border-primary transition-colors text-sm font-semibold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.location}
+                        onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
+                        placeholder="e.g. Remote / New Delhi"
+                        className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border outline-none focus:border-primary transition-colors text-sm font-semibold"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        NGO Location
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.location}
+                        onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
+                        placeholder="e.g. Mumbai, India"
+                        className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border outline-none focus:border-primary transition-colors text-sm font-semibold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        About Organization
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={profileData.description}
+                        onChange={(e) => setProfileData({ ...profileData, description: e.target.value })}
+                        placeholder="Tell us about your mission..."
+                        className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border outline-none focus:border-primary transition-colors text-sm font-semibold"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                  className="btn-primary py-3 px-10 text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {saving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             )}

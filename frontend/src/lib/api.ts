@@ -31,9 +31,9 @@ api.interceptors.response.use(
       if (refreshToken) {
         try {
           const res = await axios.post(`${API_URL}/auth/refresh`, {
-            token: refreshToken,
+            refreshToken,
           });
-          const { token: newAccessToken } = res.data.data;
+          const { accessToken: newAccessToken } = res.data.data;
 
           localStorage.setItem("accessToken", newAccessToken);
 
@@ -43,12 +43,12 @@ api.interceptors.response.use(
           // If refresh fails, log out the user
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-          window.location.href = "/auth/login";
+          window.location.href = "/login";
         }
       } else {
         // No refresh token => user needs to login
         localStorage.removeItem("accessToken");
-        window.location.href = "/auth/login";
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);

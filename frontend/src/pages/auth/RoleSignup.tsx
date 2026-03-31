@@ -9,6 +9,7 @@ import {
   Loader2,
   Users,
   ArrowLeft,
+  GraduationCap,
 } from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
@@ -40,6 +41,14 @@ const roleConfig: Record<
     badge: "Company Signup",
     badgeBg: "bg-secondary/10 text-secondary",
   },
+  ngo: {
+    label: "NGO",
+    icon: GraduationCap,
+    heading: "Join as NGO Partner",
+    sub: "Launch programs and empower seekers",
+    badge: "NGO Signup",
+    badgeBg: "bg-green-500/10 text-green-500",
+  },
 };
 
 export default function RoleSignup() {
@@ -48,6 +57,7 @@ export default function RoleSignup() {
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [ngoName, setNgoName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -72,6 +82,10 @@ export default function RoleSignup() {
       setError("Please enter your company name.");
       return;
     }
+    if (role === "ngo" && !ngoName) {
+      setError("Please enter your NGO name.");
+      return;
+    }
     if (!email.includes("@")) {
       setError("Please enter a valid email address.");
       return;
@@ -85,14 +99,14 @@ export default function RoleSignup() {
 
     try {
       const payload: any = {
-        name,
+        name: role === "ngo" ? ngoName : name,
         email,
         password,
-        role: role === "user" ? "seeker" : "company",
+        role: role === "user" ? "seeker" : (role === "ngo" ? "ngo" : "company"),
         companyName: role === "company" ? companyName : undefined,
       };
 
-      const res = await api.post("/auth/signup", payload);
+      const res = await api.post("/auth/register", payload);
       const { user, accessToken, refreshToken } = res.data.data;
 
       localStorage.setItem("accessToken", accessToken);
@@ -105,7 +119,8 @@ export default function RoleSignup() {
         user.role === "seeker" ? "/app/explore" : "/app/company/onboarding",
       );
     } catch (err: any) {
-      setError(err.response?.data?.error || "Signup failed. Please try again.");
+      const message = err.response?.data?.error?.message || err.response?.data?.message || "Signup failed. Please try again.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -200,6 +215,30 @@ export default function RoleSignup() {
                     className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
                     placeholder="Acme Corp"
                     required={role === "company"}
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {role === "ngo" && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+              >
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  NGO Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Building2 className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <input
+                    type="text"
+                    value={ngoName}
+                    onChange={(e) => setNgoName(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
+                    placeholder="Global Foundation"
+                    required={role === "ngo"}
                   />
                 </div>
               </motion.div>

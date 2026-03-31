@@ -9,6 +9,7 @@ import {
   Building2,
   Shield,
   ArrowLeft,
+  GraduationCap,
 } from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
@@ -43,6 +44,13 @@ const roleConfig: Record<
     welcome: "Admin Portal",
     badge: "Admin Login",
     badgeBg: "bg-accent/10 text-accent",
+  },
+  ngo: {
+    label: "NGO",
+    icon: GraduationCap,
+    welcome: "NGO Partner Portal",
+    badge: "NGO Login",
+    badgeBg: "bg-green-500/10 text-green-500",
   },
 };
 
@@ -96,8 +104,9 @@ export default function RoleLogin() {
       navigate(user.role === "seeker" ? "/app/explore" : "/app");
     } catch (err: any) {
       setError(
-        err.response?.data?.error ||
-          "Login failed. Please check your credentials.",
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Login failed. Please check your credentials.",
       );
     } finally {
       setIsLoading(false);

@@ -48,11 +48,6 @@ const steps = [
   { num: "04", title: "Get Hired", desc: "Track your progress and land your dream job faster." },
 ];
 
-const testimonials = [
-  { name: "Anita Verma", role: "Data Analyst at Wipro", avatar: "AV", text: "JobSeva helped me find the perfect data analyst role in just 2 weeks. The match score was incredibly accurate!" },
-  { name: "Rajesh Kumar", role: "HR Manager at Infosys", avatar: "RK", text: "We reduced our hiring time by 50% using JobSeva. The applicant pipeline is a game-changer for recruiters." },
-  { name: "Meera Patel", role: "Office Assistant", avatar: "MP", text: "Best job platform I've used. The real-time updates kept me informed throughout the entire process." },
-];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -320,7 +315,7 @@ export default function LandingPage() {
                 </Link>
 
                 <Link
-                  to="/signup/user"
+                  to="/signup"
                   className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl font-heading font-semibold text-sm border border-border hover:border-primary/50 text-foreground hover:text-primary transition-all duration-300 bg-card/50 hover:bg-primary/5"
                 >
                   <Users className="w-4 h-4" />
@@ -427,51 +422,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            custom={0}
-            className="text-3xl sm:text-4xl font-heading font-bold text-center mb-16"
-          >
-            What People <span className="text-primary">Say</span>
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-                className="clean-card-hover p-6"
-              >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-warning fill-warning" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-heading font-bold">
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <p className="text-sm font-heading font-semibold">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
 
       {/* Footer */}
@@ -488,7 +438,6 @@ export default function LandingPage() {
             <div>
               <h4 className="font-heading font-semibold text-sm mb-3">Quick Links</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/about" className="hover:text-primary inline-block hover:translate-x-1 transition-all duration-300">About Us</Link></li>
                 <li><a href="#jobs" className="hover:text-primary inline-block hover:translate-x-1 transition-all duration-300">Browse Jobs</a></li>
                 <li><a href="#how-it-works" className="hover:text-primary inline-block hover:translate-x-1 transition-all duration-300">How It Works</a></li>
                 <li><Link to="/app" className="hover:text-primary inline-block hover:translate-x-1 transition-all duration-300">Dashboard</Link></li>

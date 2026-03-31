@@ -8,9 +8,9 @@ import { AppProvider, useAppContext } from "@/contexts/AppContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppLayout from "@/components/AppLayout";
 import LandingPage from "@/pages/LandingPage";
-import AboutUs from "@/pages/AboutUs";
 import Settings from "@/pages/Settings";
 import LoginSelection from "@/pages/auth/LoginSelection";
+import SignupSelection from "@/pages/auth/SignupSelection";
 import RoleLogin from "@/pages/auth/RoleLogin";
 import RoleSignup from "@/pages/auth/RoleSignup";
 import ExploreJobsGate from "@/pages/ExploreJobsGate";
@@ -34,6 +34,24 @@ import AdminPlacements from "@/pages/AdminPlacements";
 import AdminReports from "@/pages/AdminReports";
 import JobDetails from "@/pages/JobDetails";
 import NotFound from "@/pages/NotFound";
+import TrainingPage from "@/pages/TrainingPage";
+import CourseDetails from "@/pages/CourseDetails";
+
+// NGO Pages
+import NgoDashboard from "@/pages/ngoDashboard";
+import NgoPostTraining from "@/pages/ngoPostTraining";
+import NgoCourses from "@/pages/ngoCourses";
+import NgoEnrollments from "@/pages/ngoEnrollments";
+import NgoLogin from "@/pages/ngoLogin";
+import NgoSignup from "@/pages/ngoSignup";
+import VerifyEmail from "@/pages/VerifyEmail";
+import NgoProfile from "@/pages/NgoProfile";
+
+function ProfileGate() {
+  const { role } = useAppContext();
+  if (role === "ngo") return <NgoProfile />;
+  return <SeekerProfile />;
+}
 
 const queryClient = new QueryClient();
 
@@ -50,6 +68,8 @@ function AppRoutes() {
               <SeekerDashboard />
             ) : role === "company" ? (
               <CompanyDashboard />
+            ) : role === "ngo" ? (
+              <NgoDashboard />
             ) : (
               <AdminDashboard />
             )
@@ -57,10 +77,17 @@ function AppRoutes() {
         />
         <Route path="explore" element={<ExploreJobs />} />
         <Route path="applications" element={<Applications />} />
-        <Route path="profile" element={<SeekerProfile />} />
+        <Route path="profile" element={<ProfileGate />} />
         <Route path="saved" element={<SavedJobs />} />
         <Route path="messages" element={<Messages />} />
         <Route path="job/:id" element={<JobDetails />} />
+        <Route path="course/:id" element={<CourseDetails />} />
+
+        {/* NGO Management */}
+        <Route path="ngo" element={<NgoDashboard />} />
+        <Route path="ngo/post-training" element={<NgoPostTraining />} />
+        <Route path="ngo/courses" element={<NgoCourses />} />
+        <Route path="ngo/enrollments" element={<NgoEnrollments />} />
 
         <Route path="company" element={<CompanyDashboard />} />
         <Route path="company/onboarding" element={<CompanyOnboarding />} />
@@ -76,6 +103,7 @@ function AppRoutes() {
         <Route path="admin/placements" element={<AdminPlacements />} />
         <Route path="admin/reports" element={<AdminReports />} />
 
+        <Route path="training" element={<TrainingPage />} />
         <Route path="notifications" element={<Messages />} />
         <Route path="settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
@@ -115,14 +143,20 @@ const App = () => (
             <ScrollToTop />
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/about" element={<AboutUs />} />
               {/* Auth routes */}
               <Route path="/login" element={<LoginSelection />} />
+              <Route path="/signup" element={<SignupSelection />} />
               <Route path="/login/:role" element={<RoleLogin />} />
               <Route path="/signup/:role" element={<RoleSignup />} />
+              <Route path="/login/ngo" element={<NgoLogin />} />
+              <Route path="/signup/ngo" element={<NgoSignup />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+
               {/* Public routes */}
               <Route path="/jobs" element={<ExploreJobsGate />} />
               <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/training" element={<TrainingPage />} />
+
               {/* App routes */}
               <Route path="/app/*" element={<AppRoutes />} />
               <Route path="*" element={<NotFound />} />

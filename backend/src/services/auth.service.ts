@@ -1,11 +1,13 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 import { AppError } from "../common/errors";
 import { env } from "../config/env";
 import { AuthTokenPayload } from "../types/auth";
 import { Role, User, UserSettings } from "../types/domain";
 import { prisma } from "../lib/prisma";
+import { mailService } from "./mail.service";
 
 interface AuthResult {
   user: Omit<User, "passwordHash">;
@@ -98,6 +100,7 @@ export const authService = {
     }
 
     const passwordHash = await bcrypt.hash(params.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
 
     // Default data to populate seeker or company profile
     const profileCompletion = params.role === "company" ? 40 : 55;
@@ -108,6 +111,8 @@ export const authService = {
         email: params.email.toLowerCase(),
         role: params.role,
         passwordHash,
+        isVerified: true,
+        verificationToken: null,
         profileCompletion,
         settings: {
           create: {
@@ -119,16 +124,27 @@ export const authService = {
         ...(params.role === "seeker" ? { seekerProfile: { create: {} } } : {}),
         ...(params.role === "company"
           ? {
-              companyProfile: {
-                create: { name: params.companyName || params.name },
-              },
-            }
+            companyProfile: {
+              create: { name: params.companyName || params.name },
+            },
+          }
           : {}),
+        ...(params.role === "ngo" ? { ngoProfile: { create: {} } } : {}),
       },
       include: {
         settings: true,
       },
     });
+
+    // Send verification email
+    /*
+    try {
+      await mailService.sendVerificationEmail(dbUser.email, verificationToken);
+    } catch (error) {
+      console.error("Failed to send verification email on signup:", error);
+      // We don't throw here to allow signup to complete, but user won't be verified
+    }
+    */
 
     const user = mapPrismaUser(dbUser);
     const tokens = await generateTokens(user);
@@ -137,6 +153,47 @@ export const authService = {
       user: stripSecretFields(user),
       ...tokens,
     };
+  },
+
+  async verifyEmail(token: string): Promise<void> {
+    const user = await prisma.user.findFirst({
+      where: { verificationToken: token },
+    });
+
+    if (!user) {
+      throw new AppError(400, "Invalid or expired verification token", "INVALID_TOKEN");
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isVerified: true,
+        verificationToken: null,
+      },
+    });
+  },
+
+  async resendVerification(email: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (!user) {
+      throw new AppError(404, "User not found", "USER_NOT_FOUND");
+    }
+
+    if (user.isVerified) {
+      throw new AppError(400, "Email already verified", "ALREADY_VERIFIED");
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { verificationToken },
+    });
+
+    await mailService.sendVerificationEmail(user.email, verificationToken);
   },
 
   async login(params: {
@@ -148,6 +205,8 @@ export const authService = {
       where: { email: params.email.toLowerCase() },
       include: { settings: true },
     });
+
+    console.log("Found User in DB:", dbUser);
 
     if (!dbUser) {
       throw new AppError(401, "Invalid credentials", "INVALID_CREDENTIALS");
@@ -219,7 +278,7 @@ export const authService = {
     } catch {
       await prisma.refreshToken
         .delete({ where: { token: refreshToken } })
-        .catch(() => {});
+        .catch(() => { });
       throw new AppError(401, "Invalid refresh token", "INVALID_REFRESH_TOKEN");
     }
   },

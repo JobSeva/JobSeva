@@ -1,4 +1,4 @@
-export type Role = "seeker" | "company" | "admin";
+export type Role = "seeker" | "company" | "admin" | "ngo";
 
 export type UserStatus = "active" | "suspended";
 
@@ -19,6 +19,32 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   settings: UserSettings;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  mode: string;
+  category: string;
+  image: string;
+  location: string;
+  contactNumber: string;
+  rating: number;
+  status: string;
+  ngoId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Enrollment {
+  id: string;
+  userId: string;
+  courseId: string;
+  enrolledAt: string;
+  course?: Course;
+  user?: Partial<User>;
 }
 
 export interface Job {
@@ -131,4 +157,15 @@ export interface Notification {
   type: "application" | "message" | "system";
   isRead: boolean;
   createdAt: string;
+}
+
+export interface NgoProfile {
+  userId: string;
+  description: string;
+  location: string;
+  phone: string;
+  website: string;
+  logoUrl?: string;
+  profileStrength: number;
+  updatedAt: string;
 }

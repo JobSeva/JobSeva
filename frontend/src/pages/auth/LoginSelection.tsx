@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Users, Building2, Shield, ArrowRight } from "lucide-react";
+import { Users, Building2, Shield, ArrowRight, GraduationCap } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const roles = [
@@ -30,6 +30,15 @@ const roles = [
     color: "from-accent to-primary",
     iconBg: "bg-accent/10",
     iconColor: "text-accent",
+  },
+  {
+    key: "ngo",
+    label: "NGO / Training",
+    desc: "Provide training and empower job seekers",
+    icon: GraduationCap,
+    color: "from-purple-500 to-orange-400",
+    iconBg: "bg-purple-500/10",
+    iconColor: "text-purple-600",
   },
 ];
 

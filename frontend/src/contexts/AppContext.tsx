@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "@/lib/api";
 
-export type UserRole = "seeker" | "company" | "admin";
+export type UserRole = "seeker" | "company" | "admin" | "ngo";
 
 export interface UserInfo {
   id: string;
@@ -24,13 +24,13 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType>({
   role: "seeker",
-  setRole: () => {},
+  setRole: () => { },
   user: null,
-  setUser: () => {},
+  setUser: () => { },
   notifications: 0,
   sidebarCollapsed: false,
-  setSidebarCollapsed: () => {},
-  logout: () => {},
+  setSidebarCollapsed: () => { },
+  logout: () => { },
 });
 
 export const useAppContext = () => useContext(AppContext);
@@ -79,7 +79,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         api
           .get("/notifications/unread")
           .then((res) => setNotifications(res.data.unreadCount))
-          .catch(() => {});
+          .catch(() => { });
       };
       fetchNotifs();
       const interval = setInterval(fetchNotifs, 10000); // Polling every 10 seconds

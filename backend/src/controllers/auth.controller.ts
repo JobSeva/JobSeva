@@ -6,11 +6,13 @@ import { AuthenticatedRequest } from "../types/auth";
 
 export const authController = {
   async signup(req: Request, res: Response): Promise<void> {
+    console.log("Signup Request Body:", req.body);
     const result = await authService.signup(req.body);
     res.status(201).json(success(result));
   },
 
   async login(req: Request, res: Response): Promise<void> {
+    console.log("Login Request Body:", req.body);
     const result = await authService.login(req.body);
     res.status(200).json(success(result));
   },
@@ -25,6 +27,18 @@ export const authController = {
     const { refreshToken } = req.body as { refreshToken: string };
     await authService.logout(refreshToken);
     res.status(200).json(success({ message: "Logged out" }));
+  },
+
+  async verifyEmail(req: Request, res: Response): Promise<void> {
+    const { token } = req.body as { token: string };
+    await authService.verifyEmail(token);
+    res.status(200).json(success({ message: "Email verified successfully" }));
+  },
+
+  async resendVerification(req: Request, res: Response): Promise<void> {
+    const { email } = req.body as { email: string };
+    await authService.resendVerification(email);
+    res.status(200).json(success({ message: "Verification email resent" }));
   },
 
   async me(req: AuthenticatedRequest, res: Response): Promise<void> {

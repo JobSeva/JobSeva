@@ -3,13 +3,14 @@ import { useAppContext } from "@/contexts/AppContext";
 import {
   LayoutDashboard, Search, Briefcase, User, Building2, Users, FileText,
   BarChart3, Bell, Settings, MessageSquare, ChevronLeft, ChevronRight,
-  ClipboardList, UserCheck, LogOut
+  ClipboardList, UserCheck, LogOut, GraduationCap, PlusCircle, BookOpen, ClipboardCheck
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const seekerLinks = [
   { to: "/app", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/app/training", icon: BookOpen, label: "Trainings" },
   { to: "/app/explore", icon: Search, label: "Explore Jobs" },
   { to: "/app/applications", icon: Briefcase, label: "Applications" },
   { to: "/app/saved", icon: FileText, label: "Saved Jobs" },
@@ -25,6 +26,15 @@ const companyLinks = [
   { to: "/app/company/profile", icon: Building2, label: "Company Profile" },
 ];
 
+const ngoLinks = [
+  { to: "/app", icon: LayoutDashboard, label: "Overview" },
+  { to: "/app/ngo/post-training", icon: PlusCircle, label: "Post Training" },
+  { to: "/app/ngo/courses", icon: BookOpen, label: "My Courses" },
+  { to: "/app/ngo/enrollments", icon: ClipboardCheck, label: "Enrollments" },
+  { to: "/app/messages", icon: MessageSquare, label: "Messages" },
+  { to: "/app/profile", icon: User, label: "Profile" },
+];
+
 const adminLinks = [
   { to: "/app/admin", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/app/admin/companies", icon: Building2, label: "Companies" },
@@ -35,10 +45,10 @@ const adminLinks = [
 ];
 
 export default function AppSidebar() {
-  const { role, setRole, notifications, sidebarCollapsed: collapsed, setSidebarCollapsed: setCollapsed } = useAppContext();
+  const { role, notifications, sidebarCollapsed: collapsed, setSidebarCollapsed: setCollapsed } = useAppContext();
   const location = useLocation();
 
-  const links = role === "seeker" ? seekerLinks : role === "company" ? companyLinks : adminLinks;
+  const links = role === "seeker" ? seekerLinks : role === "company" ? companyLinks : role === "ngo" ? ngoLinks : adminLinks;
 
   return (
     <motion.aside

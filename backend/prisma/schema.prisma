@@ -15,6 +15,8 @@ model User {
   role              String          // "seeker", "company", "admin"
   passwordHash      String
   status            String          @default("active")
+  isVerified        Boolean         @default(false)
+  verificationToken String?
   profileCompletion Int             @default(0)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -22,12 +24,48 @@ model User {
   settings          UserSettings?
   seekerProfile     SeekerProfile?
   companyProfile    CompanyProfile?
+  ngoProfile        NgoProfile?
   applications      Application[]
   sentMessages      Message[]       @relation("SentMessages")
   receivedMessages  Message[]       @relation("ReceivedMessages")
   notifications     Notification[]
   savedJobs         SavedJob[]
   refreshTokens     RefreshToken[]
+  enrollments       Enrollment[]
+  courses           Course[]        @relation("NgoCourses")
+}
+
+// ... other models ...
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  duration    String
+  mode        String
+  category    String
+  image       String   @default("")
+  location    String   @default("")
+  contactNumber String @default("")
+  rating      Float    @default(0)
+  status      String   @default("active")
+  ngoId       String
+  ngo         User     @relation("NgoCourses", fields: [ngoId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime @default(now())
+
+  @@unique([userId, courseId])
 }
 
 model UserSettings {
@@ -89,6 +127,18 @@ model CompanyProfile {
   updatedAt            DateTime @updatedAt
 
   jobs                 Job[]
+}
+
+model NgoProfile {
+  userId          String   @id
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description     String   @default("")
+  location        String   @default("")
+  phone           String   @default("")
+  website         String   @default("")
+  logoUrl         String?
+  profileStrength Int      @default(0)
+  updatedAt       DateTime @updatedAt
 }
 
 model Job {

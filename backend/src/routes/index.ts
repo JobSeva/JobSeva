@@ -9,8 +9,11 @@ import { companyRouter } from "./company.routes";
 import { jobsRouter } from "./jobs.routes";
 import { savedJobsRouter } from "./saved-jobs.routes";
 import { seekerProfileRouter } from "./seeker-profile.routes";
+import { ngoProfileRouter } from "./ngo-profile.routes";
 import { messagesRouter } from "./messages.routes";
 import { notificationsRouter } from "./notifications.routes";
+import { coursesRouter } from "./courses.routes";
+import { enrollmentsRouter } from "./enrollments.routes";
 
 const apiRouter = Router();
 
@@ -23,10 +26,13 @@ apiRouter.use("/jobs", jobsRouter);
 apiRouter.use("/applications", applicationsRouter);
 apiRouter.use("/saved-jobs", savedJobsRouter);
 apiRouter.use("/seeker/profile", seekerProfileRouter);
+apiRouter.use("/ngo/profile", ngoProfileRouter);
 apiRouter.use("/company", companyRouter);
 apiRouter.use("/company", companyJobsRouter);
 apiRouter.use("/admin", adminRouter);
 apiRouter.use("/messages", messagesRouter);
 apiRouter.use("/notifications", notificationsRouter);
+apiRouter.use("/courses", coursesRouter);
+apiRouter.use("/enrollments", enrollmentsRouter);
 
 export { apiRouter };

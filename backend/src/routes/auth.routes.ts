@@ -9,7 +9,7 @@ import { validate } from "../middleware/validate";
 const emailSchema = z.string().email().max(160);
 const passwordSchema = z.string().min(8).max(100);
 
-const roleSchema = z.enum(["seeker", "company", "admin"]);
+const roleSchema = z.enum(["seeker", "company", "admin", "ngo"]);
 
 const signupSchema = z.object({
   name: z.string().min(2).max(120),
@@ -29,6 +29,14 @@ const refreshSchema = z.object({
   refreshToken: z.string().min(10),
 });
 
+const verifyEmailSchema = z.object({
+  token: z.string().min(1),
+});
+
+const resendVerificationSchema = z.object({
+  email: emailSchema,
+});
+
 const updatePasswordSchema = z.object({
   currentPassword: passwordSchema,
   nextPassword: passwordSchema,
@@ -46,15 +54,34 @@ const settingsSchema = z
 
 const authRouter = Router();
 
+// Signup / Register aliases
 authRouter.post(
   "/signup",
   validate({ body: signupSchema }),
   asyncHandler(authController.signup),
 );
 authRouter.post(
+  "/register",
+  validate({ body: signupSchema }),
+  asyncHandler(authController.signup),
+);
+
+authRouter.post(
   "/login",
   validate({ body: loginSchema }),
   asyncHandler(authController.login),
+);
+
+authRouter.post(
+  "/verify-email",
+  validate({ body: verifyEmailSchema }),
+  asyncHandler(authController.verifyEmail),
+);
+
+authRouter.post(
+  "/resend-verification",
+  validate({ body: resendVerificationSchema }),
+  asyncHandler(authController.resendVerification),
 );
 authRouter.post(
   "/refresh",
