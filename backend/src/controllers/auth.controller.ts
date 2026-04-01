@@ -41,6 +41,26 @@ export const authController = {
     res.status(200).json(success({ message: "Verification email resent" }));
   },
 
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    const { email } = req.body as { email: string };
+    await authService.requestPasswordReset(email);
+    res.status(200).json(
+      success({
+        message:
+          "If an eligible account exists for this email, a reset link has been sent.",
+      }),
+    );
+  },
+
+  async resetPassword(req: Request, res: Response): Promise<void> {
+    const { token, nextPassword } = req.body as {
+      token: string;
+      nextPassword: string;
+    };
+    await authService.resetPassword(token, nextPassword);
+    res.status(200).json(success({ message: "Password reset successful" }));
+  },
+
   async me(req: AuthenticatedRequest, res: Response): Promise<void> {
     const user = await authService.getMe(req.auth!.userId);
     res.status(200).json(success(user));
