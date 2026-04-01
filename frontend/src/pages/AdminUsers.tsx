@@ -27,9 +27,12 @@ export default function AdminUsers() {
       const res = await api.get("/admin/users");
       if (res.data?.success) {
         setUsers(res.data.data || []);
+      } else {
+        setUsers([]);
       }
     } catch (err) {
       console.error("Failed to load users", err);
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }

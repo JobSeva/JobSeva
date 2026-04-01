@@ -1,6 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { BrowserRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -63,7 +69,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground font-medium">Loading your session...</p>
+          <p className="text-sm text-muted-foreground font-medium">
+            Loading your session...
+          </p>
         </div>
       </div>
     );
@@ -71,6 +79,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAppContext();
+
+  if (user?.role !== "admin") {
+    return <Navigate to="/app" replace />;
   }
 
   return <>{children}</>;
@@ -121,12 +139,54 @@ function AppRoutes() {
         <Route path="company/applicants" element={<CompanyApplicants />} />
         <Route path="company/messages" element={<Messages />} />
 
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="admin/companies" element={<AdminCompanies />} />
-        <Route path="admin/users" element={<AdminUsers />} />
-        <Route path="admin/jobs" element={<AdminJobModeration />} />
-        <Route path="admin/placements" element={<AdminPlacements />} />
-        <Route path="admin/reports" element={<AdminReports />} />
+        <Route
+          path="admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/companies"
+          element={
+            <AdminRoute>
+              <AdminCompanies />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/users"
+          element={
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/jobs"
+          element={
+            <AdminRoute>
+              <AdminJobModeration />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/placements"
+          element={
+            <AdminRoute>
+              <AdminPlacements />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/reports"
+          element={
+            <AdminRoute>
+              <AdminReports />
+            </AdminRoute>
+          }
+        />
 
         <Route path="training" element={<TrainingPage />} />
         <Route path="notifications" element={<Messages />} />

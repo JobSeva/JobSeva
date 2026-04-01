@@ -2,6 +2,29 @@ import { prisma } from "../lib/prisma";
 import { User, Job, CompanyProfile } from "../types/domain";
 
 export class AdminService {
+  private getRangeMonths(range: string): number {
+    if (range === "3m") return 3;
+    if (range === "12m") return 12;
+    return 6;
+  }
+
+  private getMonthBoundaries(months: number) {
+    const now = new Date();
+    const points: Array<{ start: Date; end: Date; label: string }> = [];
+
+    for (let i = months - 1; i >= 0; i--) {
+      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+      points.push({
+        start,
+        end,
+        label: start.toLocaleString("default", { month: "short" }),
+      });
+    }
+
+    return points;
+  }
+
   async getDashboardStats() {
     const activeJobs = await prisma.job.count({
       where: { active: true },
@@ -23,8 +46,8 @@ export class AdminService {
     const activeUsers = await prisma.user.count({
       where: { status: "active" },
     });
-    const pendingUsers = await prisma.user.count({
-      where: { status: "pending" },
+    const unverifiedUsers = await prisma.user.count({
+      where: { isVerified: false },
     });
     const suspendedUsers = await prisma.user.count({
       where: { status: "suspended" },
@@ -32,7 +55,7 @@ export class AdminService {
 
     const pieData = [
       { name: "Active", value: activeUsers },
-      { name: "Pending", value: pendingUsers },
+      { name: "Unverified", value: unverifiedUsers },
       { name: "Suspended", value: suspendedUsers },
     ];
 
@@ -314,6 +337,97 @@ export class AdminService {
 
   async getSystemLogs() {
     return [];
+  }
+
+  async getReportsAnalytics(range: string) {
+    const months = this.getRangeMonths(range);
+    const bounds = this.getMonthBoundaries(months);
+
+    const monthlyData: Array<{
+      month: string;
+      users: number;
+      jobs: number;
+      placements: number;
+    }> = [];
+
+    const placementsData: Array<{ month: string; placements: number }> = [];
+
+    for (const b of bounds) {
+      const [users, jobs, placements] = await Promise.all([
+        prisma.user.count({
+          where: {
+            createdAt: {
+              gte: b.start,
+              lt: b.end,
+            },
+          },
+        }),
+        prisma.job.count({
+          where: {
+            postedAt: {
+              gte: b.start,
+              lt: b.end,
+            },
+          },
+        }),
+        prisma.application.count({
+          where: {
+            status: "hired",
+            updatedAt: {
+              gte: b.start,
+              lt: b.end,
+            },
+          },
+        }),
+      ]);
+
+      monthlyData.push({
+        month: b.label,
+        users,
+        jobs,
+        placements,
+      });
+
+      placementsData.push({
+        month: b.label,
+        placements,
+      });
+    }
+
+    const latest = monthlyData[monthlyData.length - 1] ?? {
+      users: 0,
+      jobs: 0,
+      placements: 0,
+    };
+
+    const activeCompanies = await prisma.companyProfile.count({
+      where: { isHiring: true },
+    });
+
+    const [fullTimeCount, partTimeCount, contractCount] = await Promise.all([
+      prisma.job.count({ where: { type: "full-time" } }),
+      prisma.job.count({ where: { type: "part-time" } }),
+      prisma.job.count({ where: { type: "contract" } }),
+    ]);
+
+    const categoryData = [
+      { name: "Full-time", value: fullTimeCount },
+      { name: "Part-time", value: partTimeCount },
+      { name: "Contract", value: contractCount },
+    ].filter((item) => item.value > 0);
+
+    return {
+      range: `${months}m`,
+      kpis: {
+        monthlyUsers: latest.users,
+        newJobs: latest.jobs,
+        placements: latest.placements,
+        activeCompanies,
+      },
+      monthlyData,
+      categoryData,
+      placementsData,
+    };
   }
 }
 
