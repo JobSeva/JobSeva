@@ -12,29 +12,36 @@ import {
   Award,
   Code,
   Globe,
+  GraduationCap,
+  Linkedin,
+  Github,
+  Link as LinkIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { getSeekerProfile } from "@/services/api";
+import EditProfileModal from "@/components/EditProfileModal";
 
 export default function SeekerProfile() {
   const { user } = useAppContext();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await getSeekerProfile();
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch seeker profile", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await getSeekerProfile();
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Failed to fetch seeker profile", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProfile();
-  }, []);
+  }, [fetchProfile]);
 
   if (loading) {
     return (
@@ -44,26 +51,45 @@ export default function SeekerProfile() {
     );
   }
 
-  const skills = profile?.skillsRaw ? JSON.parse(profile.skillsRaw) : [];
-  const experience = profile?.experiences || [];
+  const skills = profile?.skills || [];
+  const languages = profile?.languages || [];
+  const experiences = profile?.experiences || [];
+  const education = profile?.education || [];
 
   return (
-    <div className="space-y-6 max-w-4xl w-full px-0 sm:px-0 mx-auto">
+    <div className="space-y-6 max-w-4xl w-full px-0 sm:px-0 mx-auto pb-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-1"
+        className="px-1 flex flex-col sm:flex-row items-center justify-between gap-4"
       >
         <h1 className="text-2xl sm:text-3xl font-heading font-bold">
           My <span className="text-primary">Profile</span>
         </h1>
+        <div className="flex items-center gap-3">
+          {profile?.linkedinUrl && (
+            <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-xl bg-muted/50 border border-border flex items-center justify-center text-muted-foreground hover:text-[#0077b5] transition-all hover:bg-[#0077b5]/5">
+              <Linkedin className="w-4 h-4" />
+            </a>
+          )}
+          {profile?.githubUrl && (
+            <a href={profile.githubUrl} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-xl bg-muted/50 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all hover:bg-foreground/5">
+              <Github className="w-4 h-4" />
+            </a>
+          )}
+          {profile?.portfolioUrl && (
+            <a href={profile.portfolioUrl} target="_blank" rel="noreferrer" className="w-9 h-9 rounded-xl bg-muted/50 border border-border flex items-center justify-center text-muted-foreground hover:text-primary transition-all hover:bg-primary/5">
+              <LinkIcon className="w-4 h-4" />
+            </a>
+          )}
+        </div>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="clean-card p-4 sm:p-6 overflow-hidden"
+        className="clean-card p-4 sm:p-6 overflow-hidden relative"
       >
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
           <div className="relative">
@@ -104,12 +130,24 @@ export default function SeekerProfile() {
                   </span>
                 </div>
               </div>
-              <button className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-6 shadow-lg shadow-primary/20">
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-6 shadow-lg shadow-primary/20"
+              >
                 <Edit3 className="w-4 h-4" /> Edit Profile
               </button>
             </div>
           </div>
         </div>
+
+        {profile?.bio && (
+          <div className="mt-8 pt-6 border-t border-border/50">
+            <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">About Me</h4>
+            <p className="text-sm text-foreground/80 leading-relaxed font-medium">
+              {profile.bio}
+            </p>
+          </div>
+        )}
 
         <div className="mt-8 p-4 rounded-2xl bg-muted/30 border border-border/50">
           <div className="flex items-center justify-between mb-2">
@@ -135,40 +173,79 @@ export default function SeekerProfile() {
       </motion.div>
 
       <div className="grid grid-cols-1 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="clean-card p-4 sm:p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-heading font-bold flex items-center gap-2.5 text-base sm:text-lg">
-              <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
-                <Code className="w-5 h-5" />
-              </div>
-              Skills & Expertise
-            </h3>
-            <button className="text-xs sm:text-sm text-primary hover:underline font-bold">
-              Edit
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2.5">
-            {skills.length > 0 ? skills.map((skill: string) => (
-              <span
-                key={skill}
-                className="px-4 py-2 rounded-xl bg-primary/5 text-primary text-xs sm:text-sm font-bold border border-primary/10 hover:bg-primary/10 transition-colors"
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Skills Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="clean-card p-4 sm:p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-heading font-bold flex items-center gap-2.5 text-base sm:text-lg">
+                <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                  <Code className="w-5 h-5" />
+                </div>
+                Skills
+              </h3>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="text-xs sm:text-sm text-primary hover:underline font-bold"
               >
-                {skill}
-              </span>
-            )) : (
-              <p className="text-sm text-muted-foreground font-medium italic">No skills added yet</p>
-            )}
-            <button className="px-4 py-2 rounded-xl border border-dashed border-border text-xs sm:text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-all flex items-center gap-2 font-bold">
-              <Plus className="w-4 h-4" /> Add Skill
-            </button>
-          </div>
-        </motion.div>
+                Edit
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {skills.length > 0 ? skills.map((skill: string) => (
+                <span
+                  key={skill}
+                  className="px-3 py-1.5 rounded-xl bg-primary/5 text-primary text-[10px] sm:text-xs font-bold border border-primary/10 hover:bg-primary/10 transition-colors"
+                >
+                  {skill}
+                </span>
+              )) : (
+                <p className="text-xs text-muted-foreground font-medium italic">No skills added</p>
+              )}
+            </div>
+          </motion.div>
 
+          {/* Languages Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="clean-card p-4 sm:p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-heading font-bold flex items-center gap-2.5 text-base sm:text-lg">
+                <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+                  <Globe className="w-5 h-5" />
+                </div>
+                Languages
+              </h3>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="text-xs sm:text-sm text-primary hover:underline font-bold"
+              >
+                Edit
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {languages.length > 0 ? languages.map((lang: string) => (
+                <span
+                  key={lang}
+                  className="px-3 py-1.5 rounded-xl bg-indigo-500/5 text-indigo-500 text-[10px] sm:text-xs font-bold border border-indigo-500/10"
+                >
+                  {lang}
+                </span>
+              )) : (
+                <p className="text-xs text-muted-foreground font-medium italic">No languages added</p>
+              )}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Experience Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -182,12 +259,15 @@ export default function SeekerProfile() {
               </div>
               Work Experience
             </h3>
-            <button className="text-xs sm:text-sm text-primary hover:underline font-bold">
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="text-xs sm:text-sm text-primary hover:underline font-bold"
+            >
               Add Experience
             </button>
           </div>
           <div className="space-y-6">
-            {experience.length > 0 ? experience.map((exp: any, i: number) => (
+            {experiences.length > 0 ? experiences.map((exp: any, i: number) => (
               <div
                 key={i}
                 className="flex items-start gap-4 pb-6 border-b border-border/50 last:border-0 last:pb-0 group"
@@ -203,14 +283,63 @@ export default function SeekerProfile() {
                     {exp.company}
                   </p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted/50 border border-border/50">
-                    <Globe className="w-3 h-3" /> {exp.period}
+                    {exp.period}
                   </p>
                 </div>
               </div>
             )) : (
               <div className="text-center py-6 px-4 rounded-2xl border-2 border-dashed border-border bg-muted/10">
                 <p className="text-sm text-muted-foreground font-medium italic">No work experience added yet</p>
-                <button className="mt-3 text-xs font-bold text-primary hover:underline">Add your first job</button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Education Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="clean-card p-4 sm:p-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-heading font-bold flex items-center gap-2.5 text-base sm:text-lg">
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+              Education
+            </h3>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="text-xs sm:text-sm text-primary hover:underline font-bold"
+            >
+              Add Education
+            </button>
+          </div>
+          <div className="space-y-6">
+            {education.length > 0 ? education.map((edu: any, i: number) => (
+              <div
+                key={i}
+                className="flex items-start gap-4 pb-6 border-b border-border/50 last:border-0 last:pb-0 group"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-muted/50 border border-border/50 flex items-center justify-center font-heading font-black text-lg text-primary/40 group-hover:bg-primary group-hover:text-white transition-all duration-300 flex-shrink-0">
+                  <GraduationCap className="w-6 h-6 opacity-30" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-sm sm:text-base truncate group-hover:text-primary transition-colors">
+                    {edu.degree} in {edu.field}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-foreground/80 font-semibold mb-1">
+                    {edu.school}
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted/50 border border-border/50">
+                    {edu.period}
+                  </p>
+                </div>
+              </div>
+            )) : (
+              <div className="text-center py-6 px-4 rounded-2xl border-2 border-dashed border-border bg-muted/10">
+                <p className="text-sm text-muted-foreground font-medium italic">No education history added yet</p>
               </div>
             )}
           </div>
@@ -224,7 +353,7 @@ export default function SeekerProfile() {
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-heading font-bold flex items-center gap-2.5 text-base sm:text-lg">
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <div className="p-1.5 rounded-lg bg-pink-500/10 text-pink-500">
                 <FileText className="w-5 h-5" />
               </div>
               Professional Resume
@@ -258,6 +387,13 @@ export default function SeekerProfile() {
           </div>
         </motion.div>
       </div>
+
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        profile={profile}
+        onUpdate={fetchProfile}
+      />
     </div>
   );
 }

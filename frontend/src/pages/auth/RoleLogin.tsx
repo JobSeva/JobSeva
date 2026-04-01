@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
+import { resendVerification } from "@/services/api";
+import { toast } from "sonner";
 
 const roleConfig: Record<
   string,
@@ -113,6 +115,19 @@ export default function RoleLogin() {
     }
   };
 
+  const handleResend = async () => {
+    if (!email) {
+      setError("Please enter your email to resend verification.");
+      return;
+    }
+    const resendPromise = resendVerification(email);
+    toast.promise(resendPromise, {
+      loading: 'Sending verification email...',
+      success: 'Verification email sent! Check your inbox.',
+      error: (err: any) => err.response?.data?.error?.message || err.response?.data?.message || 'Failed to resend email'
+    });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <motion.div
@@ -161,9 +176,18 @@ export default function RoleLogin() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20 text-center"
+              className="p-4 rounded-xl bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20 text-center space-y-2"
             >
-              {error}
+              <p>{error}</p>
+              {error === "Please verify your email to login" && (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  className="text-primary hover:underline block w-full text-xs"
+                >
+                  Resend Verification Email
+                </button>
+              )}
             </motion.div>
           )}
 

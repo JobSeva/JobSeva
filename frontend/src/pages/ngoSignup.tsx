@@ -121,13 +121,13 @@ export default function NgoSignup() {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center space-y-6"
                     >
-                        <div className="w-20 h-20 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto text-green-500">
-                            <CheckCircle2 className="w-10 h-10" />
+                        <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary">
+                            <Mail className="w-10 h-10" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Account Created!</h2>
+                            <h2 className="text-2xl font-heading font-bold text-foreground mb-2">Check Your Email</h2>
                             <p className="text-muted-foreground">
-                                Your NGO account has been created successfully. You can now login to your dashboard.
+                                We've sent a verification link to <span className="text-foreground font-semibold">{email}</span>. Please click the link to activate your NGO account.
                             </p>
                         </div>
                         <Link

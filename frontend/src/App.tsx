@@ -38,10 +38,10 @@ import TrainingPage from "@/pages/TrainingPage";
 import CourseDetails from "@/pages/CourseDetails";
 
 // NGO Pages
-import NgoDashboard from "@/pages/ngoDashboard";
-import NgoPostTraining from "@/pages/ngoPostTraining";
-import NgoCourses from "@/pages/ngoCourses";
-import NgoEnrollments from "@/pages/ngoEnrollments";
+import NgoDashboard from "@/pages/NgoDashboard";
+import NgoPostTraining from "@/pages/NgoPostTraining";
+import NgoCourses from "@/pages/NgoCourses";
+import NgoEnrollments from "@/pages/NgoEnrollments";
 import NgoLogin from "@/pages/ngoLogin";
 import NgoSignup from "@/pages/ngoSignup";
 import VerifyEmail from "@/pages/VerifyEmail";
@@ -148,8 +148,6 @@ const App = () => (
               <Route path="/signup" element={<SignupSelection />} />
               <Route path="/login/:role" element={<RoleLogin />} />
               <Route path="/signup/:role" element={<RoleSignup />} />
-              <Route path="/login/ngo" element={<NgoLogin />} />
-              <Route path="/signup/ngo" element={<NgoSignup />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
 
               {/* Public routes */}

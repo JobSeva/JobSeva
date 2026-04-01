@@ -1,0 +1,439 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    X,
+    User,
+    MapPin,
+    Phone,
+    Briefcase,
+    GraduationCap,
+    Globe,
+    Linkedin,
+    Github,
+    Link as LinkIcon,
+    Plus,
+    Trash2,
+    Save,
+    Loader2
+} from "lucide-react";
+import {
+    updateSeekerProfile,
+    addSeekerExperience,
+    updateSeekerExperience,
+    deleteSeekerExperience,
+    addSeekerEducation,
+    updateSeekerEducation,
+    deleteSeekerEducation
+} from "@/services/api";
+
+interface EditProfileModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    profile: any;
+    onUpdate: () => void;
+}
+
+type Tab = "basic" | "experience" | "education" | "social";
+
+export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }: EditProfileModalProps) {
+    const [activeTab, setActiveTab] = useState<Tab>("basic");
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState<any>({});
+
+    // Initialize form data when profile changes or modal opens
+    useEffect(() => {
+        if (profile) {
+            setFormData({
+                headline: profile.headline || "",
+                bio: profile.bio || "",
+                location: profile.location || "",
+                phone: profile.phone || "",
+                skills: profile.skills || [],
+                languages: profile.languages || [],
+                linkedinUrl: profile.linkedinUrl || "",
+                githubUrl: profile.githubUrl || "",
+                portfolioUrl: profile.portfolioUrl || "",
+            });
+        }
+    }, [profile, isOpen]);
+
+    const handleSaveBasic = async () => {
+        setIsLoading(true);
+        try {
+            await updateSeekerProfile(formData);
+            onUpdate();
+            // We don't close here to allow editing other tabs
+        } catch (error) {
+            console.error("Failed to update profile", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAddExperience = async () => {
+        const title = prompt("Job Title");
+        const company = prompt("Company");
+        const period = prompt("Period (e.g. 2020 - Present)");
+        if (!title || !company || !period) return;
+
+        setIsLoading(true);
+        try {
+            await addSeekerExperience({ title, company, period });
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeleteExperience = async (id: string) => {
+        if (!confirm("Are you sure?")) return;
+        setIsLoading(true);
+        try {
+            await deleteSeekerExperience(id);
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAddEducation = async () => {
+        const school = prompt("School/University");
+        const degree = prompt("Degree");
+        const field = prompt("Field of Study");
+        const period = prompt("Period");
+        if (!school || !degree || !field || !period) return;
+
+        setIsLoading(true);
+        try {
+            await addSeekerEducation({ school, degree, field, period });
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeleteEducation = async (id: string) => {
+        if (!confirm("Are you sure?")) return;
+        setIsLoading(true);
+        try {
+            await deleteSeekerEducation(id);
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                onClick={onClose}
+            />
+
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative bg-card border border-border shadow-2xl rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+            >
+                {/* Header */}
+                <div className="p-6 border-b border-border flex items-center justify-between bg-muted/30">
+                    <div>
+                        <h2 className="text-xl font-heading font-bold">Edit <span className="text-primary">Profile</span></h2>
+                        <p className="text-xs text-muted-foreground font-medium">Customize your professional presence</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex items-center gap-1 p-2 bg-muted/50 border-b border-border overflow-x-auto no-scrollbar">
+                    {[
+                        { id: "basic", label: "Basic Info", icon: User },
+                        { id: "experience", label: "Experience", icon: Briefcase },
+                        { id: "education", label: "Education", icon: GraduationCap },
+                        { id: "social", label: "Social", icon: Globe },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as Tab)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab.id
+                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                    : "text-muted-foreground hover:bg-background"
+                                }`}
+                        >
+                            <tab.icon className="w-3.5 h-3.5" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                    <AnimatePresence mode="wait">
+                        {activeTab === "basic" && (
+                            <motion.div
+                                key="basic"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="space-y-4"
+                            >
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Headline</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                            <User className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Software Engineer | React Specialist"
+                                            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                            value={formData.headline}
+                                            onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Bio</label>
+                                    <textarea
+                                        placeholder="Tell us about yourself..."
+                                        rows={4}
+                                        className="w-full px-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm resize-none"
+                                        value={formData.bio}
+                                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Location</label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                                <MapPin className="w-4 h-4" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Mumbai, India"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                                value={formData.location}
+                                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Phone</label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                                <Phone className="w-4 h-4" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="+91 98765 43210"
+                                                className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                                value={formData.phone}
+                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <button
+                                        onClick={handleSaveBasic}
+                                        disabled={isLoading}
+                                        className="btn-primary w-full py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                                    >
+                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                        Save Basic Information
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "experience" && (
+                            <motion.div
+                                key="experience"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="space-y-6"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold">Work History</h3>
+                                    <button
+                                        onClick={handleAddExperience}
+                                        className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" /> Add New
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {profile.experiences?.map((exp: any) => (
+                                        <div key={exp.id} className="p-4 rounded-2xl border border-border bg-muted/10 flex items-center justify-between group">
+                                            <div>
+                                                <h4 className="text-sm font-bold">{exp.title}</h4>
+                                                <p className="text-xs text-muted-foreground font-medium">{exp.company} • {exp.period}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteExperience(exp.id)}
+                                                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all opacity-0 group-hover:opacity-100"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!profile.experiences || profile.experiences.length === 0) && (
+                                        <div className="text-center py-12 rounded-3xl border-2 border-dashed border-border bg-muted/5">
+                                            <p className="text-xs text-muted-foreground font-medium italic">No work experience listed</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "education" && (
+                            <motion.div
+                                key="education"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="space-y-6"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold">Education History</h3>
+                                    <button
+                                        onClick={handleAddEducation}
+                                        className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" /> Add New
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {profile.education?.map((edu: any) => (
+                                        <div key={edu.id} className="p-4 rounded-2xl border border-border bg-muted/10 flex items-center justify-between group">
+                                            <div>
+                                                <h4 className="text-sm font-bold">{edu.degree} in {edu.field}</h4>
+                                                <p className="text-xs text-muted-foreground font-medium">{edu.school} • {edu.period}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteEducation(edu.id)}
+                                                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all opacity-0 group-hover:opacity-100"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!profile.education || profile.education.length === 0) && (
+                                        <div className="text-center py-12 rounded-3xl border-2 border-dashed border-border bg-muted/5">
+                                            <p className="text-xs text-muted-foreground font-medium italic">No education history listed</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {activeTab === "social" && (
+                            <motion.div
+                                key="social"
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                className="space-y-4"
+                            >
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">LinkedIn Profile</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                            <Linkedin className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="url"
+                                            placeholder="https://linkedin.com/in/username"
+                                            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                            value={formData.linkedinUrl}
+                                            onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">GitHub Portfolio</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                            <Github className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="url"
+                                            placeholder="https://github.com/username"
+                                            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                            value={formData.githubUrl}
+                                            onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Other Portfolio</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                            <LinkIcon className="w-4 h-4" />
+                                        </div>
+                                        <input
+                                            type="url"
+                                            placeholder="https://yourportfolio.com"
+                                            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none font-medium text-sm"
+                                            value={formData.portfolioUrl}
+                                            onChange={(e) => setFormData({ ...formData, portfolioUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <button
+                                        onClick={handleSaveBasic}
+                                        disabled={isLoading}
+                                        className="btn-primary w-full py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                                    >
+                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                        Save Social Links
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-border bg-muted/30 flex items-center justify-end">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-2 rounded-xl text-sm font-bold text-muted-foreground hover:text-foreground transition-all"
+                    >
+                        Done
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+}

@@ -11,6 +11,46 @@ export const updateSeekerProfile = async (data: any) => {
     return response.data;
 };
 
+export const addSeekerExperience = async (data: any) => {
+    const response = await api.post("/seeker/profile/experience", data);
+    return response.data;
+};
+
+export const updateSeekerExperience = async (id: string, data: any) => {
+    const response = await api.put(`/seeker/profile/experience/${id}`, data);
+    return response.data;
+};
+
+export const deleteSeekerExperience = async (id: string) => {
+    const response = await api.delete(`/seeker/profile/experience/${id}`);
+    return response.data;
+};
+
+export const addSeekerEducation = async (data: any) => {
+    const response = await api.post("/seeker/profile/education", data);
+    return response.data;
+};
+
+export const updateSeekerEducation = async (id: string, data: any) => {
+    const response = await api.put(`/seeker/profile/education/${id}`, data);
+    return response.data;
+};
+
+export const deleteSeekerEducation = async (id: string) => {
+    const response = await api.delete(`/seeker/profile/education/${id}`);
+    return response.data;
+};
+
+export const uploadSeekerAvatar = async (avatarUrl: string) => {
+    const response = await api.post("/seeker/profile/avatar", { avatarUrl });
+    return response.data;
+};
+
+export const uploadSeekerResume = async (resumeUrl: string) => {
+    const response = await api.post("/seeker/profile/resume", { resumeUrl });
+    return response.data;
+};
+
 export const getNgoProfile = async () => {
     const response = await api.get("/ngo/profile");
     return response.data;

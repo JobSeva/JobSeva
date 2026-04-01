@@ -59,8 +59,8 @@ export default function RoleSignup() {
   const [password, setPassword] = useState("");
   const [ngoName, setNgoName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
   const { setRole, setUser } = useAppContext();
 
   if (!role || !roleConfig[role]) {
@@ -106,18 +106,12 @@ export default function RoleSignup() {
         companyName: role === "company" ? companyName : undefined,
       };
 
-      const res = await api.post("/auth/register", payload);
-      const { user, accessToken, refreshToken } = res.data.data;
+      await api.post("/auth/register", payload);
 
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      setUser(user);
-      setRole(user.role);
-
-      navigate(
-        user.role === "seeker" ? "/app/explore" : "/app/company/onboarding",
-      );
+      // We no longer log in immediately. We show the verification message.
+      setIsLoading(false);
+      setIsVerificationSent(true);
+      return;
     } catch (err: any) {
       const message = err.response?.data?.error?.message || err.response?.data?.message || "Signup failed. Please try again.";
       setError(message);
@@ -125,6 +119,34 @@ export default function RoleSignup() {
       setIsLoading(false);
     }
   };
+
+  if (isVerificationSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md clean-card p-10 text-center"
+        >
+          <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <Mail className="w-10 h-10 text-primary" />
+          </div>
+          <h1 className="text-2xl font-heading font-bold text-foreground mb-4">Check Your Email</h1>
+          <p className="text-muted-foreground mb-8 text-lg">
+            We've sent a verification link to <span className="text-foreground font-semibold">{email}</span>. Please click the link to activate your account.
+          </p>
+          <div className="space-y-4">
+            <Link to="/login" className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-all">
+              Back to Login
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              Didn't receive the email? Check your spam folder or try logging in to resend it.
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
