@@ -28,6 +28,22 @@ router.get("/companies", (req, res, next) => {
   adminController.listCompanies(req, res).catch(next);
 });
 
+router.get("/ngos", (req, res, next) => {
+  adminController.listNgos(req, res).catch(next);
+});
+
+router.get("/export/users", (req, res, next) => {
+  adminController.exportUsersCsvData(req, res).catch(next);
+});
+
+router.get("/export/companies", (req, res, next) => {
+  adminController.exportCompaniesCsvData(req, res).catch(next);
+});
+
+router.get("/export/ngos", (req, res, next) => {
+  adminController.exportNgosCsvData(req, res).catch(next);
+});
+
 router.delete("/companies/:companyId", (req, res, next) => {
   adminController.deleteCompany(req, res).catch(next);
 });

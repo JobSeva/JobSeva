@@ -34,6 +34,7 @@ import PostJob from "@/pages/PostJob";
 import CompanyApplicants from "@/pages/CompanyApplicants";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminCompanies from "@/pages/AdminCompanies";
+import AdminNgos from "@/pages/AdminNgos";
 import AdminUsers from "@/pages/AdminUsers";
 import AdminJobModeration from "@/pages/AdminJobModeration";
 import AdminPlacements from "@/pages/AdminPlacements";
@@ -152,6 +153,14 @@ function AppRoutes() {
           element={
             <AdminRoute>
               <AdminCompanies />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="admin/ngos"
+          element={
+            <AdminRoute>
+              <AdminNgos />
             </AdminRoute>
           }
         />

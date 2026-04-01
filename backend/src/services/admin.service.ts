@@ -1,6 +1,20 @@
 import { prisma } from "../lib/prisma";
 import { User, Job, CompanyProfile } from "../types/domain";
 
+type AdminUserExportRow = {
+  Email: string;
+  Name: string;
+  Address: string;
+  "Phone no.": string;
+  "Resume link": string;
+};
+
+type AdminOrgExportRow = {
+  Name: string;
+  Email: string;
+  "Phone no.": string;
+};
+
 export class AdminService {
   private getRangeMonths(range: string): number {
     if (range === "3m") return 3;
@@ -136,6 +150,93 @@ export class AdminService {
   async listCompanies(): Promise<CompanyProfile[]> {
     const companies = await prisma.companyProfile.findMany();
     return companies as any;
+  }
+
+  async listNgos() {
+    return prisma.ngoProfile.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+  }
+
+  async exportJobSeekerUsersCsvData(): Promise<AdminUserExportRow[]> {
+    const users = await prisma.user.findMany({
+      where: {
+        role: "seeker",
+      },
+      select: {
+        email: true,
+        name: true,
+        seekerProfile: {
+          select: {
+            location: true,
+            phone: true,
+            resumeUrl: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return users.map((user) => ({
+      Email: user.email,
+      Name: user.name,
+      Address: user.seekerProfile?.location ?? "",
+      "Phone no.": user.seekerProfile?.phone ?? "",
+      "Resume link": user.seekerProfile?.resumeUrl ?? "",
+    }));
+  }
+
+  async exportCompaniesCsvData(): Promise<AdminOrgExportRow[]> {
+    const companies = await prisma.companyProfile.findMany({
+      select: {
+        name: true,
+        email: true,
+        phone: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return companies.map((company) => ({
+      Name: company.name,
+      Email: company.email,
+      "Phone no.": company.phone,
+    }));
+  }
+
+  async exportNgosCsvData(): Promise<AdminOrgExportRow[]> {
+    const ngos = await prisma.ngoProfile.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return ngos.map((ngo) => ({
+      Name: ngo.user?.name ?? "",
+      Email: ngo.email || ngo.user?.email || "",
+      "Phone no.": ngo.phone,
+    }));
   }
 
   async getCompany(companyId: string): Promise<CompanyProfile> {
