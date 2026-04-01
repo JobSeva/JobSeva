@@ -136,22 +136,20 @@ export const authService = {
       },
     });
 
+    const user = mapPrismaUser(dbUser);
+
     // Send verification email
-    /*
     try {
-      await mailService.sendVerificationEmail(dbUser.email, verificationToken);
+      await mailService.sendVerificationEmail(user.email, verificationToken, user.name);
     } catch (error) {
       console.error("Failed to send verification email on signup:", error);
-      // We don't throw here to allow signup to complete, but user won't be verified
+      // We still complete signup, but user will need to resend later if it failed
     }
-    */
-
-    const user = mapPrismaUser(dbUser);
-    const tokens = await generateTokens(user);
 
     return {
       user: stripSecretFields(user),
-      ...tokens,
+      accessToken: "",
+      refreshToken: "",
     };
   },
 
@@ -193,7 +191,7 @@ export const authService = {
       data: { verificationToken },
     });
 
-    await mailService.sendVerificationEmail(user.email, verificationToken);
+    await mailService.sendVerificationEmail(user.email, verificationToken, user.name);
   },
 
   async login(params: {
@@ -214,6 +212,10 @@ export const authService = {
 
     if (dbUser.status !== "active") {
       throw new AppError(403, "Account is suspended", "ACCOUNT_SUSPENDED");
+    }
+
+    if (!dbUser.isVerified) {
+      throw new AppError(401, "Please verify your email to login", "EMAIL_NOT_VERIFIED");
     }
 
     if (params.role && dbUser.role !== params.role) {

@@ -21,4 +21,7 @@ export const env = {
     process.env.JWT_REFRESH_SECRET ?? "dev_refresh_secret_change_me",
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL ?? "15m",
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL ?? "7d",
+  emailUser: process.env.EMAIL_USER,
+  emailPass: process.env.EMAIL_PASS,
+  frontendUrl: process.env.FRONTEND_URL ?? "http://localhost:8080",
 };

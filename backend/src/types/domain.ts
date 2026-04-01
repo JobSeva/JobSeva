@@ -95,15 +95,29 @@ export interface SeekerExperience {
   period: string;
 }
 
+export interface SeekerEducation {
+  id: string;
+  school: string;
+  degree: string;
+  field: string;
+  period: string;
+}
+
 export interface SeekerProfile {
   userId: string;
   headline: string;
+  bio: string;
   location: string;
   phone: string;
   avatarUrl?: string;
   skills: string[];
+  languages: string[];
   experiences: SeekerExperience[];
+  education: SeekerEducation[];
   resumeUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  portfolioUrl?: string;
   profileStrength: number;
   updatedAt: string;
 }

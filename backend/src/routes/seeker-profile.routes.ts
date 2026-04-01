@@ -9,9 +9,14 @@ import { validate } from "../middleware/validate";
 const updateProfileSchema = z
   .object({
     headline: z.string().max(120).optional(),
+    bio: z.string().max(1000).optional(),
     location: z.string().max(120).optional(),
     phone: z.string().max(30).optional(),
     skills: z.array(z.string().min(1).max(40)).max(40).optional(),
+    languages: z.array(z.string().min(1).max(40)).max(20).optional(),
+    linkedinUrl: z.string().url().or(z.literal("")).optional(),
+    githubUrl: z.string().url().or(z.literal("")).optional(),
+    portfolioUrl: z.string().url().or(z.literal("")).optional(),
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: "At least one field must be provided",
@@ -33,6 +38,17 @@ const experienceSchema = z.object({
 
 const experienceParamsSchema = z.object({
   experienceId: z.string().min(1),
+});
+
+const educationSchema = z.object({
+  school: z.string().min(2).max(120),
+  degree: z.string().min(2).max(120),
+  field: z.string().min(2).max(120),
+  period: z.string().min(2).max(60),
+});
+
+const educationParamsSchema = z.object({
+  educationId: z.string().min(1),
 });
 
 const seekerProfileRouter = Router();
@@ -73,6 +89,21 @@ seekerProfileRouter.delete(
   "/experience/:experienceId",
   validate({ params: experienceParamsSchema }),
   asyncHandler(seekerProfileController.deleteExperience),
+);
+seekerProfileRouter.post(
+  "/education",
+  validate({ body: educationSchema }),
+  asyncHandler(seekerProfileController.addEducation),
+);
+seekerProfileRouter.put(
+  "/education/:educationId",
+  validate({ params: educationParamsSchema, body: educationSchema }),
+  asyncHandler(seekerProfileController.updateEducation),
+);
+seekerProfileRouter.delete(
+  "/education/:educationId",
+  validate({ params: educationParamsSchema }),
+  asyncHandler(seekerProfileController.deleteEducation),
 );
 
 export { seekerProfileRouter };

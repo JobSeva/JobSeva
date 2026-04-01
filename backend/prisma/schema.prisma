@@ -12,7 +12,7 @@ model User {
   id                String          @id @default(uuid())
   name              String
   email             String          @unique
-  role              String          // "seeker", "company", "admin"
+  role              String
   passwordHash      String
   status            String          @default("active")
   isVerified        Boolean         @default(false)
@@ -20,50 +20,46 @@ model User {
   profileCompletion Int             @default(0)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-
-  settings          UserSettings?
-  seekerProfile     SeekerProfile?
-  companyProfile    CompanyProfile?
-  ngoProfile        NgoProfile?
   applications      Application[]
-  sentMessages      Message[]       @relation("SentMessages")
-  receivedMessages  Message[]       @relation("ReceivedMessages")
-  notifications     Notification[]
-  savedJobs         SavedJob[]
-  refreshTokens     RefreshToken[]
-  enrollments       Enrollment[]
+  companyProfile    CompanyProfile?
   courses           Course[]        @relation("NgoCourses")
+  enrollments       Enrollment[]
+  receivedMessages  Message[]       @relation("ReceivedMessages")
+  sentMessages      Message[]       @relation("SentMessages")
+  ngoProfile        NgoProfile?
+  notifications     Notification[]
+  refreshTokens     RefreshToken[]
+  savedJobs         SavedJob[]
+  seekerProfile     SeekerProfile?
+  settings          UserSettings?
 }
 
-// ... other models ...
-
 model Course {
-  id          String   @id @default(uuid())
-  title       String
-  description String
-  duration    String
-  mode        String
-  category    String
-  image       String   @default("")
-  location    String   @default("")
-  contactNumber String @default("")
-  rating      Float    @default(0)
-  status      String   @default("active")
-  ngoId       String
-  ngo         User     @relation("NgoCourses", fields: [ngoId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-
-  enrollments Enrollment[]
+  id            String       @id @default(uuid())
+  title         String
+  description   String
+  duration      String
+  mode          String
+  category      String
+  image         String       @default("")
+  location      String       @default("")
+  contactNumber String       @default("")
+  rating        Float        @default(0)
+  status        String       @default("active")
+  ngoId         String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  ngo           User         @relation("NgoCourses", fields: [ngoId], references: [id], onDelete: Cascade)
+  enrollments   Enrollment[]
 }
 
 model Enrollment {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String
+  courseId   String
   enrolledAt DateTime @default(now())
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
@@ -71,40 +67,54 @@ model Enrollment {
 model UserSettings {
   id                 String  @id @default(uuid())
   userId             String  @unique
-  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   emailNotifications Boolean @default(true)
   marketingEmails    Boolean @default(false)
   darkMode           Boolean @default(false)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SeekerProfile {
-  userId          String   @id
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  headline        String   @default("")
-  location        String   @default("")
-  phone           String   @default("")
+  userId          String             @id
+  headline        String             @default("")
+  bio             String             @default("")
+  location        String             @default("")
+  phone           String             @default("")
   avatarUrl       String?
-  skillsRaw       String   @default("[]") // JSON array of strings
+  skillsRaw       String             @default("[]")
+  languagesRaw    String             @default("[]")
   resumeUrl       String?
-  profileStrength Int      @default(0)
-  updatedAt       DateTime @updatedAt
-
+  linkedinUrl     String?
+  githubUrl       String?
+  portfolioUrl    String?
+  profileStrength Int                @default(0)
+  updatedAt       DateTime           @updatedAt
   experiences     SeekerExperience[]
+  education       SeekerEducation[]
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SeekerEducation {
+  id              String        @id @default(uuid())
+  seekerProfileId String
+  school          String
+  degree          String
+  field           String
+  period          String
+  seekerProfile   SeekerProfile @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
 }
 
 model SeekerExperience {
-  id              String         @id @default(uuid())
+  id              String        @id @default(uuid())
   seekerProfileId String
-  seekerProfile   SeekerProfile  @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
   title           String
   company         String
   period          String
+  seekerProfile   SeekerProfile @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
 }
 
 model CompanyProfile {
   companyId            String   @id @default(uuid())
   ownerUserId          String   @unique
-  ownerUser            User     @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   name                 String
   logo                 String   @default("")
   tagline              String   @default("")
@@ -125,13 +135,12 @@ model CompanyProfile {
   openPositions        Int      @default(0)
   onboardingCompleted  Boolean  @default(false)
   updatedAt            DateTime @updatedAt
-
+  ownerUser            User     @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   jobs                 Job[]
 }
 
 model NgoProfile {
   userId          String   @id
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   description     String   @default("")
   location        String   @default("")
   phone           String   @default("")
@@ -139,56 +148,53 @@ model NgoProfile {
   logoUrl         String?
   profileStrength Int      @default(0)
   updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Job {
-  id               String   @id @default(uuid())
-  title            String
-  companyId        String
-  company          CompanyProfile @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
-  location         String
-  salaryMin        Int
-  salaryMax        Int
-  type             String   // "full-time", "part-time", "contract"
-  remote           Boolean  @default(false)
-  skillsRaw        String   @default("[]") // JSON array of strings
-  description      String
-  responsibilitiesRaw String @default("[]") // JSON array of strings
-  applicantsCount  Int      @default(0)
-  postedAt         DateTime @default(now())
-  active           Boolean  @default(true)
-
-  applications     Application[]
-  savedBy          SavedJob[]
+  id                  String         @id @default(uuid())
+  title               String
+  companyId           String
+  location            String
+  salaryMin           Int
+  salaryMax           Int
+  type                String
+  remote              Boolean        @default(false)
+  skillsRaw           String         @default("[]")
+  description         String
+  responsibilitiesRaw String         @default("[]")
+  applicantsCount     Int            @default(0)
+  postedAt            DateTime       @default(now())
+  active              Boolean        @default(true)
+  applications        Application[]
+  company             CompanyProfile @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
+  savedBy             SavedJob[]
 }
 
 model Application {
   id              String   @id @default(uuid())
   seekerId        String
-  seeker          User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
   jobId           String
-  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
-  // Duplicated data for faster snapshot access, common in this kind of app:
   jobTitle        String
   company         String
   companyLogo     String
-  
-  status          String   @default("applied") // "applied", "shortlisted", "interview", "hired", "rejected"
+  status          String   @default("applied")
   appliedAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   matchScore      Int      @default(0)
   recruiterRating Float?
   recruiterNote   String?
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  seeker          User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
 }
 
 model SavedJob {
-  id        String   @id @default(uuid())
-  seekerId  String
-  seeker    User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
-  jobId     String
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  savedAt   DateTime @default(now())
+  id       String   @id @default(uuid())
+  seekerId String
+  jobId    String
+  savedAt  DateTime @default(now())
+  job      Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  seeker   User     @relation(fields: [seekerId], references: [id], onDelete: Cascade)
 
   @@unique([seekerId, jobId])
 }
@@ -196,30 +202,30 @@ model SavedJob {
 model Message {
   id            String   @id @default(uuid())
   senderId      String
-  sender        User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   receiverId    String
-  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   applicationId String?
   content       String
   isRead        Boolean  @default(false)
   createdAt     DateTime @default(now())
+  receiver      User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender        User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
   body      String
-  type      String   // "application", "message", "system"
+  type      String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
   token     String   @id
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
