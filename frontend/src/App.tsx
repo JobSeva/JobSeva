@@ -54,6 +54,8 @@ import NgoLogin from "@/pages/ngoLogin";
 import NgoSignup from "@/pages/ngoSignup";
 import VerifyEmail from "@/pages/VerifyEmail";
 import NgoProfile from "@/pages/NgoProfile";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 function ProfileGate() {
   const { role } = useAppContext();
@@ -241,6 +243,8 @@ const App = () => (
               <Route path="/login/:role" element={<RoleLogin />} />
               <Route path="/signup/:role" element={<RoleSignup />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Public routes */}
               <Route path="/jobs" element={<ExploreJobsGate />} />

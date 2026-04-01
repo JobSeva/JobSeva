@@ -15,6 +15,8 @@ interface AuthResult {
   refreshToken: string;
 }
 
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+
 const mapPrismaUser = (dbUser: any): User => {
   return {
     id: dbUser.id,
@@ -124,10 +126,10 @@ export const authService = {
         ...(params.role === "seeker" ? { seekerProfile: { create: {} } } : {}),
         ...(params.role === "company"
           ? {
-            companyProfile: {
-              create: { name: params.companyName || params.name },
-            },
-          }
+              companyProfile: {
+                create: { name: params.companyName || params.name },
+              },
+            }
           : {}),
         ...(params.role === "ngo" ? { ngoProfile: { create: {} } } : {}),
       },
@@ -140,7 +142,11 @@ export const authService = {
 
     // Send verification email
     try {
-      await mailService.sendVerificationEmail(user.email, verificationToken, user.name);
+      await mailService.sendVerificationEmail(
+        user.email,
+        verificationToken,
+        user.name,
+      );
     } catch (error) {
       console.error("Failed to send verification email on signup:", error);
       // We still complete signup, but user will need to resend later if it failed
@@ -159,7 +165,11 @@ export const authService = {
     });
 
     if (!user) {
-      throw new AppError(400, "Invalid or expired verification token", "INVALID_TOKEN");
+      throw new AppError(
+        400,
+        "Invalid or expired verification token",
+        "INVALID_TOKEN",
+      );
     }
 
     await prisma.user.update({
@@ -191,7 +201,94 @@ export const authService = {
       data: { verificationToken },
     });
 
-    await mailService.sendVerificationEmail(user.email, verificationToken, user.name);
+    await mailService.sendVerificationEmail(
+      user.email,
+      verificationToken,
+      user.name,
+    );
+  },
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const normalizedEmail = email.toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    // Keep response generic to avoid account enumeration.
+    if (!user || user.role === "admin") {
+      return;
+    }
+
+    const passwordResetToken = crypto.randomBytes(32).toString("hex");
+    const passwordResetExpiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken,
+        passwordResetExpiresAt,
+      },
+    });
+
+    await mailService.sendPasswordResetEmail(
+      user.email,
+      passwordResetToken,
+      user.name,
+    );
+  },
+
+  async validatePasswordResetToken(token: string): Promise<void> {
+    const user = await prisma.user.findFirst({
+      where: { passwordResetToken: token },
+    });
+
+    if (
+      !user ||
+      user.role === "admin" ||
+      !user.passwordResetExpiresAt ||
+      user.passwordResetExpiresAt < new Date()
+    ) {
+      throw new AppError(
+        400,
+        "Invalid or expired reset token",
+        "INVALID_TOKEN",
+      );
+    }
+  },
+
+  async resetPassword(token: string, nextPassword: string): Promise<void> {
+    const user = await prisma.user.findFirst({
+      where: { passwordResetToken: token },
+    });
+
+    if (
+      !user ||
+      user.role === "admin" ||
+      !user.passwordResetExpiresAt ||
+      user.passwordResetExpiresAt < new Date()
+    ) {
+      throw new AppError(
+        400,
+        "Invalid or expired reset token",
+        "INVALID_TOKEN",
+      );
+    }
+
+    const nextHash = await bcrypt.hash(nextPassword, 10);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash: nextHash,
+          passwordResetToken: null,
+          passwordResetExpiresAt: null,
+        },
+      }),
+      prisma.refreshToken.deleteMany({
+        where: { userId: user.id },
+      }),
+    ]);
   },
 
   async login(params: {
@@ -215,7 +312,11 @@ export const authService = {
     }
 
     if (!dbUser.isVerified) {
-      throw new AppError(401, "Please verify your email to login", "EMAIL_NOT_VERIFIED");
+      throw new AppError(
+        401,
+        "Please verify your email to login",
+        "EMAIL_NOT_VERIFIED",
+      );
     }
 
     if (params.role && dbUser.role !== params.role) {
@@ -280,7 +381,7 @@ export const authService = {
     } catch {
       await prisma.refreshToken
         .delete({ where: { token: refreshToken } })
-        .catch(() => { });
+        .catch(() => {});
       throw new AppError(401, "Invalid refresh token", "INVALID_REFRESH_TOKEN");
     }
   },

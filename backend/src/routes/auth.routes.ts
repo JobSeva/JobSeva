@@ -37,6 +37,15 @@ const resendVerificationSchema = z.object({
   email: emailSchema,
 });
 
+const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
+  nextPassword: passwordSchema,
+});
+
 const updatePasswordSchema = z.object({
   currentPassword: passwordSchema,
   nextPassword: passwordSchema,
@@ -85,14 +94,20 @@ authRouter.get(
     const token = req.query.token as string;
     if (!token) {
       // Redirect to frontend error page
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=missing_token`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=missing_token`,
+      );
     }
     try {
       const { authService } = await import("../services/auth.service");
       await authService.verifyEmail(token);
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?success=true`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?success=true`,
+      );
     } catch (err: any) {
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=invalid_token`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=invalid_token`,
+      );
     }
   }),
 );
@@ -102,6 +117,41 @@ authRouter.post(
   validate({ body: resendVerificationSchema }),
   asyncHandler(authController.resendVerification),
 );
+
+authRouter.post(
+  "/forgot-password",
+  validate({ body: forgotPasswordSchema }),
+  asyncHandler(authController.forgotPassword),
+);
+
+authRouter.get(
+  "/reset-password",
+  asyncHandler(async (req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:8080";
+    const token = req.query.token as string;
+
+    if (!token) {
+      return res.redirect(`${frontendUrl}/reset-password?error=missing_token`);
+    }
+
+    try {
+      const { authService } = await import("../services/auth.service");
+      await authService.validatePasswordResetToken(token);
+      return res.redirect(`${frontendUrl}/reset-password?token=${token}`);
+    } catch {
+      return res.redirect(
+        `${frontendUrl}/reset-password?error=invalid_or_expired`,
+      );
+    }
+  }),
+);
+
+authRouter.post(
+  "/reset-password",
+  validate({ body: resetPasswordSchema }),
+  asyncHandler(authController.resetPassword),
+);
+
 authRouter.post(
   "/refresh",
   validate({ body: refreshSchema }),
