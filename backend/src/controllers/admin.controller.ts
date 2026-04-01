@@ -37,6 +37,30 @@ export class AdminController {
     res.json(success(lists));
   }
 
+  // GET /api/admin/ngos
+  async listNgos(req: Request, res: Response) {
+    const list = await adminService.listNgos();
+    res.json(success(list));
+  }
+
+  // GET /api/admin/export/users
+  async exportUsersCsvData(req: Request, res: Response) {
+    const data = await adminService.exportJobSeekerUsersCsvData();
+    res.json(success(data));
+  }
+
+  // GET /api/admin/export/companies
+  async exportCompaniesCsvData(req: Request, res: Response) {
+    const data = await adminService.exportCompaniesCsvData();
+    res.json(success(data));
+  }
+
+  // GET /api/admin/export/ngos
+  async exportNgosCsvData(req: Request, res: Response) {
+    const data = await adminService.exportNgosCsvData();
+    res.json(success(data));
+  }
+
   // DELETE /api/admin/companies/:companyId
   async deleteCompany(req: Request<{ companyId: string }>, res: Response) {
     try {

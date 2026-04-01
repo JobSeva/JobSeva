@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Ban, CheckCircle2, Loader2, UserX } from "lucide-react";
+import {
+  Search,
+  Ban,
+  CheckCircle2,
+  Loader2,
+  UserX,
+  Download,
+} from "lucide-react";
 import api from "@/lib/api";
+import { buildCsv, downloadCsv } from "@/lib/csv";
 
 interface UserData {
   id: string;
@@ -17,6 +25,7 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -64,6 +73,26 @@ export default function AdminUsers() {
       u.role.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const exportJobSeekers = async () => {
+    setIsExporting(true);
+    try {
+      const res = await api.get("/admin/export/users");
+      const rows = res.data?.success ? (res.data.data ?? []) : [];
+      const csv = buildCsv(rows, [
+        "Email",
+        "Name",
+        "Address",
+        "Phone no.",
+        "Resume link",
+      ]);
+      downloadCsv(csv, "jobseekers.csv");
+    } catch (err) {
+      console.error("Failed to export jobseekers CSV", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -78,15 +107,29 @@ export default function AdminUsers() {
         </p>
       </motion.div>
 
-      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border max-w-md">
-        <Search className="w-4 h-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search users by name, email, or role..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
-        />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border max-w-md w-full">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search users by name, email, or role..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+          />
+        </div>
+        <button
+          onClick={exportJobSeekers}
+          disabled={isExporting}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-sm font-medium hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isExporting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          Export Data
+        </button>
       </div>
 
       {isLoading ? (
