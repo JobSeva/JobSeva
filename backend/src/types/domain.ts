@@ -64,6 +64,11 @@ export interface Job {
   applicants: number;
   postedAt: string;
   active: boolean;
+  education?: string;
+  experience?: string;
+  workMode?: string;
+  openings: number;
+  deadline?: string;
 }
 
 export type ApplicationStatus =
@@ -86,13 +91,17 @@ export interface Application {
   matchScore: number;
   recruiterRating?: number;
   recruiterNote?: string;
+  resumeUrl?: string;
 }
 
 export interface SeekerExperience {
   id: string;
   title: string;
   company: string;
-  period: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  period?: string;
 }
 
 export interface SeekerEducation {
@@ -100,7 +109,10 @@ export interface SeekerEducation {
   school: string;
   degree: string;
   field: string;
-  period: string;
+  startYear: number;
+  endYear: number;
+  grade?: string;
+  period?: string;
 }
 
 export interface SeekerProfile {
@@ -115,6 +127,7 @@ export interface SeekerProfile {
   experiences: SeekerExperience[];
   education: SeekerEducation[];
   resumeUrl?: string;
+  resumeFileName?: string;
   linkedinUrl?: string;
   githubUrl?: string;
   portfolioUrl?: string;
@@ -176,10 +189,17 @@ export interface Notification {
 export interface NgoProfile {
   userId: string;
   description: string;
+  tagline: string;
   location: string;
   phone: string;
+  email: string;
   website: string;
   logoUrl?: string;
+  foundingYear: number;
+  size: string;
+  linkedin?: string;
+  twitter?: string;
+  instagram?: string;
   profileStrength: number;
   updatedAt: string;
 }

@@ -12,15 +12,20 @@ const listQuerySchema = z.object({
 });
 
 const jobPayloadSchema = z.object({
-  title: z.string().min(2).max(160),
-  location: z.string().min(2).max(120),
-  salaryMin: z.number().int().min(0).max(100000000),
-  salaryMax: z.number().int().min(0).max(100000000),
+  title: z.string().min(1).max(200),
+  location: z.string().min(1).max(200),
+  salaryMin: z.coerce.number().int().min(0).max(1000000000),
+  salaryMax: z.coerce.number().int().min(0).max(1000000000),
   type: z.enum(["full-time", "part-time", "contract"]),
-  remote: z.boolean(),
-  skills: z.array(z.string().min(1).max(40)).min(1).max(40),
-  description: z.string().min(10).max(10000),
-  responsibilities: z.array(z.string().min(2).max(300)).min(1).max(50),
+  remote: z.boolean().default(false),
+  skills: z.array(z.string()).optional().default([]),
+  description: z.string().min(1).max(20000),
+  responsibilities: z.array(z.string()).optional().default([]),
+  education: z.string().max(500).optional().or(z.literal("")),
+  experience: z.string().max(500).optional().or(z.literal("")),
+  workMode: z.enum(["remote", "hybrid", "onsite"]).optional().default("onsite"),
+  openings: z.coerce.number().int().min(1).max(100000).optional().default(1),
+  deadline: z.string().optional().or(z.literal("")).optional(),
 });
 
 const updateJobPayloadSchema = z
@@ -34,6 +39,11 @@ const updateJobPayloadSchema = z
     skills: jobPayloadSchema.shape.skills.optional(),
     description: jobPayloadSchema.shape.description.optional(),
     responsibilities: jobPayloadSchema.shape.responsibilities.optional(),
+    education: jobPayloadSchema.shape.education.optional(),
+    experience: jobPayloadSchema.shape.experience.optional(),
+    workMode: jobPayloadSchema.shape.workMode.optional(),
+    openings: jobPayloadSchema.shape.openings.optional(),
+    deadline: jobPayloadSchema.shape.deadline.optional(),
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: "At least one field must be provided",

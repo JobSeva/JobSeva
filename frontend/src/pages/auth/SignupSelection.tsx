@@ -74,7 +74,7 @@ export default function SignupSelection() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl"
+                className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl px-4"
             >
                 {roles.map((role) => (
                     <motion.div key={role.key} variants={cardVariants}>

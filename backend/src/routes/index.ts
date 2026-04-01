@@ -14,6 +14,7 @@ import { messagesRouter } from "./messages.routes";
 import { notificationsRouter } from "./notifications.routes";
 import { coursesRouter } from "./courses.routes";
 import { enrollmentsRouter } from "./enrollments.routes";
+import { userRouter } from "./user.routes";
 
 const apiRouter = Router();
 
@@ -34,5 +35,6 @@ apiRouter.use("/messages", messagesRouter);
 apiRouter.use("/notifications", notificationsRouter);
 apiRouter.use("/courses", coursesRouter);
 apiRouter.use("/enrollments", enrollmentsRouter);
+apiRouter.use("/user", userRouter);
 
 export { apiRouter };

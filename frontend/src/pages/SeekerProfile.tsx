@@ -21,12 +21,25 @@ import { useEffect, useState, useCallback } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { getSeekerProfile } from "@/services/api";
 import EditProfileModal from "@/components/EditProfileModal";
+import { uploadResume, deleteSeekerResume } from "@/services/api";
+import { toast } from "sonner";
+import { 
+  Trash2, 
+  Upload, 
+  CheckCircle2, 
+  AlertCircle,
+  Loader2,
+  FileText as FileIcon
+} from "lucide-react";
 
 export default function SeekerProfile() {
   const { user } = useAppContext();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -42,6 +55,77 @@ export default function SeekerProfile() {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const handleFileUpload = async (file: File) => {
+    // Validate file type
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file type", {
+        description: "Please upload a PDF, DOC, or DOCX file.",
+      });
+      return;
+    }
+
+    // Validate size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large", {
+        description: "Maximum file size is 5MB.",
+      });
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      await uploadResume(file, (progress) => {
+        setUploadProgress(progress);
+      });
+      toast.success("Resume uploaded!", {
+        description: "Your professional profile is now even stronger.",
+      });
+      fetchProfile();
+    } catch (err: any) {
+      toast.error("Upload failed", {
+        description: err.response?.data?.error?.message || "Failed to upload resume. Please try again.",
+      });
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDeleteResume = async () => {
+    if (!confirm("Are you sure you want to delete your resume?")) return;
+
+    try {
+      await deleteSeekerResume();
+      toast.success("Resume deleted");
+      fetchProfile();
+    } catch (err) {
+      toast.error("Failed to delete resume");
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  };
 
   if (loading) {
     return (
@@ -359,31 +443,96 @@ export default function SeekerProfile() {
               Professional Resume
             </h3>
           </div>
-          <div className="border-2 border-dashed border-border rounded-3xl p-8 sm:p-12 text-center bg-muted/10 hover:border-primary/50 hover:bg-primary/[0.02] transition-all group">
-            <div className="w-16 h-16 rounded-2xl bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <FileText className="w-8 h-8" />
+          <div 
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            className={`
+              relative border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all duration-300 group
+              ${isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-border bg-muted/10 hover:border-primary/50 hover:bg-primary/[0.02]"}
+              ${uploading ? "pointer-events-none opacity-80" : ""}
+            `}
+          >
+            <div className={`
+              w-16 h-16 rounded-2xl border shadow-sm flex items-center justify-center mx-auto mb-5 transition-all duration-500
+              ${profile?.resumeUrl ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-card border-border text-muted-foreground group-hover:scale-110 group-hover:text-primary"}
+            `}>
+              {uploading ? <Loader2 className="w-8 h-8 animate-spin text-primary" /> : profile?.resumeUrl ? <CheckCircle2 className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
             </div>
-            {profile?.resumeUrl ? (
-              <div className="space-y-4">
-                <p className="text-sm font-bold text-foreground">Resume uploaded successfully</p>
+
+            {uploading ? (
+              <div className="max-w-xs mx-auto space-y-4">
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-primary">
+                  <span>Uploading...</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden border border-border/50">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${uploadProgress}%` }}
+                    className="h-full bg-primary"
+                  />
+                </div>
+              </div>
+            ) : profile?.resumeUrl ? (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-base font-bold text-foreground mb-1">Resume uploaded successfully</h4>
+                  <p className="text-xs text-muted-foreground font-medium">Your resume is visible to recruiters looking for your skills.</p>
+                </div>
                 <div className="flex flex-wrap items-center justify-center gap-3">
-                  <a href={profile.resumeUrl} target="_blank" rel="noreferrer" className="btn-primary py-2 px-6 text-xs font-bold">View Resume</a>
-                  <button className="px-6 py-2 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors">Replace File</button>
+                  <a 
+                    href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${profile.resumeUrl}`} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="btn-primary py-2.5 px-8 text-xs font-bold flex items-center gap-2"
+                  >
+                    <FileIcon className="w-4 h-4" /> View Resume
+                  </a>
+                  <button 
+                    onClick={() => document.getElementById("resume-upload-input")?.click()}
+                    className="px-6 py-2.5 rounded-xl border border-border text-xs font-bold bg-card hover:bg-muted transition-colors flex items-center gap-2"
+                  >
+                    <Edit3 className="w-4 h-4" /> Replace
+                  </button>
+                  <button 
+                    onClick={handleDeleteResume}
+                    className="w-10 h-10 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive hover:text-white transition-all flex items-center justify-center p-0"
+                    title="Delete Resume"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ) : (
               <>
-                <p className="text-sm font-bold text-foreground mb-1">
+                <p className="text-sm font-bold text-foreground mb-2">
                   Drop your resume here or click to upload
                 </p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-                  PDF, DOCX up to 5MB
-                </p>
-                <button className="btn-primary mt-8 px-10 py-3 rounded-2xl shadow-lg shadow-primary/20 transform active:scale-95 transition-all">
-                  Upload Resume
+                <div className="flex items-center justify-center gap-4 text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                  <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> PDF</span>
+                  <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> DOCX</span>
+                  <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> MAX 5MB</span>
+                </div>
+                <button 
+                  onClick={() => document.getElementById("resume-upload-input")?.click()}
+                  className="btn-primary mt-8 px-10 py-3 rounded-2xl shadow-lg shadow-primary/20 transform active:scale-95 transition-all flex items-center gap-2 mx-auto"
+                >
+                  <Upload className="w-4 h-4" /> Upload Resume
                 </button>
               </>
             )}
+
+            <input 
+              id="resume-upload-input"
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+              }}
+            />
           </div>
         </motion.div>
       </div>

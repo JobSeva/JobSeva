@@ -202,6 +202,8 @@ export const companyProfileService = {
     hireRate: number;
     chartData: { name: string; applications: number }[];
     hiringData: { month: string; hired: number }[];
+    recentJobs: any[];
+    recentCandidates: any[];
   }> {
     const profile = await getOrCreateProfile(ownerUserId);
 
@@ -272,6 +274,40 @@ export const companyProfileService = {
       });
     }
 
+    // Get recent jobs
+    const recentJobs = await prisma.job.findMany({
+      where: { companyId: profile.companyId },
+      include: { company: true },
+      orderBy: { postedAt: "desc" },
+      take: 3,
+    });
+
+    // Get recent candidates across ALL jobs of this company
+    const recentCandidatesRaw = await prisma.application.findMany({
+      where: {
+        job: { companyId: profile.companyId },
+      },
+      include: {
+        seeker: {
+          include: { seekerProfile: true },
+        },
+      },
+      orderBy: { appliedAt: "desc" },
+      take: 5,
+    });
+
+    const recentCandidates = recentCandidatesRaw.map((app) => ({
+      applicationId: app.id,
+      name: app.seeker.name,
+      email: app.seeker.email,
+      headline: app.seeker.seekerProfile?.headline || "",
+      skills: JSON.parse(app.seeker.seekerProfile?.skillsRaw || "[]"),
+      status: app.status,
+      matchScore: app.matchScore,
+      appliedAt: app.appliedAt.toISOString(),
+      jobId: app.jobId,
+    }));
+
     return {
       activeJobs,
       totalApplicants,
@@ -281,6 +317,16 @@ export const companyProfileService = {
       hireRate,
       chartData,
       hiringData,
+      recentJobs: recentJobs.map((j: any) => ({
+        id: j.id,
+        title: j.title,
+        location: j.location,
+        type: j.type,
+        applicants: j.applicantsCount,
+        postedAt: j.postedAt.toISOString(),
+        active: j.active,
+      })),
+      recentCandidates,
     };
   },
 };

@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import path from "path";
 
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error-handler";
@@ -40,6 +41,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
 
 app.use("/api", apiRouter);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(notFound);
 app.use(errorHandler);

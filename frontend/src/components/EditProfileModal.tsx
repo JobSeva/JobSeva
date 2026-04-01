@@ -25,6 +25,10 @@ import {
     updateSeekerEducation,
     deleteSeekerEducation
 } from "@/services/api";
+import ExperienceFormModal from "./profile/ExperienceFormModal";
+import EducationFormModal from "./profile/EducationFormModal";
+import ConfirmModal from "./profile/ConfirmModal";
+import { toast } from "sonner";
 
 interface EditProfileModalProps {
     isOpen: boolean;
@@ -39,6 +43,13 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
     const [activeTab, setActiveTab] = useState<Tab>("basic");
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<any>({});
+    
+    // Sub-modal states
+    const [isExpModalOpen, setIsExpModalOpen] = useState(false);
+    const [isEduModalOpen, setIsEduModalOpen] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<{ title: string; message: string; onConfirm: () => void } | null>(null);
+    const [editingItem, setEditingItem] = useState<any>(null);
 
     // Initialize form data when profile changes or modal opens
     useEffect(() => {
@@ -70,65 +81,84 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
         }
     };
 
-    const handleAddExperience = async () => {
-        const title = prompt("Job Title");
-        const company = prompt("Company");
-        const period = prompt("Period (e.g. 2020 - Present)");
-        if (!title || !company || !period) return;
-
+    const handleAddExperience = async (data: any) => {
         setIsLoading(true);
         try {
-            await addSeekerExperience({ title, company, period });
+            if (editingItem) {
+                await updateSeekerExperience(editingItem.id, data);
+                toast.success("Experience updated!");
+            } else {
+                await addSeekerExperience(data);
+                toast.success("Experience added!");
+            }
             onUpdate();
         } catch (error) {
+            toast.error("Failed to save experience");
             console.error(error);
         } finally {
             setIsLoading(false);
+            setEditingItem(null);
         }
     };
 
-    const handleDeleteExperience = async (id: string) => {
-        if (!confirm("Are you sure?")) return;
+    const handleDeleteExperience = (id: string) => {
+        setConfirmAction({
+            title: "Delete Experience",
+            message: "Are you sure you want to remove this work experience? This action cannot be undone.",
+            onConfirm: async () => {
+                setIsLoading(true);
+                try {
+                    await deleteSeekerExperience(id);
+                    toast.success("Experience removed");
+                    onUpdate();
+                } catch (error) {
+                    toast.error("Failed to delete experience");
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        });
+        setIsConfirmOpen(true);
+    };
+
+    const handleAddEducation = async (data: any) => {
         setIsLoading(true);
         try {
-            await deleteSeekerExperience(id);
+            if (editingItem) {
+                await updateSeekerEducation(editingItem.id, data);
+                toast.success("Education updated!");
+            } else {
+                await addSeekerEducation(data);
+                toast.success("Education added!");
+            }
             onUpdate();
         } catch (error) {
+            toast.error("Failed to save education");
             console.error(error);
         } finally {
             setIsLoading(false);
+            setEditingItem(null);
         }
     };
 
-    const handleAddEducation = async () => {
-        const school = prompt("School/University");
-        const degree = prompt("Degree");
-        const field = prompt("Field of Study");
-        const period = prompt("Period");
-        if (!school || !degree || !field || !period) return;
-
-        setIsLoading(true);
-        try {
-            await addSeekerEducation({ school, degree, field, period });
-            onUpdate();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleDeleteEducation = async (id: string) => {
-        if (!confirm("Are you sure?")) return;
-        setIsLoading(true);
-        try {
-            await deleteSeekerEducation(id);
-            onUpdate();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
+    const handleDeleteEducation = (id: string) => {
+        setConfirmAction({
+            title: "Delete Education",
+            message: "Are you sure you want to remove this education entry? This action cannot be undone.",
+            onConfirm: async () => {
+                setIsLoading(true);
+                try {
+                    await deleteSeekerEducation(id);
+                    toast.success("Education removed");
+                    onUpdate();
+                } catch (error) {
+                    toast.error("Failed to delete education");
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        });
+        setIsConfirmOpen(true);
     };
 
     if (!isOpen) return null;
@@ -280,7 +310,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-bold">Work History</h3>
                                     <button
-                                        onClick={handleAddExperience}
+                                        onClick={() => {
+                                            setEditingItem(null);
+                                            setIsExpModalOpen(true);
+                                        }}
                                         className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
                                     >
                                         <Plus className="w-3.5 h-3.5" /> Add New
@@ -294,12 +327,23 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                                 <h4 className="text-sm font-bold">{exp.title}</h4>
                                                 <p className="text-xs text-muted-foreground font-medium">{exp.company} • {exp.period}</p>
                                             </div>
-                                            <button
-                                                onClick={() => handleDeleteExperience(exp.id)}
-                                                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all opacity-0 group-hover:opacity-100"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingItem(exp);
+                                                        setIsExpModalOpen(true);
+                                                    }}
+                                                    className="p-2 rounded-lg text-primary hover:bg-primary/5 transition-all"
+                                                >
+                                                    <Plus className="w-4 h-4 rotate-45 scale-75" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteExperience(exp.id)}
+                                                    className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                     {(!profile.experiences || profile.experiences.length === 0) && (
@@ -322,7 +366,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-bold">Education History</h3>
                                     <button
-                                        onClick={handleAddEducation}
+                                        onClick={() => {
+                                            setEditingItem(null);
+                                            setIsEduModalOpen(true);
+                                        }}
                                         className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
                                     >
                                         <Plus className="w-3.5 h-3.5" /> Add New
@@ -336,12 +383,23 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                                 <h4 className="text-sm font-bold">{edu.degree} in {edu.field}</h4>
                                                 <p className="text-xs text-muted-foreground font-medium">{edu.school} • {edu.period}</p>
                                             </div>
-                                            <button
-                                                onClick={() => handleDeleteEducation(edu.id)}
-                                                className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all opacity-0 group-hover:opacity-100"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingItem(edu);
+                                                        setIsEduModalOpen(true);
+                                                    }}
+                                                    className="p-2 rounded-lg text-primary hover:bg-primary/5 transition-all"
+                                                >
+                                                    <Plus className="w-4 h-4 rotate-45 scale-75" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteEducation(edu.id)}
+                                                    className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                     {(!profile.education || profile.education.length === 0) && (
@@ -433,6 +491,35 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                         Done
                     </button>
                 </div>
+
+                {/* Submodals */}
+                <ExperienceFormModal 
+                    isOpen={isExpModalOpen}
+                    onClose={() => {
+                        setIsExpModalOpen(false);
+                        setEditingItem(null);
+                    }}
+                    onSave={handleAddExperience}
+                    initialData={editingItem}
+                />
+
+                <EducationFormModal 
+                    isOpen={isEduModalOpen}
+                    onClose={() => {
+                        setIsEduModalOpen(false);
+                        setEditingItem(null);
+                    }}
+                    onSave={handleAddEducation}
+                    initialData={editingItem}
+                />
+
+                <ConfirmModal 
+                    isOpen={isConfirmOpen}
+                    onClose={() => setIsConfirmOpen(false)}
+                    onConfirm={confirmAction?.onConfirm || (() => {})}
+                    title={confirmAction?.title || "Confirm Action"}
+                    message={confirmAction?.message || "Are you sure?"}
+                />
             </motion.div>
         </div>
     );

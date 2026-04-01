@@ -15,6 +15,7 @@ export const mapPrismaAppToApp = (prismaApp: any): Application => ({
   matchScore: prismaApp.matchScore,
   recruiterRating: prismaApp.recruiterRating || undefined,
   recruiterNote: prismaApp.recruiterNote || undefined,
+  resumeUrl: prismaApp.resumeUrl || undefined,
 });
 
 export const applicationsService = {
@@ -64,6 +65,7 @@ export const applicationsService = {
           companyLogo: job.company.logo,
           matchScore,
           status: "applied",
+          resumeUrl: job.company.companyId ? (await prisma.seekerProfile.findUnique({ where: { userId: seekerId } }))?.resumeUrl : null,
         },
       }),
       prisma.job.update({

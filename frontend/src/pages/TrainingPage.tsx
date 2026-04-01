@@ -125,72 +125,97 @@ export default function TrainingPage() {
             </section>
 
             {/* Advanced Search & Filter Bar */}
-            <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-20">
-                <div className="bg-card/80 backdrop-blur-2xl border border-border/50 rounded-3xl p-4 shadow-2xl flex flex-col lg:flex-row items-center gap-4">
+            <div className="max-w-5xl mx-auto px-4 -mt-10 relative z-20">
+                <div className="bg-card/90 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-full p-2.5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] flex flex-col md:flex-row items-center gap-2">
                     <div className="relative flex-1 w-full group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center transition-colors group-focus-within:text-primary text-muted-foreground">
+                            <Search className="w-5 h-5" />
+                        </div>
                         <input
                             type="text"
-                            placeholder="Find a course or NGO..."
+                            placeholder="Search courses, skills or partners..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 rounded-2xl bg-muted/30 border border-border/50 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-foreground"
+                            className="w-full pl-14 pr-6 py-4 rounded-full bg-muted/20 border-none outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
                         />
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="bg-muted/30 border border-border/50 rounded-2xl px-4 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-muted/50 transition-all text-foreground"
-                        >
-                            <option value="All">All Categories</option>
-                            {categories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                        </select>
+                    <div className="flex items-center gap-2 w-full md:w-auto pr-2">
+                        <div className="relative h-full flex-1 md:flex-none min-w-[140px]">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                className="w-full bg-muted/20 border-none rounded-full pl-5 pr-10 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-muted/40 transition-all appearance-none text-foreground"
+                            >
+                                <option value="All">All Categories</option>
+                                {categories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        </div>
 
-                        <select
-                            value={selectedMode}
-                            onChange={(e) => setSelectedMode(e.target.value)}
-                            className="bg-muted/30 border border-border/50 rounded-2xl px-4 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-muted/50 transition-all text-foreground"
-                        >
-                            <option value="All">All Modes</option>
-                            <option value="Online">Online</option>
-                            <option value="Offline">Offline</option>
-                        </select>
+                        <div className="relative h-full flex-1 md:flex-none min-w-[120px]">
+                            <select
+                                value={selectedMode}
+                                onChange={(e) => setSelectedMode(e.target.value)}
+                                className="w-full bg-muted/20 border-none rounded-full pl-5 pr-10 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-muted/40 transition-all appearance-none text-foreground"
+                            >
+                                <option value="All">All Modes</option>
+                                <option value="Online">Online</option>
+                                <option value="Offline">Offline</option>
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        </div>
 
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="bg-muted/30 border border-border/50 rounded-2xl px-4 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-muted/50 transition-all text-foreground"
-                        >
-                            <option value="Latest">Latest First</option>
-                            <option value="Popular">Most Popular</option>
-                        </select>
+                        <div className="relative h-full flex-1 md:flex-none min-w-[130px]">
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="w-full bg-primary text-white border-none rounded-full pl-5 pr-10 py-4 text-sm font-bold outline-none cursor-pointer hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 appearance-none"
+                            >
+                                <option value="Latest">Latest First</option>
+                                <option value="Popular">Most Popular</option>
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70 pointer-events-none" />
+                        </div>
                     </div>
                 </div>
 
                 {/* Category Chips */}
-                <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar py-6">
-                    <button
+                <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar py-8 no-scrollbar scroll-smooth">
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedCategory("All")}
-                        className={`px-6 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${selectedCategory === "All" ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" : "bg-card text-muted-foreground border-border hover:bg-muted"}`}
+                        className={`px-7 py-3 rounded-full text-[11px] font-extrabold uppercase tracking-widest whitespace-nowrap transition-all border ${selectedCategory === "All" ? "bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-lg shadow-primary/25" : "bg-card text-muted-foreground border-border/60 hover:bg-muted hover:text-foreground"}`}
                     >
                         🚀 All Access
-                    </button>
-                    {categories.map(cat => (
-                        <button
+                    </motion.button>
+                    {categories.map((cat, idx) => (
+                        <motion.button
                             key={cat.name}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + (idx * 0.05) }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setSelectedCategory(cat.name)}
-                            className={`px-6 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${selectedCategory === cat.name ? "bg-secondary text-white border-secondary shadow-lg shadow-secondary/20" : "bg-card text-muted-foreground border-border hover:bg-muted"}`}
+                            className={`px-7 py-3 rounded-full text-[11px] font-extrabold uppercase tracking-widest whitespace-nowrap transition-all border ${selectedCategory === cat.name ? "bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-lg shadow-primary/25" : "bg-card text-muted-foreground border-border/60 hover:bg-muted hover:text-foreground"}`}
                         >
-                            {cat.icon} {cat.name}
-                        </button>
+                            <span className="mr-2 text-sm leading-none inline-block align-middle">{cat.icon}</span>
+                            {cat.name}
+                        </motion.button>
                     ))}
                 </div>
             </div>
 
             {/* Courses Matrix */}
-            <section className="max-w-7xl mx-auto px-4 mt-8">
+            <section className="max-w-7xl mx-auto px-4 mt-12 mb-20">
+                <div className="flex items-center justify-between mb-8 px-2">
+                    <div>
+                        <h2 className="text-2xl font-heading font-extrabold text-foreground tracking-tight">Available Programs</h2>
+                        <p className="text-sm text-muted-foreground mt-1">Explore and enroll in high-impact certified courses</p>
+                    </div>
+                </div>
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {[1, 2, 3, 4, 1, 2, 3, 4].map(i => (
@@ -217,7 +242,7 @@ export default function TrainingPage() {
                                     initial="hidden"
                                     animate="visible"
                                     custom={i}
-                                    className="group relative flex flex-col h-full bg-card border border-border/50 rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2"
+                                    className="group relative flex flex-col h-full bg-card/60 backdrop-blur-sm border border-border/40 rounded-[2.25rem] overflow-hidden hover:shadow-[0_40px_80px_-16px_rgba(var(--primary-rgb),0.15)] transition-all duration-500 hover:-translate-y-2.5"
                                 >
                                     {/* Card Visual Header */}
                                     <div className="relative h-56 overflow-hidden">
@@ -281,19 +306,19 @@ export default function TrainingPage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-2 mt-6">
+                                        <div className="flex gap-2.5 mt-6">
                                             <Link
                                                 to={isAppView ? `/app/course/${course.id}` : `/login`}
-                                                className="flex-1 py-3 rounded-xl bg-muted font-bold text-foreground text-xs flex items-center justify-center gap-2 border border-border/50 hover:bg-muted/80 transition-all"
+                                                className="flex-1 py-3.5 rounded-xl bg-muted/60 font-bold text-foreground text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 border border-border/40 hover:bg-muted/80 transition-all"
                                             >
                                                 Details <ArrowRight className="w-3 h-3" />
                                             </Link>
                                             <button
                                                 onClick={() => handleEnroll(course.id)}
                                                 disabled={enrollingId === course.id}
-                                                className="flex-[1.5] py-3 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-50"
+                                                className="flex-[1.5] py-3.5 rounded-xl bg-primary text-white font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_12px_24px_-8px_rgba(var(--primary-rgb),0.4)] hover:shadow-[0_16px_32px_-8px_rgba(var(--primary-rgb),0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                                             >
-                                                {enrollingId === course.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Enroll Now"}
+                                                {enrollingId === course.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Enroll Now"}
                                             </button>
                                         </div>
                                     </div>

@@ -78,6 +78,25 @@ authRouter.post(
   asyncHandler(authController.verifyEmail),
 );
 
+// GET for when user clicks the verification link directly in email
+authRouter.get(
+  "/verify-email",
+  asyncHandler(async (req, res) => {
+    const token = req.query.token as string;
+    if (!token) {
+      // Redirect to frontend error page
+      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=missing_token`);
+    }
+    try {
+      const { authService } = await import("../services/auth.service");
+      await authService.verifyEmail(token);
+      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?success=true`);
+    } catch (err: any) {
+      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:8080"}/verify-email?error=invalid_token`);
+    }
+  }),
+);
+
 authRouter.post(
   "/resend-verification",
   validate({ body: resendVerificationSchema }),

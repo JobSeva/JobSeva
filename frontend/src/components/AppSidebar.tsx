@@ -20,6 +20,7 @@ const seekerLinks = [
 
 const companyLinks = [
   { to: "/app/company", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/app/company/jobs", icon: Briefcase, label: "Posted Jobs" },
   { to: "/app/company/post-job", icon: FileText, label: "Post Job" },
   { to: "/app/company/applicants", icon: Users, label: "Applicants" },
   { to: "/app/company/messages", icon: MessageSquare, label: "Messages" },

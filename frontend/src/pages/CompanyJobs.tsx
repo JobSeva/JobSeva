@@ -175,12 +175,20 @@ export default function CompanyJobs() {
                                         >
                                             <ExternalLink className="w-4 h-4" />
                                         </Link>
-                                        <button
+                                        <Link
+                                            to={`/app/company/post-job/${job.id}`}
                                             className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-warning transition-colors"
                                             title="Edit Job"
                                         >
                                             <Edit2 className="w-4 h-4" />
-                                        </button>
+                                        </Link>
+                                        <Link
+                                            to={`/app/company/applicants?jobId=${job.id}`}
+                                            className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-colors"
+                                            title="View Applicants"
+                                        >
+                                            <Users className="w-4 h-4" />
+                                        </Link>
                                         <button
                                             onClick={() => handleDelete(job.id)}
                                             className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
@@ -189,6 +197,7 @@ export default function CompanyJobs() {
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                         </motion.div>

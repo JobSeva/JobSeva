@@ -7,8 +7,12 @@ import {
   Phone,
   Loader2,
   RefreshCw,
+  FileText,
 } from "lucide-react";
 import api from "@/lib/api";
+
+import { useSearchParams } from "react-router-dom";
+import { getCompanyJobs, getCompanyJobApplicants } from "@/services/api";
 
 const columns = [
   { key: "applied", label: "Applied", color: "border-muted-foreground/30" },
@@ -28,11 +32,17 @@ interface ApplicantView {
   experienceCount: number;
   status: string;
   matchScore: number;
+  resumeUrl?: string;
   recruiterRating: number;
   appliedAt: string;
+  education: any[];
+  experiences: any[];
 }
 
 export default function CompanyApplicants() {
+  const [searchParams] = useSearchParams();
+  const filterJobId = searchParams.get("jobId");
+  
   const [candidates, setCandidates] = useState<ApplicantView[]>([]);
   const [selectedCandidate, setSelectedCandidate] =
     useState<ApplicantView | null>(null);
@@ -41,32 +51,41 @@ export default function CompanyApplicants() {
 
   useEffect(() => {
     fetchCandidates();
-  }, []);
+  }, [filterJobId]);
 
   const fetchCandidates = async () => {
     setIsLoading(true);
     try {
-      const jobsRes = await api.get("/company/jobs?limit=100");
-      if (jobsRes.data?.success) {
-        const jobs = jobsRes.data.data?.items || [];
-        let all: ApplicantView[] = [];
-
-        for (const job of jobs) {
-          try {
-            const appRes = await api.get(`/company/jobs/${job.id}/applicants`);
-            if (appRes.data?.success && appRes.data.data) {
-              all = [...all, ...appRes.data.data];
-            }
-          } catch {
-            // Ignore individual job failure
-          }
+      if (filterJobId) {
+        // Fetch only for this specific job
+        const appRes = await getCompanyJobApplicants(filterJobId);
+        if (appRes.success && appRes.data) {
+          setCandidates(appRes.data);
         }
+      } else {
+        // Fetch all jobs first
+        const jobsRes = await getCompanyJobs();
+        if (jobsRes.success) {
+          const jobs = jobsRes.data?.items || [];
+          let all: ApplicantView[] = [];
 
-        all.sort(
-          (a, b) =>
-            new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
-        );
-        setCandidates(all);
+          for (const job of jobs) {
+            try {
+              const appRes = await getCompanyJobApplicants(job.id);
+              if (appRes.success && appRes.data) {
+                all = [...all, ...appRes.data];
+              }
+            } catch {
+              // Ignore individual job failure
+            }
+          }
+
+          all.sort(
+            (a, b) =>
+              new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
+          );
+          setCandidates(all);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -74,6 +93,7 @@ export default function CompanyApplicants() {
       setIsLoading(false);
     }
   };
+
 
   const handleUpdateStatus = async (
     applicationId: string,
@@ -265,8 +285,62 @@ export default function CompanyApplicants() {
                 </div>
               )}
             </div>
+            {selectedCandidate.resumeUrl && (
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-primary shadow-sm">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-foreground">Professional Resume</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">PDF / DOCX</p>
+                  </div>
+                </div>
+                <a 
+                  href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${selectedCandidate.resumeUrl}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-lg hover:shadow-primary/20 transition-all shadow-sm"
+                >
+                  View
+                </a>
+              </div>
+            )}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">Skills</p>
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">Education</p>
+              <div className="space-y-3">
+                {selectedCandidate.education?.length > 0 ? (
+                  selectedCandidate.education.map((edu: any) => (
+                    <div key={edu.id} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                      <h4 className="text-sm font-bold">{edu.degree} in {edu.field}</h4>
+                      <p className="text-xs text-muted-foreground">{edu.school} • {edu.period || `${edu.startYear} - ${edu.endYear}`}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">No education history listed</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">Experience</p>
+              <div className="space-y-3">
+                {selectedCandidate.experiences?.length > 0 ? (
+                  selectedCandidate.experiences.map((exp: any) => (
+                    <div key={exp.id} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                      <h4 className="text-sm font-bold">{exp.title}</h4>
+                      <p className="text-xs text-muted-foreground">{exp.company} • {exp.period}</p>
+                      {exp.description && <p className="text-[11px] mt-1 line-clamp-2">{exp.description}</p>}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">No experience history listed</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-bold">Skills</p>
               <div className="flex gap-2 flex-wrap">
                 {selectedCandidate.skills?.length > 0 ? (
                   selectedCandidate.skills.map((s) => (

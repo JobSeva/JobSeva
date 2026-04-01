@@ -36,14 +36,20 @@ const mapDbToSeekerProfile = (
       id: exp.id,
       title: exp.title,
       company: exp.company,
-      period: exp.period,
+      startDate: exp.startDate,
+      endDate: exp.endDate,
+      description: exp.description || undefined,
+      period: exp.period || undefined,
     })),
     education: (dbProfile.education || []).map((edu: any) => ({
       id: edu.id,
       school: edu.school,
       degree: edu.degree,
       field: edu.field,
-      period: edu.period,
+      startYear: edu.startYear,
+      endYear: edu.endYear,
+      grade: edu.grade || undefined,
+      period: edu.period || undefined,
     })),
     resumeUrl: dbProfile.resumeUrl || undefined,
     linkedinUrl: dbProfile.linkedinUrl || undefined,
@@ -234,7 +240,10 @@ export const seekerProfileService = {
         seekerProfileId: userId,
         title: payload.title,
         company: payload.company,
-        period: payload.period,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+        description: payload.description,
+        period: payload.period || `${payload.startDate} - ${payload.endDate}`,
       },
     });
 
@@ -271,7 +280,10 @@ export const seekerProfileService = {
       data: {
         title: payload.title,
         company: payload.company,
-        period: payload.period,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+        description: payload.description,
+        period: payload.period || `${payload.startDate} - ${payload.endDate}`,
       },
     });
 
@@ -331,7 +343,10 @@ export const seekerProfileService = {
         school: payload.school,
         degree: payload.degree,
         field: payload.field,
-        period: payload.period,
+        startYear: payload.startYear,
+        endYear: payload.endYear,
+        grade: payload.grade,
+        period: payload.period || `${payload.startYear} - ${payload.endYear}`,
       },
     });
 
@@ -361,7 +376,10 @@ export const seekerProfileService = {
         school: payload.school,
         degree: payload.degree,
         field: payload.field,
-        period: payload.period,
+        startYear: payload.startYear,
+        endYear: payload.endYear,
+        grade: payload.grade,
+        period: payload.period || `${payload.startYear} - ${payload.endYear}`,
       },
     });
 
@@ -399,5 +417,106 @@ export const seekerProfileService = {
 
     const profile = mapDbToSeekerProfile(updated);
     return touch(userId, profile);
+  },
+
+  async dashboard(userId: string): Promise<{
+    totalApplications: number;
+    savedJobsCount: number;
+    activeInterviews: number;
+    profileStrength: number;
+    recentApplications: any[];
+    recommendations: any[];
+    chartData: { name: string; applications: number }[];
+  }> {
+    const profile = await getOrCreateProfile(userId);
+
+    const totalApplications = await prisma.application.count({
+      where: { seekerId: userId },
+    });
+
+    const savedJobsCount = await prisma.savedJob.count({
+      where: { seekerId: userId },
+    });
+
+    const activeInterviews = await prisma.application.count({
+      where: {
+        seekerId: userId,
+        status: "interview",
+      },
+    });
+
+    const recentApplicationsRaw = await prisma.application.findMany({
+      where: { seekerId: userId },
+      include: { job: { include: { company: true } } },
+      orderBy: { appliedAt: "desc" },
+      take: 5,
+    });
+
+    const recentApplications = recentApplicationsRaw.map((app) => ({
+      id: app.id,
+      jobTitle: app.job.title,
+      company: app.job.company.name,
+      companyLogo: app.job.company.logo,
+      status: app.status,
+      appliedAt: app.appliedAt.toISOString(),
+    }));
+
+    // Simple recommendation engine: active jobs with most applicants first (or just recent)
+    const recommendationsRaw = await prisma.job.findMany({
+      where: { active: true },
+      include: { company: true },
+      orderBy: { postedAt: "desc" },
+      take: 3,
+    });
+
+    const recommendations = recommendationsRaw.map((job) => ({
+      id: job.id,
+      title: job.title,
+      company: job.company.name,
+      companyLogo: job.company.logo,
+      location: job.location,
+      type: job.type,
+      skills: JSON.parse(job.skillsRaw),
+      education: job.education || undefined,
+      experience: job.experience || undefined,
+      workMode: job.workMode || undefined,
+      openings: job.openings,
+      deadline: job.deadline?.toISOString() || undefined,
+    }));
+
+    // Last 7 days chart data
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const chartDataMap = new Map<string, number>(days.map((d) => [d, 0]));
+    
+    const last7DaysApps = await prisma.application.findMany({
+      where: {
+        seekerId: userId,
+        appliedAt: {
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+
+    last7DaysApps.forEach((app) => {
+      const dayName = days[app.appliedAt.getDay()] as string;
+      chartDataMap.set(dayName, chartDataMap.get(dayName)! + 1);
+    });
+
+    const chartData = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+      (d) => ({
+        name: d,
+        applications: chartDataMap.get(d) || 0,
+      }),
+    );
+
+    return {
+      totalApplications,
+      savedJobsCount,
+      activeInterviews,
+      profileStrength: profile.profileStrength,
+      recentApplications,
+      recommendations,
+      chartData,
+    };
   },
 };

@@ -1,18 +1,22 @@
-﻿import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate, useParams, Navigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
   Lock,
+  Eye,
+  EyeOff,
   User,
   Building2,
   Loader2,
   Users,
   ArrowLeft,
   GraduationCap,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
-import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
+import { toast } from "sonner";
 
 const roleConfig: Record<
   string,
@@ -51,17 +55,54 @@ const roleConfig: Record<
   },
 };
 
+// Password strength checker
+function getPasswordStrength(password: string): {
+  score: number; // 0–4
+  label: string;
+  color: string;
+  bgColor: string;
+} {
+  if (!password) return { score: 0, label: "", color: "", bgColor: "" };
+
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  // Map score to 0-4
+  const capped = Math.min(score, 4);
+
+  const levels = [
+    { label: "", color: "", bgColor: "" },
+    { label: "Weak", color: "text-red-500", bgColor: "bg-red-500" },
+    { label: "Fair", color: "text-orange-500", bgColor: "bg-orange-500" },
+    { label: "Good", color: "text-yellow-500", bgColor: "bg-yellow-500" },
+    { label: "Strong", color: "text-green-500", bgColor: "bg-green-500" },
+  ];
+
+  return { score: capped, ...levels[capped] };
+}
+
 export default function RoleSignup() {
   const { role } = useParams<{ role: string }>();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [ngoName, setNgoName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ngoName, setNgoName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isVerificationSent, setIsVerificationSent] = useState(false);
-  const { setRole, setUser } = useAppContext();
+
+  // Touch tracking for real-time validation
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
 
   if (!role || !roleConfig[role]) {
     return <Navigate to="/login" replace />;
@@ -70,11 +111,18 @@ export default function RoleSignup() {
   const config = roleConfig[role];
   const RoleIcon = config.icon;
 
+  const isEmailValid = email.includes("@") && email.includes(".");
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
+  const passwordsMatch = password === confirmPassword;
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(null);
+    setEmailTouched(true);
+    setConfirmTouched(true);
 
-    if (!name || !email || !password) {
+    // Validations
+    if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
@@ -86,12 +134,16 @@ export default function RoleSignup() {
       setError("Please enter your NGO name.");
       return;
     }
-    if (!email.includes("@")) {
+    if (!isEmailValid) {
       setError("Please enter a valid email address.");
       return;
     }
     if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
+      return;
+    }
+    if (!passwordsMatch) {
+      setError("Passwords do not match.");
       return;
     }
 
@@ -102,239 +154,410 @@ export default function RoleSignup() {
         name: role === "ngo" ? ngoName : name,
         email,
         password,
-        role: role === "user" ? "seeker" : (role === "ngo" ? "ngo" : "company"),
+        role: role === "user" ? "seeker" : role === "ngo" ? "ngo" : "company",
         companyName: role === "company" ? companyName : undefined,
       };
 
       await api.post("/auth/register", payload);
 
-      // We no longer log in immediately. We show the verification message.
-      setIsLoading(false);
-      setIsVerificationSent(true);
-      return;
+      toast.success("Account created! 🎉", {
+        description: `Verification link sent to ${email}.`,
+        duration: 5000,
+      });
+
+      setIsSuccess(true);
     } catch (err: any) {
-      const message = err.response?.data?.error?.message || err.response?.data?.message || "Signup failed. Please try again.";
+      const message =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        "Signup failed. Please try again.";
       setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isVerificationSent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md clean-card p-10 text-center"
-        >
-          <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-10 h-10 text-primary" />
-          </div>
-          <h1 className="text-2xl font-heading font-bold text-foreground mb-4">Check Your Email</h1>
-          <p className="text-muted-foreground mb-8 text-lg">
-            We've sent a verification link to <span className="text-foreground font-semibold">{email}</span>. Please click the link to activate your account.
-          </p>
-          <div className="space-y-4">
-            <Link to="/login" className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary/90 transition-all">
-              Back to Login
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              Didn't receive the email? Check your spam folder or try logging in to resend it.
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
+  const emailError = emailTouched && email && !isEmailValid ? "Please enter a valid email address." : null;
+  const confirmError = confirmTouched && confirmPassword && !passwordsMatch ? "Passwords do not match." : null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#F8FAFC] dark:bg-background relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse opacity-60" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] animate-pulse opacity-60" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "4s" }} />
+      </div>
+
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md clean-card p-8 sm:p-10 relative overflow-hidden"
+        initial={{ opacity: 0, y: 40, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[500px] relative z-10"
       >
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-secondary" />
+        <div className="bg-card/80 backdrop-blur-xl rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden relative p-8 sm:p-12">
+          {/* Top Gradient Accent */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite]" />
+          
+          {/* Header Glow Area */}
+          <div className="absolute top-[-50px] left-1/2 -translate-x-1/2 w-[280px] h-[100px] bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
+            {/* Success State */}
+            <AnimatePresence mode="wait">
+              {isSuccess ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center space-y-6 py-4"
+                >
+                  <div className="w-20 h-20 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto text-green-500">
+                    <Mail className="w-10 h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-heading font-bold text-foreground">Check Your Email</h2>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      We've sent a verification link to <span className="text-foreground font-semibold font-mono">{email}</span>. Click the link to activate your account.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted/50 rounded-2xl border border-border flex items-start gap-3 text-left">
+                    <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-muted-foreground">
+                      Verification is required before you can log in. If you don't see the email, please check your spam folder.
+                    </p>
+                  </div>
+                  <Link
+                    to={`/login/${role}`}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-heading font-semibold text-sm bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg transition-all"
+                  >
+                    Go to Login
+                  </Link>
+                </motion.div>
+              ) : (
+                <>
+                  <div className="text-center mb-8 relative z-10">
+                    <Link to="/" className="inline-block mb-4 logo-hover">
+                      <img
+                        src="/JobSeva.png"
+                        alt="JobSeva"
+                        className="h-20 sm:h-24 w-auto mx-auto drop-shadow-sm"
+                      />
+                    </Link>
 
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-5 logo-hover">
-            <img
-              src="/JobSeva.png"
-              alt="JobSeva"
-              className="h-24 sm:h-28 w-auto mx-auto"
-            />
-          </Link>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
+                      className="mb-4"
+                    >
+                      <span
+                        className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-semibold ${config.badgeBg}`}
+                      >
+                        <RoleIcon className="w-3.5 h-3.5" />
+                        {config.badge}
+                      </span>
+                    </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mb-4"
-          >
-            <span
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-semibold ${config.badgeBg}`}
-            >
-              <RoleIcon className="w-3.5 h-3.5" />
-              {config.badge}
-            </span>
-          </motion.div>
+                    <h1 className="text-2xl font-heading font-bold text-foreground">
+                      {config.heading}
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1.5">{config.sub}</p>
+                  </div>
 
-          <h1 className="text-2xl font-heading font-bold text-foreground">
-            {config.heading}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2">{config.sub}</p>
-        </div>
+                  <form onSubmit={handleSignup} className="space-y-4 relative z-10">
+                    {/* Error Alert */}
+                    <AnimatePresence mode="wait">
+                      {error && (
+                        <motion.div
+                          key="error"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="p-3.5 bg-destructive/[0.03] dark:bg-destructive/[0.1] border border-destructive/20 rounded-xl text-destructive text-sm text-center font-semibold flex items-start gap-2 mb-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                            <span>{error}</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-        <form onSubmit={handleSignup} className="space-y-5">
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm text-center font-medium"
-            >
-              {error}
-            </motion.div>
-          )}
+                    {/* Rest of the form remains same... */}
 
-          <div className="space-y-4">
+            {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
                 Full Name
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                </div>
+              <div className="relative group">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 <input
+                  id="signup-name"
                   type="text"
+                  autoFocus
+                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
+                  className="block w-full pl-11 pr-4 py-3 bg-muted/40 border border-border/60 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/60 shadow-sm"
                   placeholder="John Doe"
-                  required
                 />
               </div>
             </div>
 
-            {role === "company" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-              >
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Company Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Building2 className="h-5 w-5 text-muted-foreground" />
+            {/* Company Name (conditional) */}
+            <AnimatePresence>
+              {role === "company" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-1.5"
+                >
+                  <label className="block text-sm font-semibold text-foreground">
+                    Company Name
+                  </label>
+                  <div className="relative group">
+                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                    <input
+                      id="signup-company"
+                      type="text"
+                      required
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      className="block w-full pl-11 pr-4 py-3 bg-muted/40 border border-border/60 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/60 shadow-sm"
+                      placeholder="Acme Corp"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
-                    placeholder="Acme Corp"
-                    required={role === "company"}
-                  />
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {role === "ngo" && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-              >
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  NGO Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Building2 className="h-5 w-5 text-muted-foreground" />
+            {/* NGO Name (conditional) */}
+            <AnimatePresence>
+              {role === "ngo" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-1.5"
+                >
+                  <label className="block text-sm font-semibold text-foreground">
+                    NGO Name
+                  </label>
+                  <div className="relative group">
+                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                    <input
+                      id="signup-ngo"
+                      type="text"
+                      required
+                      value={ngoName}
+                      onChange={(e) => setNgoName(e.target.value)}
+                      className="block w-full pl-11 pr-4 py-3 bg-muted/40 border border-border/60 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/60 shadow-sm"
+                      placeholder="Global Foundation"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={ngoName}
-                    onChange={(e) => setNgoName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
-                    placeholder="Global Foundation"
-                    required={role === "ngo"}
-                  />
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
+            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
                 Email Address
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
-                </div>
+              <div className="relative group">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 <input
+                  id="signup-email"
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
+                  onBlur={() => setEmailTouched(true)}
+                  className={`block w-full pl-11 pr-11 py-3 bg-muted/40 border rounded-[1.25rem] text-sm font-medium focus:ring-4 outline-none transition-all duration-200 placeholder:text-muted-foreground/60 shadow-sm ${
+                    emailError
+                      ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
+                      : "border-border/60 focus:ring-primary/10 focus:border-primary"
+                  }`}
                   placeholder="name@example.com"
-                  required
+                  autoComplete="email"
                 />
+                {email && isEmailValid && !emailError && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2"
+                  >
+                    <CheckCircle2 className="w-4.5 h-4.5 text-green-500 fill-green-500/5" />
+                  </motion.div>
+                )}
               </div>
+              {emailError && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs text-destructive mt-1 ml-1"
+                >
+                  {emailError}
+                </motion.p>
+              )}
             </div>
 
+            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
                 Password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-muted-foreground" />
-                </div>
+              <div className="relative group">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 <input
-                  type="password"
+                  id="signup-password"
+                  type={showPassword ? "text" : "password"}
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/70"
-                  placeholder="••••••••"
-                  required
+                  className="block w-full pl-11 pr-11 py-3 bg-muted/40 border border-border/60 rounded-[1.25rem] text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-200 outline-none placeholder:text-muted-foreground/60 shadow-sm"
+                  placeholder="Min. 8 characters"
+                  autoComplete="new-password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-all p-1 hover:bg-muted rounded-full"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
+
+              {/* Password strength indicator */}
+              {password && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 space-y-1.5"
+                >
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4].map((seg) => (
+                      <div
+                        key={seg}
+                        className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                          passwordStrength.score >= seg
+                            ? passwordStrength.bgColor
+                            : "bg-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  {passwordStrength.label && (
+                    <p className={`text-xs font-medium ${passwordStrength.color}`}>
+                      Password strength: {passwordStrength.label}
+                      {passwordStrength.score < 3 && (
+                        <span className="text-muted-foreground font-normal">
+                          {" "}— Add uppercase letters, numbers, or symbols
+                        </span>
+                      )}
+                    </p>
+                  )}
+                </motion.div>
+              )}
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              "Create Account"
-            )}
-          </button>
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
+                Confirm Password
+              </label>
+              <div className="relative group">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                <input
+                  id="signup-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => setConfirmTouched(true)}
+                  className={`block w-full pl-11 pr-11 py-3 bg-muted/40 border rounded-[1.25rem] text-sm font-medium focus:ring-4 outline-none transition-all duration-200 placeholder:text-muted-foreground/60 shadow-sm ${
+                    confirmError
+                      ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
+                      : "border-border/60 focus:ring-primary/10 focus:border-primary"
+                  }`}
+                  placeholder="Re-enter your password"
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-all p-1 hover:bg-muted rounded-full"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <AnimatePresence>
+                {confirmError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-xs text-destructive mt-1 ml-1"
+                  >
+                    {confirmError}
+                  </motion.p>
+                )}
+                {confirmTouched && confirmPassword && passwordsMatch && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-xs text-green-500 mt-1 ml-1 flex items-center gap-1"
+                  >
+                    <CheckCircle2 className="w-3 h-3" /> Passwords match
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link
-              to={`/login/${role}`}
-              className="font-medium text-primary hover:text-primary/80 transition-colors"
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              whileHover={{ scale: isLoading ? 1 : 1.01 }}
+              whileTap={{ scale: isLoading ? 1 : 0.99 }}
+              className="w-full h-12 relative overflow-hidden rounded-[1.25rem] px-6 font-heading font-bold text-sm transition-all duration-300 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] hover:bg-[length:100%_100%] text-primary-foreground shadow-[0_20px_40px_-12px_rgba(var(--primary-rgb),0.3)] hover:shadow-[0_25px_50px_-12px_rgba(var(--primary-rgb),0.4)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 group mt-4 sm:mt-6"
             >
-              Sign in
-            </Link>
-          </p>
-        </form>
-      </motion.div>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </motion.button>
 
-      <Link
-        to="/signup"
-        className="fixed top-6 left-6 p-2 rounded-full bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors z-10"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </Link>
-    </div>
-  );
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              Already have an account?{" "}
+              <Link
+                to={`/login/${role}`}
+                className="font-semibold text-primary hover:underline transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </form>
+        </>
+      )}
+    </AnimatePresence>
+  </div>
+</motion.div>
+
+<Link
+  to="/"
+  className="fixed top-6 left-6 p-2.5 rounded-full bg-card/50 backdrop-blur-md border border-white/20 text-muted-foreground hover:text-foreground hover:bg-muted transition-all z-50 shadow-lg"
+>
+  <ArrowLeft className="w-5 h-5" />
+</Link>
+</div>
+);
 }

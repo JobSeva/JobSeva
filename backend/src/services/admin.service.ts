@@ -156,6 +156,11 @@ export class AdminService {
       applicants: job.applicantsCount,
       postedAt: job.postedAt.toISOString(),
       active: job.active,
+      education: job.education || undefined,
+      experience: job.experience || undefined,
+      workMode: job.workMode || undefined,
+      openings: job.openings,
+      deadline: job.deadline?.toISOString() || undefined,
     }));
   }
 
@@ -183,6 +188,11 @@ export class AdminService {
       applicants: job.applicantsCount,
       postedAt: job.postedAt.toISOString(),
       active: job.active,
+      education: job.education || undefined,
+      experience: job.experience || undefined,
+      workMode: job.workMode || undefined,
+      openings: job.openings,
+      deadline: job.deadline?.toISOString() || undefined,
     };
   }
 
@@ -263,6 +273,11 @@ export class AdminService {
       applicants: job.applicantsCount,
       postedAt: job.postedAt.toISOString(),
       active: job.active,
+      education: job.education || undefined,
+      experience: job.experience || undefined,
+      workMode: job.workMode || undefined,
+      openings: job.openings,
+      deadline: job.deadline?.toISOString() || undefined,
     }));
 
     return {

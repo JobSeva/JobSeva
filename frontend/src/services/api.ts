@@ -51,6 +51,11 @@ export const uploadSeekerResume = async (resumeUrl: string) => {
     return response.data;
 };
 
+export const deleteSeekerResume = async () => {
+    const response = await api.delete("/seeker/profile/resume");
+    return response.data;
+};
+
 export const getNgoProfile = async () => {
     const response = await api.get("/ngo/profile");
     return response.data;
@@ -76,6 +81,17 @@ export const getCompanyJobs = async () => {
     return response.data;
 };
 
+export const getCompanyJobById = async (jobId: string) => {
+    const response = await api.get(`/company/jobs/${jobId}`);
+    return response.data;
+};
+
+export const updateCompanyJob = async (jobId: string, jobData: any) => {
+    const response = await api.put(`/company/jobs/${jobId}`, jobData);
+    return response.data;
+};
+
+
 export const applyJob = async (jobId: string) => {
     const response = await api.post("/applications", { jobId });
     return response.data;
@@ -86,10 +102,21 @@ export const getUserApplications = async () => {
     return response.data;
 };
 
+export const getRecommendations = async () => {
+    const response = await api.get("/jobs/recommendations");
+    return response.data;
+};
+
 export const getApplicants = async (jobId: string) => {
     const response = await api.get(`/applications/job/${jobId}`);
     return response.data;
 };
+
+export const getCompanyJobApplicants = async (jobId: string) => {
+    const response = await api.get(`/company/jobs/${jobId}/applicants`);
+    return response.data;
+};
+
 
 export const updateSettings = async (data: { emailNotifications?: boolean; marketingEmails?: boolean; darkMode?: boolean }) => {
     const response = await api.put("/user/settings", data);
@@ -101,13 +128,19 @@ export const updatePassword = async (data: { currentPassword: string; nextPasswo
     return response.data;
 };
 
-export const uploadResume = async (file: File) => {
+export const uploadResume = async (file: File, onProgress?: (percentage: number) => void) => {
     const formData = new FormData();
     formData.append("resume", file);
 
     const response = await api.post("/user/upload-resume", formData, {
         headers: {
             "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+            if (onProgress && progressEvent.total) {
+                const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                onProgress(percentage);
+            }
         },
     });
     return response.data;

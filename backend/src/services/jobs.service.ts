@@ -31,6 +31,11 @@ export const mapPrismaJobToJob = (prismaJob: any): Job => ({
   applicants: prismaJob.applicantsCount,
   postedAt: prismaJob.postedAt.toISOString(),
   active: prismaJob.active,
+  education: prismaJob.education || undefined,
+  experience: prismaJob.experience || undefined,
+  workMode: prismaJob.workMode || undefined,
+  openings: prismaJob.openings,
+  deadline: prismaJob.deadline?.toISOString() || undefined,
 });
 
 export const jobsService = {

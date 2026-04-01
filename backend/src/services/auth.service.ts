@@ -111,8 +111,8 @@ export const authService = {
         email: params.email.toLowerCase(),
         role: params.role,
         passwordHash,
-        isVerified: true,
-        verificationToken: null,
+        isVerified: false,
+        verificationToken,
         profileCompletion,
         settings: {
           create: {

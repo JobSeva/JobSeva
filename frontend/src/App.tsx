@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,15 +33,16 @@ import AdminJobModeration from "@/pages/AdminJobModeration";
 import AdminPlacements from "@/pages/AdminPlacements";
 import AdminReports from "@/pages/AdminReports";
 import JobDetails from "@/pages/JobDetails";
+import CompanyJobs from "@/pages/CompanyJobs";
 import NotFound from "@/pages/NotFound";
 import TrainingPage from "@/pages/TrainingPage";
 import CourseDetails from "@/pages/CourseDetails";
 
 // NGO Pages
-import NgoDashboard from "@/pages/NgoDashboard";
-import NgoPostTraining from "@/pages/NgoPostTraining";
-import NgoCourses from "@/pages/NgoCourses";
-import NgoEnrollments from "@/pages/NgoEnrollments";
+import NgoDashboard from "@/pages/ngoDashboard";
+import NgoPostTraining from "@/pages/ngoPostTraining";
+import NgoCourses from "@/pages/ngoCourses";
+import NgoEnrollments from "@/pages/ngoEnrollments";
 import NgoLogin from "@/pages/ngoLogin";
 import NgoSignup from "@/pages/ngoSignup";
 import VerifyEmail from "@/pages/VerifyEmail";
@@ -51,6 +52,28 @@ function ProfileGate() {
   const { role } = useAppContext();
   if (role === "ngo") return <NgoProfile />;
   return <SeekerProfile />;
+}
+
+/** Blocks unauthenticated users from accessing protected routes */
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthLoading, user } = useAppContext();
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground font-medium">Loading your session...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 const queryClient = new QueryClient();
@@ -90,9 +113,11 @@ function AppRoutes() {
         <Route path="ngo/enrollments" element={<NgoEnrollments />} />
 
         <Route path="company" element={<CompanyDashboard />} />
+        <Route path="company/jobs" element={<CompanyJobs />} />
         <Route path="company/onboarding" element={<CompanyOnboarding />} />
         <Route path="company/profile" element={<CompanyProfileView />} />
         <Route path="company/post-job" element={<PostJob />} />
+        <Route path="company/post-job/:id" element={<PostJob />} />
         <Route path="company/applicants" element={<CompanyApplicants />} />
         <Route path="company/messages" element={<Messages />} />
 
@@ -116,12 +141,10 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Force instant scroll to top
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     document.documentElement.scrollTo({ top: 0, left: 0, behavior: "instant" });
     document.body.scrollTo({ top: 0, left: 0, behavior: "instant" });
 
-    // Secondary fallback for after framer-motion mounts
     const timer = setTimeout(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }, 50);
@@ -155,8 +178,15 @@ const App = () => (
               <Route path="/companies" element={<CompaniesPage />} />
               <Route path="/training" element={<TrainingPage />} />
 
-              {/* App routes */}
-              <Route path="/app/*" element={<AppRoutes />} />
+              {/* Protected app routes */}
+              <Route
+                path="/app/*"
+                element={
+                  <ProtectedRoute>
+                    <AppRoutes />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

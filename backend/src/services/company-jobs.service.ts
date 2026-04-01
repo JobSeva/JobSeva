@@ -12,6 +12,11 @@ interface CompanyJobPayload {
   skills: string[];
   description: string;
   responsibilities: string[];
+  education?: string;
+  experience?: string;
+  workMode?: string;
+  openings?: number;
+  deadline?: string;
 }
 
 interface ApplicantView {
@@ -21,6 +26,7 @@ interface ApplicantView {
   email: string;
   headline: string;
   skills: string[];
+  resumeUrl?: string;
   experienceCount: number;
   status: ApplicationStatus;
   matchScore: number;
@@ -28,6 +34,8 @@ interface ApplicantView {
   recruiterNote?: string;
   appliedAt: string;
   updatedAt: string;
+  education: any[];
+  experiences: any[];
 }
 
 const getCompanyProfile = async (ownerUserId: string) => {
@@ -36,9 +44,10 @@ const getCompanyProfile = async (ownerUserId: string) => {
   });
 
   if (!profile) {
+    console.error(`[CRITICAL] Company profile missing for user: ${ownerUserId}. Job operations will fail.`);
     throw new AppError(
       409,
-      "Company profile not found. Complete onboarding first",
+      "Company profile not found. Please complete your company onboarding first.",
       "COMPANY_PROFILE_REQUIRED",
     );
   }
@@ -64,10 +73,19 @@ const getOwnedJob = async (ownerUserId: string, jobId: string) => {
 };
 
 const jobToDto = (job: any): Job => {
+  const safeJsonParse = (str: string) => {
+    try {
+      return JSON.parse(str || "[]");
+    } catch (e) {
+      console.warn("Failed to parse JSON field, returning empty array:", str);
+      return [];
+    }
+  };
+
   return {
     id: job.id,
     title: job.title,
-    company: job.company?.name || "",
+    company: job.company?.name || "Unknown Company",
     companyId: job.companyId,
     companyLogo: job.company?.logo || "",
     location: job.location,
@@ -75,12 +93,17 @@ const jobToDto = (job: any): Job => {
     salaryMax: job.salaryMax,
     type: job.type as "full-time" | "part-time" | "contract",
     remote: job.remote,
-    skills: JSON.parse(job.skillsRaw),
+    skills: safeJsonParse(job.skillsRaw),
     description: job.description,
-    responsibilities: JSON.parse(job.responsibilitiesRaw),
+    responsibilities: safeJsonParse(job.responsibilitiesRaw),
     applicants: job.applicantsCount,
-    postedAt: job.postedAt.toISOString(),
+    postedAt: job.postedAt ? job.postedAt.toISOString() : new Date().toISOString(),
     active: job.active,
+    education: job.education || undefined,
+    experience: job.experience || undefined,
+    workMode: job.workMode || undefined,
+    openings: job.openings,
+    deadline: (job.deadline && !isNaN(job.deadline.getTime())) ? job.deadline.toISOString() : undefined,
   };
 };
 
@@ -89,7 +112,7 @@ export const companyJobsService = {
     ownerUserId: string,
     page: number,
     limit: number,
-  ): Promise<{ items: Job[]; total: number; page: number; limit: number }> {
+  ): Promise<{ items: Job[]; total: number; page: number; limit: number; totalPages: number }> {
     const profile = await getCompanyProfile(ownerUserId);
 
     const total = await prisma.job.count({
@@ -109,6 +132,7 @@ export const companyJobsService = {
       total,
       page,
       limit,
+      totalPages: Math.ceil(total / limit),
     };
   },
 
@@ -127,11 +151,16 @@ export const companyJobsService = {
         salaryMax: payload.salaryMax,
         type: payload.type,
         remote: payload.remote,
-        skillsRaw: JSON.stringify(payload.skills),
+        skillsRaw: JSON.stringify(payload.skills || []),
         description: payload.description,
-        responsibilitiesRaw: JSON.stringify(payload.responsibilities),
+        responsibilitiesRaw: JSON.stringify(payload.responsibilities || []),
         applicantsCount: 0,
         active: true,
+        education: payload.education || null,
+        experience: payload.experience || null,
+        workMode: payload.workMode || "onsite",
+        openings: payload.openings || 1,
+        deadline: (payload.deadline && !isNaN(Date.parse(payload.deadline))) ? new Date(payload.deadline) : null,
       },
       include: { company: true },
     });
@@ -181,6 +210,12 @@ export const companyJobsService = {
       updateData.responsibilitiesRaw = JSON.stringify(
         patch.responsibilities,
       );
+    if (patch.education !== undefined) updateData.education = patch.education;
+    if (patch.experience !== undefined) updateData.experience = patch.experience;
+    if (patch.workMode !== undefined) updateData.workMode = patch.workMode;
+    if (patch.openings !== undefined) updateData.openings = patch.openings;
+    if (patch.deadline !== undefined)
+      updateData.deadline = patch.deadline ? new Date(patch.deadline) : null;
 
     const job = await prisma.job.update({
       where: { id: jobId },
@@ -236,14 +271,17 @@ export const companyJobsService = {
         name: app.seeker.name,
         email: app.seeker.email,
         headline: seekerProfile?.headline || "",
+        resumeUrl: app.resumeUrl || seekerProfile?.resumeUrl,
         skills,
-        experienceCount: 0, // Will be populated if we fetch experiences
+        experienceCount: seekerProfile?.experiences?.length || 0,
         status: app.status as ApplicationStatus,
         matchScore: app.matchScore,
         recruiterRating: app.recruiterRating || undefined,
         recruiterNote: app.recruiterNote || undefined,
         appliedAt: app.appliedAt.toISOString(),
         updatedAt: app.updatedAt.toISOString(),
+        education: seekerProfile?.education || [],
+        experiences: seekerProfile?.experiences || [],
       };
     });
   },

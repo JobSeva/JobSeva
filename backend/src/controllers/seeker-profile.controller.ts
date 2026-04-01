@@ -133,4 +133,10 @@ export const seekerProfileController = {
     );
     res.status(200).json(success(profile));
   },
+
+  async dashboard(req: AuthenticatedRequest, res: Response): Promise<void> {
+    const seekerId = requireSeekerAuth(req);
+    const data = await seekerProfileService.dashboard(seekerId);
+    res.status(200).json(success(data));
+  },
 };

@@ -20,6 +20,7 @@ interface AppContextType {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (v: boolean) => void;
   logout: () => void;
+  isAuthLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType>({
@@ -31,6 +32,7 @@ const AppContext = createContext<AppContextType>({
   sidebarCollapsed: false,
   setSidebarCollapsed: () => { },
   logout: () => { },
+  isAuthLoading: true,
 });
 
 export const useAppContext = () => useContext(AppContext);
@@ -40,6 +42,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [role, setRole] = useState<UserRole>("seeker");
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     window.innerWidth < 1024,
   );
@@ -55,7 +58,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       setRole(u.role as UserRole);
     } catch (err) {
       console.error("Failed to load user info", err);
-      // We rely on Axios interceptors to clear local storage if strictly unauthorized
+      // Clear invalid tokens
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -67,6 +74,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     const token = localStorage.getItem("accessToken");
     if (token) {
       loadUser();
+    } else {
+      setIsAuthLoading(false);
     }
 
     return () => window.removeEventListener("resize", handleResize);
@@ -108,6 +117,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         sidebarCollapsed,
         setSidebarCollapsed,
         logout,
+        isAuthLoading,
       }}
     >
       {children}

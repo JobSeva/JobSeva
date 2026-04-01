@@ -83,6 +83,7 @@ model SeekerProfile {
   skillsRaw       String             @default("[]")
   languagesRaw    String             @default("[]")
   resumeUrl       String?
+  resumeFileName  String?
   linkedinUrl     String?
   githubUrl       String?
   portfolioUrl    String?
@@ -99,7 +100,10 @@ model SeekerEducation {
   school          String
   degree          String
   field           String
-  period          String
+  startYear       Int           @default(2020)
+  endYear         Int           @default(2024)
+  grade           String?
+  period          String?
   seekerProfile   SeekerProfile @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
 }
 
@@ -108,7 +112,10 @@ model SeekerExperience {
   seekerProfileId String
   title           String
   company         String
-  period          String
+  startDate       String        @default("")
+  endDate         String        @default("")
+  description     String?
+  period          String?
   seekerProfile   SeekerProfile @relation(fields: [seekerProfileId], references: [userId], onDelete: Cascade)
 }
 
@@ -142,10 +149,17 @@ model CompanyProfile {
 model NgoProfile {
   userId          String   @id
   description     String   @default("")
+  tagline         String   @default("")
   location        String   @default("")
   phone           String   @default("")
+  email           String   @default("")
   website         String   @default("")
   logoUrl         String?
+  foundingYear    Int      @default(0)
+  size            String   @default("")
+  linkedin        String?
+  twitter         String?
+  instagram       String?
   profileStrength Int      @default(0)
   updatedAt       DateTime @updatedAt
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -166,6 +180,11 @@ model Job {
   applicantsCount     Int            @default(0)
   postedAt            DateTime       @default(now())
   active              Boolean        @default(true)
+  education           String?
+  experience          String?
+  workMode            String?
+  openings            Int            @default(1)
+  deadline            DateTime?
   applications        Application[]
   company             CompanyProfile @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
   savedBy             SavedJob[]
@@ -179,6 +198,7 @@ model Application {
   company         String
   companyLogo     String
   status          String   @default("applied")
+  resumeUrl       String?
   appliedAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   matchScore      Int      @default(0)
