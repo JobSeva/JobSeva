@@ -12,6 +12,10 @@ router.get("/dashboard", (req, res, next) => {
   adminController.getDashboard(req, res).catch(next);
 });
 
+router.get("/reports", (req, res, next) => {
+  adminController.getReports(req, res).catch(next);
+});
+
 router.get("/users", (req, res, next) => {
   adminController.listUsers(req, res).catch(next);
 });

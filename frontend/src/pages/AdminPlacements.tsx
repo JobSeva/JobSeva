@@ -22,18 +22,16 @@ export default function AdminPlacements() {
 
   const fetchPlacements = async () => {
     try {
-      // By using /admin/applications we can extract both pending and confirmed placements
       const res = await api.get("/admin/applications");
-      const list = res.data?.success ? res.data.data : res.data;
+      const list = res.data?.success ? res.data.data : [];
       if (Array.isArray(list)) {
-        // Here we map standard application to placement-like details for the view
         const mapped = list.map((a: any) => ({
           id: a.applicationId || a.id,
-          candidateName: a.seekerName || "Unknown Candidate",
-          company: a.companyName || a.company || "Unknown Company",
+          candidateName: a.seeker?.name || "Unknown Candidate",
+          company: a.job?.company?.name || a.company || "Unknown Company",
           jobTitle: a.jobTitle || "Unknown Role",
           status: a.status === "hired" ? "confirmed" : "pending",
-          createdAt: a.createdAt || a.appliedAt || new Date().toISOString(),
+          createdAt: a.appliedAt || a.createdAt || new Date().toISOString(),
         }));
         setPlacements(mapped);
       }
