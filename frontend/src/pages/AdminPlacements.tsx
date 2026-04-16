@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Trophy, CheckCircle2, Clock, Loader2 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 interface Application {
   id: string;
@@ -51,11 +52,7 @@ export default function AdminPlacements() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-[300px] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Fetching placement records..." />;
   }
 
   const confirmedCount = placements.filter(
@@ -158,11 +155,10 @@ export default function AdminPlacements() {
                   </td>
                   <td className="p-4">
                     <span
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
-                        p.status === "confirmed"
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${p.status === "confirmed"
                           ? "bg-success/10 text-success"
                           : "bg-warning/10 text-warning"
-                      }`}
+                        }`}
                     >
                       {p.status}
                     </span>

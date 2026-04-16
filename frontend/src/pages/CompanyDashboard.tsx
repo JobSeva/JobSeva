@@ -28,6 +28,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { getCompanyJobs } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 const tooltipStyle = {
   background: "hsl(var(--card))",
@@ -99,20 +100,16 @@ export default function CompanyDashboard() {
   const handleDeleteJob = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this job listing?")) return;
     try {
-        await api.delete(`/company/jobs/${id}`);
-        toast.success("Job deleted successfully");
-        setRecentJobs(prev => prev.filter(j => j.id !== id));
+      await api.delete(`/company/jobs/${id}`);
+      toast.success("Job deleted successfully");
+      setRecentJobs(prev => prev.filter(j => j.id !== id));
     } catch (err) {
-        toast.error("Failed to delete job");
+      toast.error("Failed to delete job");
     }
   };
 
-  if (isLoading || !data) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (isLoading) {
+    return <Loader message="Loading company dashboard..." />;
   }
 
   const stats = [
@@ -192,13 +189,12 @@ export default function CompanyDashboard() {
                 </p>
               </div>
               <div
-                className={`p-2.5 rounded-xl ${
-                  stat.variant === "purple"
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : stat.variant === "orange"
-                      ? "bg-warning/10 text-warning border border-warning/20"
-                      : "bg-success/10 text-success border border-success/20"
-                }`}
+                className={`p-2.5 rounded-xl ${stat.variant === "purple"
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : stat.variant === "orange"
+                    ? "bg-warning/10 text-warning border border-warning/20"
+                    : "bg-success/10 text-success border border-success/20"
+                  }`}
               >
                 <stat.icon className="w-5 h-5" />
               </div>
@@ -318,7 +314,7 @@ export default function CompanyDashboard() {
           <div className="space-y-4">
             {recentJobs.length === 0 ? (
               <div className="clean-card p-12 text-center text-muted-foreground bg-muted/20 border-dashed border-2">
-                 No jobs posted yet. Start hiring today!
+                No jobs posted yet. Start hiring today!
               </div>
             ) : (
               recentJobs.map((job, i) => (
@@ -331,14 +327,14 @@ export default function CompanyDashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                        <Briefcase className="w-6 h-6" />
+                      <Briefcase className="w-6 h-6" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-sm sm:text-base">{job.title}</h4>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
-                            <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.location}</span>
-                            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {job.applicants} Applicants</span>
-                        </div>
+                      <h4 className="font-bold text-sm sm:text-base">{job.title}</h4>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {job.location}</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {job.applicants} Applicants</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 border-t md:border-t-0 pt-3 md:pt-0">
@@ -415,20 +411,20 @@ export default function CompanyDashboard() {
                       </div>
                     </div>
                     <span className="text-xs font-bold text-primary">
-                        {c.matchScore}% 
+                      {c.matchScore}%
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     {c.skills.slice(0, 2).map((s) => (
-                        <span key={s} className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-bold text-muted-foreground">
-                            {s}
-                        </span>
+                      <span key={s} className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-bold text-muted-foreground">
+                        {s}
+                      </span>
                     ))}
                     {c.skills.length > 2 && (
-                       <span className="text-[10px] text-muted-foreground">+{c.skills.length - 2}</span>
+                      <span className="text-[10px] text-muted-foreground">+{c.skills.length - 2}</span>
                     )}
                     <span className="ml-auto text-[10px] text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> Latest
+                      <Clock className="w-3 h-3" /> Latest
                     </span>
                   </div>
                 </motion.div>

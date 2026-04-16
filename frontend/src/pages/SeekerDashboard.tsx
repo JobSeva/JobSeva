@@ -12,6 +12,7 @@ import {
   Clock,
   Loader2,
 } from "lucide-react";
+import Loader from "@/components/Loader";
 import api from "@/lib/api";
 import { useAppContext } from "@/contexts/AppContext";
 import { getUserApplications, getRecommendations } from "@/services/api";
@@ -64,11 +65,7 @@ export default function SeekerDashboard() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Loading your personal dashboard..." />;
   }
 
   return (
@@ -87,7 +84,7 @@ export default function SeekerDashboard() {
           </p>
         </div>
         <Link to="/app/explore" className="btn-primary flex items-center gap-2">
-            Find Jobs <ArrowRight className="w-4 h-4" />
+          Find Jobs <ArrowRight className="w-4 h-4" />
         </Link>
       </motion.div>
 
@@ -260,15 +257,14 @@ export default function SeekerDashboard() {
                 </div>
                 <div className="text-right shrink-0">
                   <span
-                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${
-                      app.status === "hired"
+                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${app.status === "hired"
                         ? "bg-success/20 text-success"
                         : app.status === "interview"
                           ? "bg-primary/20 text-primary"
                           : app.status === "shortlisted"
                             ? "bg-warning/20 text-warning"
                             : "bg-muted text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {app.status || "Pending"}
                   </span>
@@ -293,7 +289,7 @@ export default function SeekerDashboard() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-xl font-heading font-bold">
-                 Curated for You
+                Curated for You
               </h2>
               <p className="text-sm text-muted-foreground">
                 Jobs that match your unique skill profile

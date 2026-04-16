@@ -17,6 +17,7 @@ import {
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
 import { resendVerification } from "@/services/api";
+import Loader from "@/components/Loader";
 import { toast } from "sonner";
 
 const roleConfig: Record<
@@ -282,14 +283,13 @@ export default function RoleLogin() {
                   onBlur={() => setEmailTouched(true)}
                   placeholder="name@example.com"
                   autoComplete="email"
-                  className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${
-                    emailError ||
-                    (error &&
-                      (error.toLowerCase().includes("email") ||
-                        error.toLowerCase().includes("invalid")))
+                  className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${emailError ||
+                      (error &&
+                        (error.toLowerCase().includes("email") ||
+                          error.toLowerCase().includes("invalid")))
                       ? "border-destructive focus:border-destructive focus:ring-destructive/10"
                       : "border-border/60 focus:border-primary shadow-sm"
-                  }`}
+                    }`}
                 />
                 {/* Valid email indicator */}
                 {email && isEmailValid && !emailError && (
@@ -342,13 +342,12 @@ export default function RoleLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${
-                    error &&
-                    (error.toLowerCase().includes("password") ||
-                      error.toLowerCase().includes("invalid"))
+                  className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${error &&
+                      (error.toLowerCase().includes("password") ||
+                        error.toLowerCase().includes("invalid"))
                       ? "border-destructive focus:border-destructive focus:ring-destructive/10"
                       : "border-border/60 focus:border-primary shadow-sm"
-                  }`}
+                    }`}
                 />
                 <button
                   type="button"
@@ -372,11 +371,10 @@ export default function RoleLogin() {
                 role="checkbox"
                 aria-checked={rememberMe}
                 onClick={() => setRememberMe(!rememberMe)}
-                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 ${
-                  rememberMe
+                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 ${rememberMe
                     ? "bg-primary border-primary"
                     : "border-border hover:border-primary/60"
-                }`}
+                  }`}
               >
                 {rememberMe && (
                   <motion.svg
@@ -414,12 +412,7 @@ export default function RoleLogin() {
             >
               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="tracking-widest uppercase text-xs">
-                    Authenticating
-                  </span>
-                </>
+                <Loader size="sm" message="Authenticating..." />
               ) : (
                 <>
                   <span className="tracking-wide">Sign In to JobSeva</span>

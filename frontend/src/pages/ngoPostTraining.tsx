@@ -4,6 +4,7 @@ import { Plus, Loader2, Video, MapPin, Image as ImageIcon, Save, ArrowLeft, Chev
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { createCourse, getCourseById, updateCourse } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 const categories = [
     "Web Development",
@@ -89,11 +90,7 @@ export default function NgoPostTraining() {
     };
 
     if (loading) {
-        return (
-            <div className="h-[60vh] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        );
+        return <Loader message="Loading course data..." />;
     }
 
     return (
@@ -237,7 +234,7 @@ export default function NgoPostTraining() {
                             disabled={submitting}
                             className="btn-primary w-full py-4 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                         >
-                            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5" /> {isEditBus ? "Update Course" : "Publish Course"}</>}
+                            {submitting ? <Loader size="sm" message="Publishing..." /> : <><Plus className="w-5 h-5" /> {isEditBus ? "Update Course" : "Publish Course"}</>}
                         </button>
                         <button
                             onClick={() => handleSubmit("draft")}

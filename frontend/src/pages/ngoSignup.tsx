@@ -15,6 +15,7 @@ import {
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
 import { resendVerification } from "@/services/api";
+import Loader from "@/components/Loader";
 
 export default function NgoSignup() {
     const [name, setName] = useState("");
@@ -250,7 +251,7 @@ export default function NgoSignup() {
                             className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl text-sm font-medium text-white transition-all duration-300 bg-gradient-to-r from-purple-500 to-orange-400 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         >
                             {isLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader size="sm" message="Creating Account..." />
                             ) : (
                                 "Create Account"
                             )}

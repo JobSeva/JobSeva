@@ -11,11 +11,11 @@ export class CommunicationsController {
     const { otherUserId } = req.query as { otherUserId?: string };
 
     if (otherUserId) {
-        const msgs = await commsService.getMessages(userId, otherUserId);
-        res.json(success(msgs));
+      const msgs = await commsService.getMessages(userId, otherUserId);
+      res.json(success(msgs));
     } else {
-        const convos = await commsService.getConversations(userId);
-        res.json(success(convos));
+      const convos = await commsService.getConversations(userId);
+      res.json(success(convos));
     }
   }
 

@@ -23,14 +23,15 @@ import { getSeekerProfile } from "@/services/api";
 import EditProfileModal from "@/components/EditProfileModal";
 import { uploadResume, deleteSeekerResume } from "@/services/api";
 import { toast } from "sonner";
-import { 
-  Trash2, 
-  Upload, 
-  CheckCircle2, 
+import {
+  Trash2,
+  Upload,
+  CheckCircle2,
   AlertCircle,
-  Loader2,
-  FileText as FileIcon
+  FileText as FileIcon,
+  Loader2
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function SeekerProfile() {
   const { user } = useAppContext();
@@ -128,11 +129,7 @@ export default function SeekerProfile() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loader message="Loading profile..." />;
   }
 
   const skills = profile?.skills || [];
@@ -443,7 +440,7 @@ export default function SeekerProfile() {
               Professional Resume
             </h3>
           </div>
-          <div 
+          <div
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
@@ -457,7 +454,7 @@ export default function SeekerProfile() {
               w-16 h-16 rounded-2xl border shadow-sm flex items-center justify-center mx-auto mb-5 transition-all duration-500
               ${profile?.resumeUrl ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-card border-border text-muted-foreground group-hover:scale-110 group-hover:text-primary"}
             `}>
-              {uploading ? <Loader2 className="w-8 h-8 animate-spin text-primary" /> : profile?.resumeUrl ? <CheckCircle2 className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
+              {uploading ? <Loader size="sm" /> : profile?.resumeUrl ? <CheckCircle2 className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
             </div>
 
             {uploading ? (
@@ -467,7 +464,7 @@ export default function SeekerProfile() {
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden border border-border/50">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${uploadProgress}%` }}
                     className="h-full bg-primary"
@@ -481,21 +478,21 @@ export default function SeekerProfile() {
                   <p className="text-xs text-muted-foreground font-medium">Your resume is visible to recruiters looking for your skills.</p>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3">
-                  <a 
-                    href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${profile.resumeUrl}`} 
-                    target="_blank" 
-                    rel="noreferrer" 
+                  <a
+                    href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${profile.resumeUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
                     className="btn-primary py-2.5 px-8 text-xs font-bold flex items-center gap-2"
                   >
                     <FileIcon className="w-4 h-4" /> View Resume
                   </a>
-                  <button 
+                  <button
                     onClick={() => document.getElementById("resume-upload-input")?.click()}
                     className="px-6 py-2.5 rounded-xl border border-border text-xs font-bold bg-card hover:bg-muted transition-colors flex items-center gap-2"
                   >
                     <Edit3 className="w-4 h-4" /> Replace
                   </button>
-                  <button 
+                  <button
                     onClick={handleDeleteResume}
                     className="w-10 h-10 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive hover:text-white transition-all flex items-center justify-center p-0"
                     title="Delete Resume"
@@ -514,7 +511,7 @@ export default function SeekerProfile() {
                   <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> DOCX</span>
                   <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> MAX 5MB</span>
                 </div>
-                <button 
+                <button
                   onClick={() => document.getElementById("resume-upload-input")?.click()}
                   className="btn-primary mt-8 px-10 py-3 rounded-2xl shadow-lg shadow-primary/20 transform active:scale-95 transition-all flex items-center gap-2 mx-auto"
                 >
@@ -523,7 +520,7 @@ export default function SeekerProfile() {
               </>
             )}
 
-            <input 
+            <input
               id="resume-upload-input"
               type="file"
               className="hidden"

@@ -14,6 +14,7 @@ import {
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 type Job = {
   id: string;
@@ -168,9 +169,7 @@ export default function ExploreJobs() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <Loader message="Fetching the best jobs for you..." />
       ) : (
         <div
           className={

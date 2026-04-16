@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 type Job = {
   id: string;
@@ -86,11 +87,7 @@ export default function JobDetails() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Opening job details..." />;
   }
 
   if (!job) {
@@ -246,7 +243,7 @@ export default function JobDetails() {
                 className="btn-primary w-full py-3 text-center disabled:opacity-50 flex justify-center items-center gap-2"
               >
                 {isApplying ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   "Apply Now"
                 )}

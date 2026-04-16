@@ -6,7 +6,7 @@ export default function PublicFooter() {
         <footer className="relative border-t border-white/10 pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-card/40 backdrop-blur-xl overflow-hidden">
             {/* Top accent gradient border */}
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
-            
+
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Brand Section */}
@@ -103,7 +103,7 @@ export default function PublicFooter() {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 mb-1">Call Us</span>
-                                    <a href="tel:+919967267280" className="hover:text-primary transition-colors">+91 9967267280</a>
+                                    <a href="tel:+918850070036" className="hover:text-primary transition-colors">+91 8850070036</a>
                                 </div>
                             </li>
                             <li className="flex items-start gap-4">

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Users, Mail, BookOpen, Calendar, Loader2, Search, Filter, Download, User } from "lucide-react";
 import { getNgoCourses, getCourseEnrollments } from "@/services/api";
 import { useAppContext } from "@/contexts/AppContext";
+import Loader from "@/components/Loader";
 
 export default function NgoEnrollments() {
     const { user } = useAppContext();
@@ -82,10 +83,7 @@ export default function NgoEnrollments() {
             </div>
 
             {loading ? (
-                <div className="h-[40vh] flex flex-col items-center justify-center gap-3">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground animate-pulse">Loading enrollments...</p>
-                </div>
+                <Loader message="Syncing student enrollments..." />
             ) : filtered.length === 0 ? (
                 <div className="clean-card p-16 text-center space-y-4 max-w-lg mx-auto">
                     <div className="w-16 h-16 rounded-3xl bg-secondary/10 flex items-center justify-center text-secondary mx-auto mb-4">

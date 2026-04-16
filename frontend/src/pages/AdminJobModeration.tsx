@@ -10,6 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 interface Job {
   id: string;
@@ -113,9 +114,7 @@ export default function AdminJobModeration() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-[300px] items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <Loader message="Auditing job marketplace..." />
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filtered.map((job, i) => (
@@ -133,11 +132,10 @@ export default function AdminJobModeration() {
                       {job.title}
                     </h3>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
-                        job.active
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${job.active
                           ? "bg-success/10 text-success border-success/20"
                           : "bg-warning/10 text-warning border-warning/20"
-                      }`}
+                        }`}
                     >
                       {job.active ? "Active" : "Hidden"}
                     </span>
@@ -162,7 +160,7 @@ export default function AdminJobModeration() {
                       title="Hide from public"
                     >
                       {processingId === job.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <Loader size="sm" />
                       ) : (
                         <Eye className="w-3.5 h-3.5" />
                       )}
@@ -176,7 +174,7 @@ export default function AdminJobModeration() {
                       title="Publish as Active"
                     >
                       {processingId === job.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <Loader size="sm" />
                       ) : (
                         <CheckCircle2 className="w-3.5 h-3.5" />
                       )}
@@ -192,7 +190,7 @@ export default function AdminJobModeration() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20 transition-all disabled:opacity-50"
                   >
                     {processingId === job.id && !job.active ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <Loader size="sm" />
                     ) : (
                       <Trash2 className="w-3.5 h-3.5" />
                     )}

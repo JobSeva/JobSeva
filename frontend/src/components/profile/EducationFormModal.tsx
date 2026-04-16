@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, GraduationCap, Calendar, Award, Loader2, Save, School } from "lucide-react";
+import { X, GraduationCap, Calendar, Award, Save, School } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface EducationFormModalProps {
   isOpen: boolean;
@@ -9,11 +10,11 @@ interface EducationFormModalProps {
   initialData?: any;
 }
 
-export default function EducationFormModal({ 
-  isOpen, 
-  onClose, 
-  onSave, 
-  initialData 
+export default function EducationFormModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData
 }: EducationFormModalProps) {
   const [formData, setFormData] = useState({
     school: initialData?.school || "",
@@ -70,7 +71,7 @@ export default function EducationFormModal({
         <div className="p-6 border-b border-border flex items-center justify-between bg-muted/30">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5" />
+              < GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-heading font-bold">
@@ -107,7 +108,7 @@ export default function EducationFormModal({
             <div className="space-y-1.5">
               <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Degree</label>
               <div className="relative group">
-                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                < GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <input
                   required
                   type="text"
@@ -194,7 +195,7 @@ export default function EducationFormModal({
               disabled={isLoading}
               className="btn-primary px-8 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20"
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isLoading ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
               {initialData ? "Update" : "Save"} Education
             </button>
           </div>

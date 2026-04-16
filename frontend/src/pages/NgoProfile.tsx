@@ -17,6 +17,7 @@ import {
     Users as UsersIcon,
     Link as LinkIcon
 } from "lucide-react";
+import Loader from "@/components/Loader";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { getNgoProfile, updateNgoProfile } from "@/services/api";
@@ -82,7 +83,7 @@ export default function NgoProfile() {
             // Clean up submission object - only send fields that are valid
             const submission: any = { ...editForm };
             const year = Number(editForm.foundingYear);
-            
+
             if (!year || year < 1800 || year > new Date().getFullYear()) {
                 delete submission.foundingYear;
             } else {
@@ -95,7 +96,7 @@ export default function NgoProfile() {
             toast.success("Profile updated successfully");
             // If name changed, we might need a page refresh or context update
             if (editForm.name !== user?.name) {
-                window.location.reload(); 
+                window.location.reload();
             }
         } catch (err: any) {
             const msg = err.response?.data?.message || "Failed to update profile";
@@ -125,11 +126,7 @@ export default function NgoProfile() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-        );
+        return <Loader message="Loading organization profile..." />;
     }
 
     return (
@@ -144,24 +141,24 @@ export default function NgoProfile() {
                 </h1>
                 {isEditing ? (
                     <div className="flex items-center gap-2">
-                        <button 
+                        <button
                             onClick={handleCancel}
                             className="p-2.5 rounded-xl border border-border hover:bg-muted transition-colors text-muted-foreground"
                             disabled={saving}
                         >
                             <X className="w-5 h-5" />
                         </button>
-                        <button 
+                        <button
                             onClick={handleSave}
                             disabled={saving}
                             className="btn-primary py-2.5 px-6 flex items-center gap-2 shadow-lg shadow-primary/20"
                         >
-                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            {saving ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
                             Save Changes
                         </button>
                     </div>
                 ) : (
-                    <button 
+                    <button
                         onClick={() => setIsEditing(true)}
                         className="btn-primary flex items-center gap-2 py-2.5 px-6 shadow-lg shadow-primary/20"
                     >
@@ -180,10 +177,10 @@ export default function NgoProfile() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 text-center sm:text-left">
                     <div className="relative group">
                         {editForm.logoUrl || profile?.logoUrl ? (
-                            <img 
-                                src={editForm.logoUrl || profile.logoUrl} 
-                                alt={editForm.name} 
-                                className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] object-cover shadow-2xl border-4 border-background ring-1 ring-border/50" 
+                            <img
+                                src={editForm.logoUrl || profile.logoUrl}
+                                alt={editForm.name}
+                                className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] object-cover shadow-2xl border-4 border-background ring-1 ring-border/50"
                             />
                         ) : (
                             <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-3xl sm:text-4xl font-heading font-bold text-white shadow-2xl">
@@ -193,7 +190,7 @@ export default function NgoProfile() {
                         {isEditing && (
                             <div className="absolute inset-0 bg-black/40 rounded-[2rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                 <Camera className="w-8 h-8 text-white" />
-                                <input 
+                                <input
                                     type="text"
                                     value={editForm.logoUrl}
                                     onChange={(e) => setEditForm(prev => ({ ...prev, logoUrl: e.target.value }))}
@@ -209,15 +206,15 @@ export default function NgoProfile() {
                         <div className="space-y-2">
                             {isEditing ? (
                                 <div className="space-y-3">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editForm.name}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                                         className="text-2xl sm:text-3xl font-heading font-bold bg-muted/50 border border-primary/20 rounded-xl px-4 py-2 w-full outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                                         placeholder="NGO Name"
                                     />
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editForm.tagline}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, tagline: e.target.value }))}
                                         className="text-base text-primary/80 font-medium bg-muted/30 border border-border/50 rounded-lg px-3 py-1.5 w-full outline-none focus:border-primary/30"
@@ -242,8 +239,8 @@ export default function NgoProfile() {
                             <span className="flex items-center gap-2.5">
                                 <MapPin className="w-4 h-4 text-primary shrink-0" />
                                 {isEditing ? (
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editForm.location}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, location: e.target.value }))}
                                         className="bg-muted/50 border border-border/50 rounded-lg px-2 py-1 flex-1 text-xs"
@@ -258,8 +255,8 @@ export default function NgoProfile() {
                             <span className="flex items-center gap-2.5">
                                 <Phone className="w-4 h-4 text-primary shrink-0" />
                                 {isEditing ? (
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editForm.phone}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
                                         className="bg-muted/50 border border-border/50 rounded-lg px-2 py-1 flex-1 text-xs"
@@ -270,8 +267,8 @@ export default function NgoProfile() {
                             <span className="flex items-center gap-2.5">
                                 <Globe className="w-4 h-4 text-primary shrink-0" />
                                 {isEditing ? (
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={editForm.website}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, website: e.target.value }))}
                                         className="bg-muted/50 border border-border/50 rounded-lg px-2 py-1 flex-1 text-xs"
@@ -319,7 +316,7 @@ export default function NgoProfile() {
                             Organization Profile
                         </h3>
                         {isEditing ? (
-                            <textarea 
+                            <textarea
                                 value={editForm.description}
                                 onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                                 className="bg-muted/50 border border-border/50 rounded-2xl p-5 w-full min-h-[180px] outline-none focus:border-primary/50 text-sm leading-relaxed"
@@ -357,8 +354,8 @@ export default function NgoProfile() {
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{social.label}</p>
                                         {isEditing ? (
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 value={(editForm as any)[social.field || social.id]}
                                                 onChange={(e) => setEditForm(prev => ({ ...prev, [social.field || social.id]: e.target.value }))}
                                                 className="bg-transparent border-none border-b border-border/30 rounded-none px-0 py-0.5 w-full outline-none focus:border-primary text-xs font-semibold"
@@ -394,8 +391,8 @@ export default function NgoProfile() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-wider">Founding Year</label>
                                 {isEditing ? (
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         value={editForm.foundingYear || ""}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, foundingYear: Number(e.target.value) }))}
                                         className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2.5 w-full outline-none focus:border-primary text-sm font-bold"
@@ -412,7 +409,7 @@ export default function NgoProfile() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-wider">Estimated Size</label>
                                 {isEditing ? (
-                                    <select 
+                                    <select
                                         value={editForm.size}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, size: e.target.value }))}
                                         className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2.5 w-full outline-none focus:border-primary text-sm font-bold appearance-none cursor-pointer"

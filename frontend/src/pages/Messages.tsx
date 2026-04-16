@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Paperclip, Search, Loader2 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 import { useAppContext } from "@/contexts/AppContext";
 
 export default function Messages() {
@@ -116,11 +117,10 @@ export default function Messages() {
               <button
                 key={c.id}
                 onClick={() => setSelectedUserId(c.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                  selectedUserId === c.id
-                    ? "bg-primary/10 border border-primary/20"
-                    : "hover:bg-muted"
-                }`}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${selectedUserId === c.id
+                  ? "bg-primary/10 border border-primary/20"
+                  : "hover:bg-muted"
+                  }`}
               >
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-heading font-bold text-sm text-primary flex-shrink-0">
                   {c.avatarUrl ? (
@@ -178,9 +178,7 @@ export default function Messages() {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {loading ? (
-                  <div className="flex justify-center items-center h-full">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  </div>
+                  <Loader message="Opening your inbox..." />
                 ) : messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
                     <p>No messages yet</p>
@@ -194,11 +192,10 @@ export default function Messages() {
                         className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
-                            isMe
-                              ? "bg-primary text-primary-foreground rounded-br-md"
-                              : "bg-muted text-foreground rounded-bl-md"
-                          }`}
+                          className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMe
+                            ? "bg-primary text-primary-foreground rounded-br-md"
+                            : "bg-muted text-foreground rounded-bl-md"
+                            }`}
                         >
                           <p>{msg.content}</p>
                           <p

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FileText, Loader2, BookmarkCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 interface Job {
   id: string;
@@ -63,11 +64,7 @@ export default function SavedJobs() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Retrieving your saved opportunities..." />;
   }
 
   if (error) {

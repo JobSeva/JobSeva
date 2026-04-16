@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 import { Link } from "react-router-dom";
 
 const stages = [
@@ -66,7 +67,7 @@ export default function Applications() {
       } catch (err: any) {
         setError(
           err.response?.data?.error?.message ||
-            "An error occurred while loading applications",
+          "An error occurred while loading applications",
         );
       } finally {
         setIsLoading(false);
@@ -86,11 +87,7 @@ export default function Applications() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Retrieving your applications..." />;
   }
 
   if (error) {
@@ -189,11 +186,10 @@ export default function Applications() {
                           className="flex items-center gap-2"
                         >
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
-                              isCompleted
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${isCompleted
                                 ? stage.color
                                 : "bg-muted text-muted-foreground"
-                            }`}
+                              }`}
                           >
                             <stage.icon className="w-4 h-4" />
                           </div>

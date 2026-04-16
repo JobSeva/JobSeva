@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getNgoCourses, deleteCourse } from "@/services/api";
 import { useAppContext } from "@/contexts/AppContext";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 export default function NgoCourses() {
     const { user } = useAppContext();
@@ -77,10 +78,7 @@ export default function NgoCourses() {
             </div>
 
             {loading ? (
-                <div className="h-[40vh] flex flex-col items-center justify-center gap-3">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground animate-pulse">Loading courses...</p>
-                </div>
+                <Loader message="Fetching your specialized courses..." />
             ) : filteredCourses.length === 0 ? (
                 <div className="clean-card p-16 text-center space-y-4 max-w-lg mx-auto">
                     <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center text-primary mx-auto mb-4">

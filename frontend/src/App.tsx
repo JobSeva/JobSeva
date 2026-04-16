@@ -13,6 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider, useAppContext } from "@/contexts/AppContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import AppLayout from "@/components/AppLayout";
+import Loader from "@/components/Loader";
 import LandingPage from "@/pages/LandingPage";
 import Settings from "@/pages/Settings";
 import LoginSelection from "@/pages/auth/LoginSelection";
@@ -73,16 +74,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthLoading, user } = useAppContext();
 
   if (isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground font-medium">
-            Loading your session...
-          </p>
-        </div>
-      </div>
-    );
+    return <Loader fullScreen message="Loading your session..." />;
   }
 
   if (!user) {

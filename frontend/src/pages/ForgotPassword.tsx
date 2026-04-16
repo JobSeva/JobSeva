@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { forgotPassword } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 const getApiErrorMessage = (error: unknown, fallback: string): string => {
   if (
@@ -111,10 +112,7 @@ export default function ForgotPassword() {
                 className="w-full py-3 rounded-xl font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Sending...
-                  </>
+                  <Loader size="sm" message="Sending..." />
                 ) : (
                   "Send Reset Link"
                 )}

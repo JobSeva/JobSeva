@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import { getSeekerProfile, getNgoProfile, updateSeekerProfile, updateNgoProfile } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 export default function Settings() {
   const { user, role } = useAppContext();
@@ -83,11 +84,7 @@ export default function Settings() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Loading settings..." />;
   }
 
   return (
@@ -112,8 +109,8 @@ export default function Settings() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                  : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                : "hover:bg-muted text-muted-foreground hover:text-foreground"
                 }`}
             >
               <tab.icon className="w-4.5 h-4.5" />
@@ -225,7 +222,7 @@ export default function Settings() {
                   disabled={saving}
                   className="btn-primary py-3 px-10 text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {saving ? <Loader size="sm" /> : null}
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
               </div>

@@ -10,6 +10,7 @@ import {
   FileText,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 import { useSearchParams } from "react-router-dom";
 import { getCompanyJobs, getCompanyJobApplicants } from "@/services/api";
@@ -42,7 +43,7 @@ interface ApplicantView {
 export default function CompanyApplicants() {
   const [searchParams] = useSearchParams();
   const filterJobId = searchParams.get("jobId");
-  
+
   const [candidates, setCandidates] = useState<ApplicantView[]>([]);
   const [selectedCandidate, setSelectedCandidate] =
     useState<ApplicantView | null>(null);
@@ -125,11 +126,7 @@ export default function CompanyApplicants() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Fetching candidates..." />;
   }
 
   return (
@@ -259,7 +256,7 @@ export default function CompanyApplicants() {
           >
             {isUpdating && (
               <div className="absolute inset-0 bg-background/50 rounded-xl backdrop-blur-sm flex items-center justify-center z-10">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                <Loader size="sm" message="Updating status..." />
               </div>
             )}
             <div className="flex items-center gap-4">
@@ -296,7 +293,7 @@ export default function CompanyApplicants() {
                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">PDF / DOCX</p>
                   </div>
                 </div>
-                <a 
+                <a
                   href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${selectedCandidate.resumeUrl}`}
                   target="_blank"
                   rel="noreferrer"

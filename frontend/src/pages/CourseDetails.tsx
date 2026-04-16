@@ -5,6 +5,7 @@ import { Clock, MapPin, Monitor, Users, ArrowLeft, CheckCircle, Loader2, Graduat
 import { useAppContext } from "@/contexts/AppContext";
 import { getCourseById, enrollCourse, getUserEnrollments } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 export default function CourseDetails() {
     const { id } = useParams<{ id: string }>();
@@ -62,11 +63,7 @@ export default function CourseDetails() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        );
+        return <Loader message="Fetching course itinerary..." />;
     }
 
     if (!course) {
@@ -162,7 +159,7 @@ export default function CourseDetails() {
                             disabled={enrolling}
                             className="w-full sm:w-auto px-8 py-3 rounded-xl font-heading font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-purple-500 to-orange-400 text-white hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] disabled:opacity-70 flex items-center justify-center gap-2"
                         >
-                            {enrolling ? <Loader2 className="w-4 h-4 animate-spin" /> : "Enroll Now"}
+                            {enrolling ? <Loader size="sm" /> : "Enroll Now"}
                         </button>
                     )}
                 </div>

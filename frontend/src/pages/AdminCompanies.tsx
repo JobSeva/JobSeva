@@ -11,6 +11,7 @@ import {
   Download,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 import { buildCsv, downloadCsv } from "@/lib/csv";
 
 interface CompanyProfile {
@@ -118,7 +119,7 @@ export default function AdminCompanies() {
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-sm font-medium hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isExporting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader size="sm" />
           ) : (
             <Download className="w-4 h-4" />
           )}
@@ -127,9 +128,7 @@ export default function AdminCompanies() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-[300px] items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <Loader message="Managing corporate entities..." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((company, i) => (
@@ -198,7 +197,7 @@ export default function AdminCompanies() {
                   className="flex-1 px-4 py-2 rounded-xl border border-destructive/20 text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {deletingId === company.companyId ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader size="sm" />
                   ) : (
                     <Trash2 className="w-4 h-4" />
                   )}

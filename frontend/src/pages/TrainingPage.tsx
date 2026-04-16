@@ -6,6 +6,7 @@ import { getAllCourses, enrollCourse } from "@/services/api";
 import { useAppContext } from "@/contexts/AppContext";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
+import Loader from "@/components/Loader";
 
 const categories = [
     { name: "Web Development", icon: "💻" },
@@ -217,11 +218,7 @@ export default function TrainingPage() {
                     </div>
                 </div>
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {[1, 2, 3, 4, 1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-96 rounded-3xl bg-muted animate-pulse" />
-                        ))}
-                    </div>
+                    <Loader message="Mastering new skills..." />
                 ) : sortedCourses.length === 0 ? (
                     <div className="clean-card p-20 text-center space-y-4">
                         <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
@@ -318,7 +315,7 @@ export default function TrainingPage() {
                                                 disabled={enrollingId === course.id}
                                                 className="flex-[1.5] py-3.5 rounded-xl bg-primary text-white font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_12px_24px_-8px_rgba(var(--primary-rgb),0.4)] hover:shadow-[0_16px_32px_-8px_rgba(var(--primary-rgb),0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                                             >
-                                                {enrollingId === course.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Enroll Now"}
+                                                {enrollingId === course.id ? <Loader size="sm" /> : "Enroll Now"}
                                             </button>
                                         </div>
                                     </div>

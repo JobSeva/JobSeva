@@ -18,6 +18,7 @@ import {
   Loader2,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 export default function CompanyProfileView() {
   const [companyData, setCompanyData] = useState<any>(null);
@@ -32,11 +33,7 @@ export default function CompanyProfileView() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex justify-center p-12">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Fetching organizational profile..." />;
   }
 
   if (!companyData) {

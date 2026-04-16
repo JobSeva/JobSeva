@@ -13,9 +13,9 @@ import {
     Link as LinkIcon,
     Plus,
     Trash2,
-    Save,
-    Loader2
+    Save
 } from "lucide-react";
+import Loader from "@/components/Loader";
 import {
     updateSeekerProfile,
     addSeekerExperience,
@@ -43,7 +43,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
     const [activeTab, setActiveTab] = useState<Tab>("basic");
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<any>({});
-    
+
     // Sub-modal states
     const [isExpModalOpen, setIsExpModalOpen] = useState(false);
     const [isEduModalOpen, setIsEduModalOpen] = useState(false);
@@ -205,8 +205,8 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as Tab)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                    : "text-muted-foreground hover:bg-background"
+                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                : "text-muted-foreground hover:bg-background"
                                 }`}
                         >
                             <tab.icon className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                         disabled={isLoading}
                                         className="btn-primary w-full py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                                     >
-                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                        {isLoading ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
                                         Save Basic Information
                                     </button>
                                 </div>
@@ -473,7 +473,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                                         disabled={isLoading}
                                         className="btn-primary w-full py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                                     >
-                                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                        {isLoading ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
                                         Save Social Links
                                     </button>
                                 </div>
@@ -493,7 +493,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                 </div>
 
                 {/* Submodals */}
-                <ExperienceFormModal 
+                <ExperienceFormModal
                     isOpen={isExpModalOpen}
                     onClose={() => {
                         setIsExpModalOpen(false);
@@ -503,7 +503,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                     initialData={editingItem}
                 />
 
-                <EducationFormModal 
+                <EducationFormModal
                     isOpen={isEduModalOpen}
                     onClose={() => {
                         setIsEduModalOpen(false);
@@ -513,10 +513,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdate }:
                     initialData={editingItem}
                 />
 
-                <ConfirmModal 
+                <ConfirmModal
                     isOpen={isConfirmOpen}
                     onClose={() => setIsConfirmOpen(false)}
-                    onConfirm={confirmAction?.onConfirm || (() => {})}
+                    onConfirm={confirmAction?.onConfirm || (() => { })}
                     title={confirmAction?.title || "Confirm Action"}
                     message={confirmAction?.message || "Are you sure?"}
                 />

@@ -2,15 +2,10 @@ import nodemailer from "nodemailer";
 import { env } from "../config/env";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER || env.emailUser,
     pass: process.env.EMAIL_PASS || env.emailPass,
-  },
-  tls: {
-    rejectUnauthorized: false,
   },
 });
 
@@ -145,44 +140,98 @@ const getPasswordResetEmailHtml = (name: string, resetUrl: string): string => `
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reset Your Password - JobSeva</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .container { width: 100% !important; padding: 20px !important; }
+      .card { border-radius: 12px !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:40px 16px;">
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:40px 0;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+        <!-- Container -->
+        <table class="container" width="500" cellpadding="0" cellspacing="0" style="width:500px;margin:0 auto;">
+          
+          <!-- Logo Section -->
           <tr>
-            <td style="background:linear-gradient(135deg,#0ea5e9 0%,#f97316 100%);border-radius:16px 16px 0 0;padding:40px 32px;text-align:center;">
-              <h1 style="margin:0;font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">JobSeva</h1>
-              <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;">Password reset requested</p>
+            <td align="center" style="padding-bottom: 32px;">
+              <!-- Replace with actual hosted logo URL -->
+              <img src="https://jobseva.com/JobSeva.png" alt="JobSeva Logo" width="160" style="display:block;outline:none;border:none;text-decoration:none;">
             </td>
           </tr>
+
+          <!-- Main Card -->
           <tr>
-            <td style="background:#ffffff;padding:36px 40px 30px;">
-              <h2 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#0f172a;text-align:center;">Reset Your Password</h2>
-              <p style="margin:0 0 24px;font-size:15px;color:#64748b;text-align:center;line-height:1.6;">
-                Hi <strong style="color:#0f172a;">${name}</strong>, we received a request to reset your JobSeva password.
-              </p>
-              <p style="margin:0 0 20px;font-size:14px;color:#475569;line-height:1.7;">
-                Click the button below to set a new password. This link expires in <strong>60 minutes</strong>.
-              </p>
-              <div style="text-align:center;margin:0 0 22px;">
-                <a href="${resetUrl}"
-                   style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#f97316);color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:14px 34px;border-radius:12px;letter-spacing:0.2px;box-shadow:0 4px 14px rgba(14,165,233,0.3);">
-                  Reset Password
-                </a>
-              </div>
-              <p style="margin:0 0 8px;font-size:13px;color:#94a3b8;text-align:center;">If the button does not work, open this link:</p>
-              <p style="margin:0;font-size:12px;color:#0ea5e9;text-align:center;word-break:break-all;line-height:1.5;">
-                <a href="${resetUrl}" style="color:#0ea5e9;text-decoration:none;">${resetUrl}</a>
-              </p>
+            <td class="card" style="background-color:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);">
+              
+              <!-- Gradient Header -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:linear-gradient(135deg, #7c3aed 0%, #f97316 100%);padding:40px 40px 30px;text-align:center;">
+                    <div style="background:rgba(255,255,255,0.2);width:64px;height:64px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
+                      <span style="font-size:32px;">🔑</span>
+                    </div>
+                    <h1 style="margin:0;font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Reset Your Password</h1>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Body Content -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:40px;text-align:center;">
+                    <p style="margin:0 0 16px;font-size:16px;line-height:24px;color:#334155;font-weight:500;">
+                      Hi ${name},
+                    </p>
+                    <p style="margin:0 0 32px;font-size:16px;line-height:24px;color:#64748b;">
+                      We received a request to reset your password. If you didn't make this request, you can safely ignore this email.
+                    </p>
+
+                    <!-- CTA Button -->
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg, #7c3aed 0%, #f97316 100%);color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:18px 36px;border-radius:14px;box-shadow:0 4px 6px -1px rgba(124, 58, 237, 0.2), 0 2px 4px -1px rgba(124, 58, 237, 0.1);">
+                            Reset Password
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <p style="margin:32px 0 0;font-size:14px;color:#94a3b8;font-weight:500;">
+                      This link expires in <span style="color:#f97316;">60 minutes</span>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Footer Background -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background-color:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #f1f5f9;">
+                    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:18px;">
+                      If you're having trouble clicking the button, copy and paste the link below into your web browser:
+                    </p>
+                    <p style="margin:12px 0 0;font-size:12px;color:#7c3aed;word-break:break-all;">
+                      <a href="${resetUrl}" style="color:#7c3aed;text-decoration:none;">${resetUrl}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
+
+          <!-- Final Footer -->
           <tr>
-            <td style="background:#ffffff;padding:20px 40px 30px;border-radius:0 0 16px 16px;border:1px solid #e2e8f0;border-top:none;">
-              <hr style="border:none;border-top:1px solid #e2e8f0;margin:0 0 14px;" />
-              <p style="margin:0 0 8px;font-size:12px;color:#94a3b8;text-align:center;">If you did not request this reset, you can safely ignore this email.</p>
-              <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center;">For your security, only your most recent reset link will work.</p>
+            <td style="padding:32px 40px 0;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#cbd5e1;text-transform:uppercase;letter-spacing:1px;font-weight:600;">
+                © 2026 JobSeva India
+              </p>
+              <p style="margin:8px 0 0;font-size:12px;color:#cbd5e1;">
+                Securing your career journey.
+              </p>
             </td>
           </tr>
         </table>
@@ -191,7 +240,7 @@ const getPasswordResetEmailHtml = (name: string, resetUrl: string): string => `
   </table>
 </body>
 </html>
-`;
+`;;
 
 const getBackendBaseUrl = (): string => {
   return (

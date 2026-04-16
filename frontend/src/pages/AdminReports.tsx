@@ -23,6 +23,7 @@ import {
   Cell,
 } from "recharts";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 const COLORS = [
   "hsl(var(--primary))",
@@ -131,11 +132,7 @@ export default function AdminReports() {
   };
 
   if (isLoading || !reports) {
-    return (
-      <div className="flex h-[300px] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Generating analytical reports..." />;
   }
 
   return (
@@ -162,11 +159,10 @@ export default function AdminReports() {
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                range === r
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${range === r
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {r.toUpperCase()}
             </button>

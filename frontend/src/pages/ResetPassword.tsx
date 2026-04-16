@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { resetPassword } from "@/services/api";
 import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 const getApiErrorMessage = (error: unknown, fallback: string): string => {
   if (
@@ -217,10 +218,7 @@ export default function ResetPassword() {
                 className="w-full py-3 rounded-xl font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Updating...
-                  </>
+                  <Loader size="sm" message="Updating..." />
                 ) : (
                   "Update Password"
                 )}

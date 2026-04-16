@@ -24,6 +24,7 @@ import {
   Cell,
 } from "recharts";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 const PIE_COLORS = [
   "hsl(var(--primary))",
@@ -76,11 +77,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (isLoading || !stats) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <Loader message="Loading administrative metrics..." />;
   }
 
   const statCards = [
@@ -141,13 +138,12 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <div
-                className={`p-2 rounded-xl ${
-                  stat.variant === "purple"
+                className={`p-2 rounded-xl ${stat.variant === "purple"
                     ? "bg-primary/10 text-primary"
                     : stat.variant === "orange"
                       ? "bg-warning/10 text-warning"
                       : "bg-success/10 text-success"
-                }`}
+                  }`}
               >
                 <stat.icon className="w-5 h-5" />
               </div>

@@ -9,6 +9,7 @@ import {
   Download,
 } from "lucide-react";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 import { buildCsv, downloadCsv } from "@/lib/csv";
 
 interface UserData {
@@ -124,7 +125,7 @@ export default function AdminUsers() {
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-sm font-medium hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isExporting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader size="sm" />
           ) : (
             <Download className="w-4 h-4" />
           )}
@@ -133,9 +134,7 @@ export default function AdminUsers() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <Loader message="Accessing user directory..." />
       ) : (
         <div className="clean-card overflow-hidden">
           <div className="overflow-x-auto">
@@ -176,11 +175,10 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium border ${
-                          user.status === "active"
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-medium border ${user.status === "active"
                             ? "bg-success/10 text-success border-success/20"
                             : "bg-destructive/10 text-destructive border-destructive/20"
-                        }`}
+                          }`}
                       >
                         {user.status === "active" ? "Active" : "Suspended"}
                       </span>
@@ -188,11 +186,10 @@ export default function AdminUsers() {
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end">
                         <button
-                          className={`p-2 rounded-lg transition-colors border ${
-                            user.status === "active"
+                          className={`p-2 rounded-lg transition-colors border ${user.status === "active"
                               ? "text-destructive hover:bg-destructive/10 border-transparent hover:border-destructive/20"
                               : "text-success hover:bg-success/10 border-transparent hover:border-success/20"
-                          } disabled:opacity-50`}
+                            } disabled:opacity-50`}
                           onClick={() => toggleStatus(user.id, user.status)}
                           disabled={isToggling === user.id}
                           title={
@@ -202,7 +199,7 @@ export default function AdminUsers() {
                           }
                         >
                           {isToggling === user.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader size="sm" />
                           ) : user.status === "active" ? (
                             <Ban className="w-4 h-4" />
                           ) : (

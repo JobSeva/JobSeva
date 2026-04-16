@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   Mail,
   Lock,
-  Loader2,
   GraduationCap,
   ArrowLeft,
   AlertCircle,
@@ -12,6 +11,7 @@ import {
 import { useAppContext } from "@/contexts/AppContext";
 import api from "@/lib/api";
 import { resendVerification } from "@/services/api";
+import Loader from "@/components/Loader";
 
 export default function NgoLogin() {
   const [email, setEmail] = useState("");
@@ -132,15 +132,15 @@ export default function NgoLogin() {
                   <p>{error}</p>
                   {(error.toLowerCase().includes("verify") ||
                     error.toLowerCase().includes("verified")) && (
-                    <button
-                      type="button"
-                      onClick={handleResend}
-                      disabled={isLoading}
-                      className="text-purple-500 hover:underline font-bold block"
-                    >
-                      {isLoading ? "Sending..." : "Resend Verification Email"}
-                    </button>
-                  )}
+                      <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={isLoading}
+                        className="text-purple-500 hover:underline font-bold block"
+                      >
+                        {isLoading ? "Sending..." : "Resend Verification Email"}
+                      </button>
+                    )}
                 </div>
               </div>
             </motion.div>
@@ -190,7 +190,7 @@ export default function NgoLogin() {
             className="w-full relative overflow-hidden rounded-xl px-6 py-3 font-heading font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-purple-500 to-orange-400 text-white hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader size="sm" message="Authenticating..." />
             ) : (
               "Sign In"
             )}

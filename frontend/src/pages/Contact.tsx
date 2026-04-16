@@ -34,7 +34,7 @@ export default function Contact() {
                             </div>
                             <div>
                                 <h3 className="text-xl font-heading font-bold text-foreground">Email Support</h3>
-                                <p className="text-muted-foreground mt-2">support@jobseva.com</p>
+                                <p className="text-muted-foreground mt-2">jobsevaindia@gmail.com</p>
                             </div>
                         </div>
 
@@ -44,7 +44,7 @@ export default function Contact() {
                             </div>
                             <div>
                                 <h3 className="text-xl font-heading font-bold text-foreground">Phone</h3>
-                                <p className="text-muted-foreground mt-2">+91 98765 43210</p>
+                                <p className="text-muted-foreground mt-2">+91 8850070036</p>
                             </div>
                         </div>
 

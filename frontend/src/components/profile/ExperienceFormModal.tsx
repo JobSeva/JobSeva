@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Briefcase, Calendar, AlignLeft, Loader2, Save } from "lucide-react";
+import { X, Briefcase, Calendar, AlignLeft, Save } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface ExperienceFormModalProps {
   isOpen: boolean;
@@ -9,11 +10,11 @@ interface ExperienceFormModalProps {
   initialData?: any;
 }
 
-export default function ExperienceFormModal({ 
-  isOpen, 
-  onClose, 
-  onSave, 
-  initialData 
+export default function ExperienceFormModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData
 }: ExperienceFormModalProps) {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
@@ -177,7 +178,7 @@ export default function ExperienceFormModal({
               disabled={isLoading}
               className="btn-primary px-8 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20"
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isLoading ? <Loader size="sm" /> : <Save className="w-4 h-4" />}
               {initialData ? "Update" : "Save"} Experience
             </button>
           </div>

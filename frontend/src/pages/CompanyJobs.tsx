@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { getCompanyJobs } from "@/services/api";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import Loader from "@/components/Loader";
 
 interface Job {
     id: string;
@@ -111,9 +112,7 @@ export default function CompanyJobs() {
             </div>
 
             {isLoading ? (
-                <div className="flex justify-center items-center py-20">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
+                <Loader message="Loading your active listings..." />
             ) : filteredJobs.length === 0 ? (
                 <div className="clean-card p-12 text-center space-y-4">
                     <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto">
