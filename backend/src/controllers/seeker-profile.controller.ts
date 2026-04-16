@@ -14,6 +14,26 @@ const requireSeekerAuth = (req: AuthenticatedRequest): string => {
 };
 
 export const seekerProfileController = {
+  async getPublic(req: AuthenticatedRequest, res: Response): Promise<void> {
+    if (!req.auth) {
+      throw new AppError(401, "Authentication required", "AUTH_REQUIRED");
+    }
+
+    const { seekerId } = req.params;
+
+    if (!seekerId) {
+      throw new AppError(400, "seekerId is required", "VALIDATION_ERROR");
+    }
+
+    const profile = await seekerProfileService.getPublicProfile(
+      seekerId,
+      req.auth.userId,
+      req.auth.role,
+    );
+
+    res.status(200).json(success(profile));
+  },
+
   async get(req: AuthenticatedRequest, res: Response): Promise<void> {
     const seekerId = requireSeekerAuth(req);
     const profile = await seekerProfileService.get(seekerId);
@@ -30,7 +50,10 @@ export const seekerProfileController = {
     const seekerId = requireSeekerAuth(req);
     const { avatarUrl } = req.body as { avatarUrl: string };
 
-    const profile = await seekerProfileService.uploadAvatar(seekerId, avatarUrl);
+    const profile = await seekerProfileService.uploadAvatar(
+      seekerId,
+      avatarUrl,
+    );
     res.status(200).json(success(profile));
   },
 
@@ -38,7 +61,10 @@ export const seekerProfileController = {
     const seekerId = requireSeekerAuth(req);
     const { resumeUrl } = req.body as { resumeUrl: string };
 
-    const profile = await seekerProfileService.uploadResume(seekerId, resumeUrl);
+    const profile = await seekerProfileService.uploadResume(
+      seekerId,
+      resumeUrl,
+    );
     res.status(200).json(success(profile));
   },
 
@@ -50,7 +76,10 @@ export const seekerProfileController = {
 
   async addExperience(req: AuthenticatedRequest, res: Response): Promise<void> {
     const seekerId = requireSeekerAuth(req);
-    const profile = await seekerProfileService.addExperience(seekerId, req.body);
+    const profile = await seekerProfileService.addExperience(
+      seekerId,
+      req.body,
+    );
     res.status(201).json(success(profile));
   },
 

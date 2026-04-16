@@ -6,6 +6,11 @@ export const getSeekerProfile = async () => {
   return response.data;
 };
 
+export const getPublicSeekerProfile = async (seekerId: string) => {
+  const response = await api.get(`/seeker/profile/public/${seekerId}`);
+  return response.data;
+};
+
 export const updateSeekerProfile = async (data: any) => {
   const response = await api.put("/seeker/profile", data);
   return response.data;

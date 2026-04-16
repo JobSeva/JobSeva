@@ -26,6 +26,7 @@ import SeekerDashboard from "@/pages/SeekerDashboard";
 import ExploreJobs from "@/pages/ExploreJobs";
 import Applications from "@/pages/Applications";
 import SeekerProfile from "@/pages/SeekerProfile";
+import SeekerPublicProfile from "@/pages/SeekerPublicProfile";
 import SavedJobs from "@/pages/SavedJobs";
 import Messages from "@/pages/Messages";
 import CompanyDashboard from "@/pages/CompanyDashboard";
@@ -119,6 +120,7 @@ function AppRoutes() {
         <Route path="explore" element={<ExploreJobs />} />
         <Route path="applications" element={<Applications />} />
         <Route path="profile" element={<ProfileGate />} />
+        <Route path="seeker/:seekerId" element={<SeekerPublicProfile />} />
         <Route path="saved" element={<SavedJobs />} />
         <Route path="messages" element={<Messages />} />
         <Route path="job/:id" element={<JobDetails />} />

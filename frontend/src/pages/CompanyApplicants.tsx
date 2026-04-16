@@ -12,7 +12,7 @@ import {
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
 
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getCompanyJobs, getCompanyJobApplicants } from "@/services/api";
 
 const columns = [
@@ -42,6 +42,7 @@ interface ApplicantView {
 
 export default function CompanyApplicants() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const filterJobId = searchParams.get("jobId");
 
   const [candidates, setCandidates] = useState<ApplicantView[]>([]);
@@ -94,7 +95,6 @@ export default function CompanyApplicants() {
       setIsLoading(false);
     }
   };
-
 
   const handleUpdateStatus = async (
     applicationId: string,
@@ -271,6 +271,15 @@ export default function CompanyApplicants() {
                   {selectedCandidate.headline || "Applicant"}
                 </p>
               </div>
+              <button
+                onClick={() => {
+                  setSelectedCandidate(null);
+                  navigate(`/app/seeker/${selectedCandidate.seekerId}`);
+                }}
+                className="ml-auto px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors"
+              >
+                View Full Profile
+              </button>
             </div>
             <div className="space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
@@ -289,8 +298,12 @@ export default function CompanyApplicants() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-foreground">Professional Resume</p>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">PDF / DOCX</p>
+                    <p className="text-xs font-bold text-foreground">
+                      Professional Resume
+                    </p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-60">
+                      PDF / DOCX
+                    </p>
                   </div>
                 </div>
                 <a
@@ -304,40 +317,67 @@ export default function CompanyApplicants() {
               </div>
             )}
             <div>
-              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">Education</p>
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">
+                Education
+              </p>
               <div className="space-y-3">
                 {selectedCandidate.education?.length > 0 ? (
                   selectedCandidate.education.map((edu: any) => (
-                    <div key={edu.id} className="p-3 rounded-xl bg-muted/30 border border-border/50">
-                      <h4 className="text-sm font-bold">{edu.degree} in {edu.field}</h4>
-                      <p className="text-xs text-muted-foreground">{edu.school} • {edu.period || `${edu.startYear} - ${edu.endYear}`}</p>
+                    <div
+                      key={edu.id}
+                      className="p-3 rounded-xl bg-muted/30 border border-border/50"
+                    >
+                      <h4 className="text-sm font-bold">
+                        {edu.degree} in {edu.field}
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        {edu.school} •{" "}
+                        {edu.period || `${edu.startYear} - ${edu.endYear}`}
+                      </p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-muted-foreground italic">No education history listed</p>
+                  <p className="text-xs text-muted-foreground italic">
+                    No education history listed
+                  </p>
                 )}
               </div>
             </div>
 
             <div>
-              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">Experience</p>
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider font-bold">
+                Experience
+              </p>
               <div className="space-y-3">
                 {selectedCandidate.experiences?.length > 0 ? (
                   selectedCandidate.experiences.map((exp: any) => (
-                    <div key={exp.id} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                    <div
+                      key={exp.id}
+                      className="p-3 rounded-xl bg-muted/30 border border-border/50"
+                    >
                       <h4 className="text-sm font-bold">{exp.title}</h4>
-                      <p className="text-xs text-muted-foreground">{exp.company} • {exp.period}</p>
-                      {exp.description && <p className="text-[11px] mt-1 line-clamp-2">{exp.description}</p>}
+                      <p className="text-xs text-muted-foreground">
+                        {exp.company} • {exp.period}
+                      </p>
+                      {exp.description && (
+                        <p className="text-[11px] mt-1 line-clamp-2">
+                          {exp.description}
+                        </p>
+                      )}
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-muted-foreground italic">No experience history listed</p>
+                  <p className="text-xs text-muted-foreground italic">
+                    No experience history listed
+                  </p>
                 )}
               </div>
             </div>
 
             <div>
-              <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-bold">Skills</p>
+              <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider font-bold">
+                Skills
+              </p>
               <div className="flex gap-2 flex-wrap">
                 {selectedCandidate.skills?.length > 0 ? (
                   selectedCandidate.skills.map((s) => (

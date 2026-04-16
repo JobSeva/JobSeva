@@ -15,7 +15,6 @@ import {
 import Loader from "@/components/Loader";
 import api from "@/lib/api";
 import { useAppContext } from "@/contexts/AppContext";
-import { getUserApplications, getRecommendations } from "@/services/api";
 import {
   AreaChart,
   Area,
@@ -33,7 +32,7 @@ export default function SeekerDashboard() {
   const [profileStats, setProfileStats] = useState({
     totalApplications: 0,
     savedJobs: 0,
-    profileViews: 124, // Mocked for now
+    profileViews: 0,
     activeInterviews: 0,
   });
   const [chartData, setChartData] = useState<any[]>([]);
@@ -50,7 +49,7 @@ export default function SeekerDashboard() {
           setProfileStats({
             totalApplications: d.totalApplications,
             savedJobs: d.savedJobsCount,
-            profileViews: 124, // Keep mocked for now as per schema
+            profileViews: d.profileViews ?? 0,
             activeInterviews: d.activeInterviews,
           });
           setChartData(d.chartData || []);
@@ -77,7 +76,10 @@ export default function SeekerDashboard() {
       >
         <div>
           <h1 className="text-3xl font-heading font-bold">
-            Welcome back, <span className="text-primary">{user?.name?.split(' ')[0] || 'Seeker'}</span>
+            Welcome back,{" "}
+            <span className="text-primary">
+              {user?.name?.split(" ")[0] || "Seeker"}
+            </span>
           </h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Your application pipeline is looking active!
@@ -228,9 +230,7 @@ export default function SeekerDashboard() {
           className="clean-card p-6 flex flex-col"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-heading font-bold">
-              Recent Activity
-            </h2>
+            <h2 className="text-lg font-heading font-bold">Recent Activity</h2>
             <Link
               to="/app/applications"
               className="text-sm text-primary hover:underline flex items-center gap-1 font-bold"
@@ -257,14 +257,15 @@ export default function SeekerDashboard() {
                 </div>
                 <div className="text-right shrink-0">
                   <span
-                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${app.status === "hired"
+                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${
+                      app.status === "hired"
                         ? "bg-success/20 text-success"
                         : app.status === "interview"
                           ? "bg-primary/20 text-primary"
                           : app.status === "shortlisted"
                             ? "bg-warning/20 text-warning"
                             : "bg-muted text-muted-foreground"
-                      }`}
+                    }`}
                   >
                     {app.status || "Pending"}
                   </span>
