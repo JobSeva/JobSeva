@@ -149,7 +149,7 @@ export default function RoleLogin() {
       } else if (err.response?.data?.error?.message) {
         msg = err.response.data.error.message;
       }
-      
+
       setError(msg);
       toast.error("Login Failed", { description: msg });
     } finally {
@@ -180,8 +180,14 @@ export default function RoleLogin() {
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse opacity-60" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] animate-pulse opacity-60" style={{ animationDelay: "2s" }} />
-        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "4s" }} />
+        <div
+          className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] animate-pulse opacity-60"
+          style={{ animationDelay: "2s" }}
+        />
+        <div
+          className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] animate-pulse"
+          style={{ animationDelay: "4s" }}
+        />
       </div>
 
       {/* Grid Pattern */}
@@ -196,7 +202,7 @@ export default function RoleLogin() {
         <div className="bg-card/80 backdrop-blur-xl rounded-[2.5rem] border border-white/20 dark:border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden relative p-8 sm:p-12">
           {/* Top Gradient Accent */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite]" />
-          
+
           {/* Header Glow Area */}
           <div className="absolute top-[-50px] left-1/2 -translate-x-1/2 w-[250px] h-[100px] bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
 
@@ -244,9 +250,7 @@ export default function RoleLogin() {
                   className="overflow-hidden"
                 >
                   <div className="p-4 rounded-[1.25rem] bg-destructive/[0.03] dark:bg-destructive/[0.1] text-destructive text-sm font-semibold border border-destructive/20 flex flex-col items-center gap-2 text-center mb-2 shadow-sm animate-in fade-in zoom-in duration-300">
-                    <p className="flex items-center gap-2">
-                       {error}
-                    </p>
+                    <p className="flex items-center gap-2">{error}</p>
                     {error.toLowerCase().includes("verify") && (
                       <button
                         type="button"
@@ -279,7 +283,10 @@ export default function RoleLogin() {
                   placeholder="name@example.com"
                   autoComplete="email"
                   className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${
-                    emailError || (error && (error.toLowerCase().includes("email") || error.toLowerCase().includes("invalid")))
+                    emailError ||
+                    (error &&
+                      (error.toLowerCase().includes("email") ||
+                        error.toLowerCase().includes("invalid")))
                       ? "border-destructive focus:border-destructive focus:ring-destructive/10"
                       : "border-border/60 focus:border-primary shadow-sm"
                   }`}
@@ -312,12 +319,18 @@ export default function RoleLogin() {
                 <label className="text-sm font-medium text-foreground">
                   Password
                 </label>
-                <button
-                  type="button"
-                  className="text-xs text-primary hover:underline font-medium transition-colors"
-                >
-                  Forgot password?
-                </button>
+                {role === "admin" ? (
+                  <span className="text-xs text-muted-foreground">
+                    Password reset disabled for admin
+                  </span>
+                ) : (
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-primary hover:underline font-medium transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                )}
               </div>
               <div className="relative group">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
@@ -330,7 +343,9 @@ export default function RoleLogin() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                   className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${
-                    error && (error.toLowerCase().includes("password") || error.toLowerCase().includes("invalid"))
+                    error &&
+                    (error.toLowerCase().includes("password") ||
+                      error.toLowerCase().includes("invalid"))
                       ? "border-destructive focus:border-destructive focus:ring-destructive/10"
                       : "border-border/60 focus:border-primary shadow-sm"
                   }`}
@@ -381,7 +396,10 @@ export default function RoleLogin() {
                   </motion.svg>
                 )}
               </button>
-              <span className="text-sm text-muted-foreground select-none cursor-pointer" onClick={() => setRememberMe(!rememberMe)}>
+              <span
+                className="text-sm text-muted-foreground select-none cursor-pointer"
+                onClick={() => setRememberMe(!rememberMe)}
+              >
                 Remember me for 7 days
               </span>
             </div>
@@ -398,7 +416,9 @@ export default function RoleLogin() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="tracking-widest uppercase text-xs">Authenticating</span>
+                  <span className="tracking-widest uppercase text-xs">
+                    Authenticating
+                  </span>
                 </>
               ) : (
                 <>

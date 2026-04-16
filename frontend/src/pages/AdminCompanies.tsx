@@ -8,8 +8,10 @@ import {
   Globe,
   MapPin,
   Loader2,
+  Download,
 } from "lucide-react";
 import api from "@/lib/api";
+import { buildCsv, downloadCsv } from "@/lib/csv";
 
 interface CompanyProfile {
   companyId: string;
@@ -27,6 +29,7 @@ export default function AdminCompanies() {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     fetchCompanies();
@@ -70,6 +73,20 @@ export default function AdminCompanies() {
       c.industry.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const exportCompanies = async () => {
+    setIsExporting(true);
+    try {
+      const res = await api.get("/admin/export/companies");
+      const rows = res.data?.success ? (res.data.data ?? []) : [];
+      const csv = buildCsv(rows, ["Name", "Email", "Phone no."]);
+      downloadCsv(csv, "companies.csv");
+    } catch (err) {
+      console.error("Failed to export companies CSV", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -84,15 +101,29 @@ export default function AdminCompanies() {
         </p>
       </motion.div>
 
-      <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border max-w-md">
-        <Search className="w-4 h-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search companies by name or industry..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
-        />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border max-w-md w-full">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search companies by name or industry..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent border-none outline-none w-full text-sm text-foreground placeholder:text-muted-foreground"
+          />
+        </div>
+        <button
+          onClick={exportCompanies}
+          disabled={isExporting}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card text-sm font-medium hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isExporting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          Export Data
+        </button>
       </div>
 
       {isLoading ? (

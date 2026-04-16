@@ -1,9 +1,26 @@
 import { useLocation, Link } from "react-router-dom";
 import { useAppContext } from "@/contexts/AppContext";
 import {
-  LayoutDashboard, Search, Briefcase, User, Building2, Users, FileText,
-  BarChart3, Bell, Settings, MessageSquare, ChevronLeft, ChevronRight,
-  ClipboardList, UserCheck, LogOut, GraduationCap, PlusCircle, BookOpen, ClipboardCheck
+  LayoutDashboard,
+  Search,
+  Briefcase,
+  User,
+  Building2,
+  Users,
+  FileText,
+  BarChart3,
+  Bell,
+  Settings,
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  UserCheck,
+  LogOut,
+  GraduationCap,
+  PlusCircle,
+  BookOpen,
+  ClipboardCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,6 +56,7 @@ const ngoLinks = [
 const adminLinks = [
   { to: "/app/admin", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/app/admin/companies", icon: Building2, label: "Companies" },
+  { to: "/app/admin/ngos", icon: GraduationCap, label: "NGOs" },
   { to: "/app/admin/users", icon: Users, label: "Users" },
   { to: "/app/admin/jobs", icon: ClipboardList, label: "Job Moderation" },
   { to: "/app/admin/placements", icon: UserCheck, label: "Placements" },
@@ -46,10 +64,22 @@ const adminLinks = [
 ];
 
 export default function AppSidebar() {
-  const { role, notifications, sidebarCollapsed: collapsed, setSidebarCollapsed: setCollapsed } = useAppContext();
+  const {
+    role,
+    notifications,
+    sidebarCollapsed: collapsed,
+    setSidebarCollapsed: setCollapsed,
+  } = useAppContext();
   const location = useLocation();
 
-  const links = role === "seeker" ? seekerLinks : role === "company" ? companyLinks : role === "ngo" ? ngoLinks : adminLinks;
+  const links =
+    role === "seeker"
+      ? seekerLinks
+      : role === "company"
+        ? companyLinks
+        : role === "ngo"
+          ? ngoLinks
+          : adminLinks;
 
   return (
     <motion.aside
@@ -59,16 +89,25 @@ export default function AppSidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-28 border-b border-border">
-        <Link to="/" className="flex items-center gap-3 logo-hover overflow-hidden">
+        <Link
+          to="/"
+          className="flex items-center gap-3 logo-hover overflow-hidden"
+        >
           {!collapsed ? (
             <motion.img
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              src="/JobSeva.png" alt="JobSeva" className="h-20 sm:h-24 w-auto object-contain flex-shrink-0"
+              src="/JobSeva.png"
+              alt="JobSeva"
+              className="h-20 sm:h-24 w-auto object-contain flex-shrink-0"
             />
           ) : (
-            <img src="/JobSeva.png" alt="Job" className="h-14 w-14 object-cover object-left rounded-lg flex-shrink-0" />
+            <img
+              src="/JobSeva.png"
+              alt="Job"
+              className="h-14 w-14 object-cover object-left rounded-lg flex-shrink-0"
+            />
           )}
         </Link>
       </div>
@@ -81,12 +120,15 @@ export default function AppSidebar() {
             <Link
               key={link.to}
               to={link.to}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${isActive
-                ? "bg-primary/10 text-primary border-r-2 border-primary"
-                : "text-muted-foreground hover:text-secondary hover:bg-muted"
-                }`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                isActive
+                  ? "bg-primary/10 text-primary border-r-2 border-primary"
+                  : "text-muted-foreground hover:text-secondary hover:bg-muted"
+              }`}
             >
-              <link.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-primary" : "group-hover:text-foreground"}`} />
+              <link.icon
+                className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-primary" : "group-hover:text-foreground"}`}
+              />
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span
@@ -141,7 +183,11 @@ export default function AppSidebar() {
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
       >
-        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        {collapsed ? (
+          <ChevronRight className="w-3 h-3" />
+        ) : (
+          <ChevronLeft className="w-3 h-3" />
+        )}
       </button>
     </motion.aside>
   );

@@ -34,6 +34,7 @@ import PostJob from "@/pages/PostJob";
 import CompanyApplicants from "@/pages/CompanyApplicants";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminCompanies from "@/pages/AdminCompanies";
+import AdminNgos from "@/pages/AdminNgos";
 import AdminUsers from "@/pages/AdminUsers";
 import AdminJobModeration from "@/pages/AdminJobModeration";
 import AdminPlacements from "@/pages/AdminPlacements";
@@ -58,6 +59,8 @@ import NgoLogin from "@/pages/ngoLogin";
 import NgoSignup from "@/pages/ngoSignup";
 import VerifyEmail from "@/pages/VerifyEmail";
 import NgoProfile from "@/pages/NgoProfile";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 function ProfileGate() {
   const { role } = useAppContext();
@@ -161,6 +164,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="admin/ngos"
+          element={
+            <AdminRoute>
+              <AdminNgos />
+            </AdminRoute>
+          }
+        />
+        <Route
           path="admin/users"
           element={
             <AdminRoute>
@@ -237,6 +248,8 @@ const App = () => (
               <Route path="/login/:role" element={<RoleLogin />} />
               <Route path="/signup/:role" element={<RoleSignup />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Public routes */}
               <Route path="/jobs" element={<ExploreJobsGate />} />
