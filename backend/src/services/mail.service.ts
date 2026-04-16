@@ -242,6 +242,71 @@ const getPasswordResetEmailHtml = (name: string, resetUrl: string): string => `
 </html>
 `;;
 
+const getNewJobPostedEmailHtml = (params: {
+  name: string;
+  jobTitle: string;
+  companyName: string;
+  location: string;
+  type: string;
+  jobUrl: string;
+}): string => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Job Posted - JobSeva</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc;padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#2563eb 0%,#0ea5e9 100%);padding:28px 32px;border-radius:16px 16px 0 0;text-align:center;">
+              <h1 style="margin:0;font-size:26px;color:#ffffff;font-weight:800;">New Opportunity on JobSeva</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#ffffff;padding:28px 32px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
+              <p style="margin:0 0 12px;font-size:15px;color:#334155;">Hi ${params.name},</p>
+              <p style="margin:0 0 20px;font-size:15px;color:#475569;line-height:1.7;">
+                A new job has been posted that may match your profile.
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;">
+                <tr>
+                  <td style="font-size:14px;color:#0f172a;line-height:1.8;">
+                    <strong>Role:</strong> ${params.jobTitle}<br />
+                    <strong>Company:</strong> ${params.companyName}<br />
+                    <strong>Location:</strong> ${params.location}<br />
+                    <strong>Type:</strong> ${params.type}
+                  </td>
+                </tr>
+              </table>
+
+              <div style="text-align:center;margin-top:24px;">
+                <a href="${params.jobUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 28px;border-radius:10px;">
+                  View Job
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#ffffff;padding:18px 32px 28px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 16px 16px;">
+              <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center;line-height:1.6;">
+                You received this email because you have a JobSeva seeker account.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
 const getBackendBaseUrl = (): string => {
   return (
     process.env.BACKEND_URL ||
@@ -299,6 +364,40 @@ export const mailService = {
       console.log(`Password reset email sent to ${email}`);
     } catch (error) {
       console.error("Error sending password reset email:", error);
+      throw error;
+    }
+  },
+
+  async sendJobPostedEmail(
+    email: string,
+    name: string,
+    params: {
+      jobTitle: string;
+      companyName: string;
+      location: string;
+      type: string;
+      jobUrl: string;
+    },
+  ) {
+    const mailOptions = {
+      from: `"JobSeva" <${process.env.EMAIL_USER || env.emailUser}>`,
+      to: email,
+      subject: `New job posted: ${params.jobTitle}`,
+      html: getNewJobPostedEmailHtml({
+        name,
+        jobTitle: params.jobTitle,
+        companyName: params.companyName,
+        location: params.location,
+        type: params.type,
+        jobUrl: params.jobUrl,
+      }),
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`New job alert email sent to ${email}`);
+    } catch (error) {
+      console.error(`Error sending new job alert email to ${email}:`, error);
       throw error;
     }
   },

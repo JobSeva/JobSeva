@@ -24,6 +24,14 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = (originalRequest?.url || "").toString();
+    const isLoginRequest = requestUrl.includes("/auth/login");
+
+    // Keep users on the role login form when credentials are invalid.
+    if (isLoginRequest) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");

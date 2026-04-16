@@ -1,5 +1,6 @@
 import { AppError } from "../common/errors";
 import { prisma } from "../lib/prisma";
+import { mailService } from "./mail.service";
 import { ApplicationStatus, Job } from "../types/domain";
 
 interface CompanyJobPayload {
@@ -37,6 +38,51 @@ interface ApplicantView {
   education: any[];
   experiences: any[];
 }
+
+const JOB_POST_EMAIL_BATCH_LIMIT = 5000;
+
+const notifySeekersAboutNewJob = async (job: any): Promise<void> => {
+  const seekers = await prisma.user.findMany({
+    where: {
+      role: "seeker",
+    },
+    select: {
+      email: true,
+      name: true,
+    },
+    take: JOB_POST_EMAIL_BATCH_LIMIT,
+  });
+
+  if (seekers.length === 0) {
+    return;
+  }
+
+  const frontendBaseUrl =
+    (process.env.FRONTEND_URL || "http://localhost:8080").replace(/\/$/, "");
+  const jobUrl = `${frontendBaseUrl}/jobs/${job.id}`;
+
+  const deliveryResults = await Promise.allSettled(
+    seekers.map((recipient) =>
+      mailService.sendJobPostedEmail(recipient.email, recipient.name, {
+        jobTitle: job.title,
+        companyName: job.company?.name || "JobSeva",
+        location: job.location,
+        type: job.type,
+        jobUrl,
+      }),
+    ),
+  );
+
+  const failedCount = deliveryResults.filter(
+    (result) => result.status === "rejected",
+  ).length;
+
+  if (failedCount > 0) {
+    console.warn(
+      `[MAIL] New job alert delivery failed for ${failedCount} of ${seekers.length} seekers.`,
+    );
+  }
+};
 
 const getCompanyProfile = async (ownerUserId: string) => {
   const profile = await prisma.companyProfile.findUnique({
@@ -169,6 +215,11 @@ export const companyJobsService = {
     await prisma.companyProfile.update({
       where: { companyId: profile.companyId },
       data: { openPositions: { increment: 1 } },
+    });
+
+    // Trigger email broadcast in the background to keep job creation responsive.
+    void notifySeekersAboutNewJob(job).catch((error) => {
+      console.error("Failed to send new job alert emails:", error);
     });
 
     return jobToDto(job);
