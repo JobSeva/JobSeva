@@ -1,0 +1,24 @@
+﻿import { Router } from "express";
+import { commsController } from "../controllers/communications.controller";
+import { requireAuth } from "../middleware/auth";
+
+const router = Router();
+router.use(requireAuth);
+
+router.get("/", (req, res, next) => {
+  commsController.getMessages(req, res).catch(next);
+});
+
+router.get("/unread", (req, res, next) => {
+  commsController.getUnreadMessagesCount(req, res).catch(next);
+});
+
+router.post("/", (req, res, next) => {
+  commsController.sendMessage(req, res).catch(next);
+});
+
+router.put("/:messageId/read", (req, res, next) => {
+  commsController.markMessageRead(req, res).catch(next);
+});
+
+export const messagesRouter = router;

@@ -44,6 +44,11 @@ import NotFound from "@/pages/NotFound";
 import TrainingPage from "@/pages/TrainingPage";
 import CourseDetails from "@/pages/CourseDetails";
 
+import AboutUs from "@/pages/AboutUs";
+import Contact from "@/pages/Contact";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Terms from "@/pages/Terms";
+
 // NGO Pages
 import NgoDashboard from "@/pages/ngoDashboard";
 import NgoPostTraining from "@/pages/ngoPostTraining";
@@ -237,6 +242,10 @@ const App = () => (
               <Route path="/jobs" element={<ExploreJobsGate />} />
               <Route path="/companies" element={<CompaniesPage />} />
               <Route path="/training" element={<TrainingPage />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
 
               {/* Protected app routes */}
               <Route

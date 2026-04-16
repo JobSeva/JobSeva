@@ -1,142 +1,96 @@
+import React from "react";
 import { motion } from "framer-motion";
 import PublicNavbar from "@/components/PublicNavbar";
-import { Shield, Target, Users, Sparkles, CheckCircle } from "lucide-react";
-
-const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
-};
+import PublicFooter from "@/components/PublicFooter";
+import { Target, Eye, Settings, CheckCircle2 } from "lucide-react";
 
 export default function AboutUs() {
     return (
-        <div className="min-h-screen bg-background text-foreground pt-20">
+        <div className="min-h-screen bg-background pt-20">
             <PublicNavbar />
 
-            {/* Hero Section */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 border-b border-border bg-muted/20">
-                <div className="max-w-4xl mx-auto text-center">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 border border-primary/20"
-                    >
-                        <Sparkles className="w-4 h-4" /> Empowering Careers
+            {/* Dark Modern Hero */}
+            <section className="relative py-24 px-4 overflow-hidden bg-[#0A0118]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent blur-3xl opacity-50" />
+                <div className="max-w-4xl mx-auto relative z-10 text-center">
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 text-primary text-xs font-bold uppercase tracking-widest">
+                        About JobSeva
                     </motion.div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl sm:text-5xl font-heading font-extrabold mb-6"
-                    >
-                        About <span className="text-primary">JobSeva</span>
+                    <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-6xl font-heading font-extrabold text-white leading-tight">
+                        Bridging the Gap between <br /><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Talent and Opportunity</span>
                     </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-lg text-muted-foreground leading-relaxed"
-                    >
-                        JobSeva is more than just a job board. We are a bridge between talent and opportunity, driven by technology and a commitment to making hiring faster, fairer, and more effective.
+                    <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-muted-foreground mt-6 text-lg font-medium leading-relaxed">
+                        JobSeva is a modern job hiring platform designed to connect job seekers, companies, and NGOs through a seamless and intelligent ecosystem. Our platform leverages smart matching and structured data to help individuals find the right opportunities and organizations find the right talent.
                     </motion.p>
                 </div>
             </section>
 
-            {/* Mission & Vision */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={fadeUp}
-                        custom={0}
-                        className="clean-card p-8 group border-l-4 border-l-primary"
-                    >
-                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <Target className="w-6 h-6 text-primary" />
+            <section className="max-w-6xl mx-auto px-4 py-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="clean-card p-10 bg-card border border-border/50 rounded-3xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-primary group-hover:w-2 transition-all" />
+                        <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
+                            <Target className="w-7 h-7" />
                         </div>
-                        <h2 className="text-2xl font-heading font-bold mb-4">Our Mission</h2>
+                        <h2 className="text-3xl font-heading font-bold mb-4 text-foreground">Our Mission</h2>
                         <p className="text-muted-foreground leading-relaxed">
-                            To empower every professional to find their dream job and every company to find the perfect talent through innovative, transparent, and user-centric solutions.
+                            Our mission is to simplify the hiring process and make job opportunities accessible to everyone, especially freshers and underserved communities, by integrating skill-based training and employment.
                         </p>
                     </motion.div>
 
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={fadeUp}
-                        custom={1}
-                        className="clean-card p-8 group border-l-4 border-l-secondary"
-                    >
-                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <Shield className="w-6 h-6 text-secondary" />
+                    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="clean-card p-10 bg-card border border-border/50 rounded-3xl relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-secondary group-hover:w-2 transition-all" />
+                        <div className="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary text-orange-500 mb-6">
+                            <Eye className="w-7 h-7" />
                         </div>
-                        <h2 className="text-2xl font-heading font-bold mb-4">Our Vision</h2>
+                        <h2 className="text-3xl font-heading font-bold mb-4 text-foreground">Our Vision</h2>
                         <p className="text-muted-foreground leading-relaxed">
-                            To become the world's most trusted recruitment ecosystem where opportunities are accessible to everyone, regardless of their background or location.
+                            To become India's most trusted platform for job placement and skill development by bridging the gap between talent and opportunity.
                         </p>
                     </motion.div>
                 </div>
-            </section>
 
-            {/* Why Choose Us */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
-                <div className="max-w-6xl mx-auto">
-                    <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
-                        <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-heading font-bold">
-                            Why <span className="text-primary">Choose Us</span>?
-                        </motion.h2>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="mb-20">
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl font-heading font-bold text-foreground">What We Do</h2>
+                        <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">Creating a unified ecosystem for all stakeholders</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { icon: Users, title: "Candidate First", desc: "We prioritize the user experience, ensuring that job seeking is simple and stress-free." },
-                            { icon: CheckCircle, title: "Verified Jobs", desc: "Every job posting is vetted to ensure you only apply to legitimate opportunities." },
-                            { icon: Sparkles, title: "AI-Powered", desc: "Our smart algorithms match you with roles that truly fit your skills and goals." },
-                        ].map((feature, i) => (
-                            <motion.div
-                                key={feature.title}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                                variants={fadeUp}
-                                custom={i}
-                                className="clean-card p-6 text-center hover:shadow-lg transition-all"
-                            >
-                                <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                                    <feature.icon className="w-7 h-7" />
-                                </div>
-                                <h3 className="text-xl font-heading font-semibold mb-2">{feature.title}</h3>
-                                <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                            "Connect job seekers with verified companies",
+                            "Enable NGOs to provide training and courses",
+                            "Help companies find skilled candidates efficiently",
+                            "Provide a unified dashboard for all users"
+                        ].map((item, i) => (
+                            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 bg-muted/30 rounded-2xl border border-border/40 text-center hover:shadow-lg transition-all">
+                                <Settings className="w-8 h-8 mx-auto text-primary mb-4" />
+                                <p className="text-sm font-bold text-foreground">{item}</p>
                             </motion.div>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl font-heading font-bold text-foreground">Why Choose JobSeva</h2>
+                    </div>
+                    <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 mb-20">
+                        {[
+                            "AI-powered job matching",
+                            "Verified companies and NGOs",
+                            "Skill-based training programs",
+                            "Easy application process"
+                        ].map((feature, i) => (
+                            <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50">
+                                <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0" />
+                                <span className="font-bold text-foreground text-lg">{feature}</span>
+                            </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Illustration/Image Placeholder */}
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-5xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="rounded-3xl overflow-hidden aspect-[21/9] bg-gradient-to-br from-primary/20 to-secondary/20 border border-border flex items-center justify-center p-12 text-center"
-                    >
-                        <div>
-                            <h3 className="text-2xl font-heading font-bold mb-4">Building the Future of Work</h3>
-                            <p className="text-muted-foreground max-w-2xl mx-auto">
-                                Join us on our journey to redefine recruitment. Whether you're a job seeker or a company, we're here to help you succeed.
-                            </p>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Footer Copy (Simplified) */}
-            <footer className="py-10 px-4 text-center border-t border-border">
-                <p className="text-sm text-muted-foreground">© 2026 JobSeva. All rights reserved.</p>
-            </footer>
+            <PublicFooter />
         </div>
     );
 }

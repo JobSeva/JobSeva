@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Paperclip, Search, Loader2 } from "lucide-react";
 import api from "@/lib/api";
@@ -14,7 +14,7 @@ export default function Messages() {
 
   const fetchConversations = async () => {
     try {
-      const res = await api.get("/messages/conversations");
+      const res = await api.get("/messages");
       setConversations(res.data.data || []);
     } catch (e) {
       console.error("Failed to fetch conversations", e);
@@ -24,7 +24,7 @@ export default function Messages() {
   const fetchMessages = async (otherUserId: string) => {
     try {
       setLoading(true);
-      const res = await api.get(`/messages/${otherUserId}`);
+      const res = await api.get(`/messages?otherUserId=${otherUserId}`);
       setMessages(res.data.data || []);
     } catch (e) {
       console.error("Failed to fetch messages", e);
@@ -43,42 +43,18 @@ export default function Messages() {
     }
   }, [selectedUserId]);
 
-  // Poll messages every 3 seconds for the open conversation
-  useEffect(() => {
-    if (!selectedUserId) return;
-    const id = setInterval(() => {
-      fetchMessages(selectedUserId);
-    }, 3000);
-    return () => clearInterval(id);
-  }, [selectedUserId]);
-
   const handleSendMessage = async () => {
     if (!messageText.trim() || !selectedUserId) return;
-    const tempId = `tmp-${Date.now()}`;
-    const tempMsg = {
-      id: tempId,
-      senderId: user?.id,
-      receiverId: selectedUserId,
-      content: messageText,
-      createdAt: new Date().toISOString(),
-    };
-
-    // optimistic UI
-    setMessages((prev) => [...prev, tempMsg]);
-    setMessageText("");
-
     try {
       const res = await api.post("/messages", {
         receiverId: selectedUserId,
         content: messageText,
       });
-      const saved = res.data.data;
-      setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
-      fetchConversations(); // refresh last message preview
+      setMessages([...messages, res.data.data]);
+      setMessageText("");
+      fetchConversations(); // refresh last message
     } catch (e) {
       console.error("Failed to send message", e);
-      // rollback optimistic update
-      setMessages((prev) => prev.filter((m) => m.id !== tempId));
     }
   };
 
@@ -180,10 +156,6 @@ export default function Messages() {
                 {loading ? (
                   <div className="flex justify-center items-center h-full">
                     <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  </div>
-                ) : messages.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    <p>No messages yet</p>
                   </div>
                 ) : (
                   messages.map((msg) => {
