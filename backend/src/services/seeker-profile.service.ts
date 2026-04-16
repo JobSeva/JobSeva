@@ -1,6 +1,12 @@
 import { AppError } from "../common/errors";
 import { prisma } from "../lib/prisma";
-import { SeekerExperience, SeekerProfile } from "../types/domain";
+import {
+  PublicSeekerProfile,
+  Role,
+  SeekerDashboardChartPoint,
+  SeekerExperience,
+  SeekerProfile,
+} from "../types/domain";
 
 const nowIso = () => new Date().toISOString();
 
@@ -15,14 +21,13 @@ const recomputeStrength = (profile: SeekerProfile): number => {
   if (profile.experiences?.length >= 1) strength += 10;
   if (profile.education?.length >= 1) strength += 10;
   if (profile.resumeUrl) strength += 5;
-  if (profile.linkedinUrl || profile.githubUrl || profile.portfolioUrl) strength += 10;
+  if (profile.linkedinUrl || profile.githubUrl || profile.portfolioUrl)
+    strength += 10;
 
   return Math.min(100, strength);
 };
 
-const mapDbToSeekerProfile = (
-  dbProfile: any,
-): SeekerProfile => {
+const mapDbToSeekerProfile = (dbProfile: any): SeekerProfile => {
   return {
     userId: dbProfile.userId,
     headline: dbProfile.headline || "",
@@ -117,11 +122,63 @@ export const seekerProfileService = {
     return getOrCreateProfile(userId);
   },
 
+  async getPublicProfile(
+    seekerUserId: string,
+    viewerUserId: string,
+    viewerRole: Role,
+  ): Promise<PublicSeekerProfile> {
+    const seekerUser = await prisma.user.findFirst({
+      where: { id: seekerUserId, role: "seeker" },
+      include: {
+        seekerProfile: {
+          include: {
+            experiences: true,
+            education: true,
+          },
+        },
+      },
+    });
+
+    if (!seekerUser) {
+      throw new AppError(404, "Seeker not found", "SEEKER_NOT_FOUND");
+    }
+
+    const profile = seekerUser.seekerProfile
+      ? mapDbToSeekerProfile(seekerUser.seekerProfile)
+      : await getOrCreateProfile(seekerUserId);
+
+    if (viewerUserId !== seekerUserId) {
+      await prisma.seekerProfileView.create({
+        data: {
+          seekerUserId,
+          viewerUserId,
+          viewerRole,
+        },
+      });
+    }
+
+    return {
+      userId: seekerUserId,
+      name: seekerUser.name,
+      headline: profile.headline,
+      bio: profile.bio,
+      location: profile.location,
+      avatarUrl: profile.avatarUrl,
+      skills: profile.skills,
+      languages: profile.languages,
+      experiences: profile.experiences,
+      education: profile.education,
+      resumeUrl: profile.resumeUrl,
+      linkedinUrl: profile.linkedinUrl,
+      githubUrl: profile.githubUrl,
+      portfolioUrl: profile.portfolioUrl,
+      updatedAt: profile.updatedAt,
+    };
+  },
+
   async update(
     userId: string,
-    patch: Partial<
-      SeekerProfile
-    >,
+    patch: Partial<SeekerProfile>,
   ): Promise<SeekerProfile> {
     const profile = await getOrCreateProfile(userId);
 
@@ -181,7 +238,10 @@ export const seekerProfileService = {
     return touch(userId, mapDbToSeekerProfile(updated));
   },
 
-  async uploadAvatar(userId: string, avatarUrl: string): Promise<SeekerProfile> {
+  async uploadAvatar(
+    userId: string,
+    avatarUrl: string,
+  ): Promise<SeekerProfile> {
     await getOrCreateProfile(userId);
 
     const updated = await prisma.seekerProfile.update({
@@ -331,10 +391,7 @@ export const seekerProfileService = {
     return touch(userId, profile);
   },
 
-  async addEducation(
-    userId: string,
-    payload: any,
-  ): Promise<SeekerProfile> {
+  async addEducation(userId: string, payload: any): Promise<SeekerProfile> {
     await getOrCreateProfile(userId);
 
     await prisma.seekerEducation.create({
@@ -422,11 +479,12 @@ export const seekerProfileService = {
   async dashboard(userId: string): Promise<{
     totalApplications: number;
     savedJobsCount: number;
+    profileViews: number;
     activeInterviews: number;
     profileStrength: number;
     recentApplications: any[];
     recommendations: any[];
-    chartData: { name: string; applications: number }[];
+    chartData: SeekerDashboardChartPoint[];
   }> {
     const profile = await getOrCreateProfile(userId);
 
@@ -443,6 +501,10 @@ export const seekerProfileService = {
         seekerId: userId,
         status: "interview",
       },
+    });
+
+    const profileViews = await prisma.seekerProfileView.count({
+      where: { seekerUserId: userId },
     });
 
     const recentApplicationsRaw = await prisma.application.findMany({
@@ -486,8 +548,9 @@ export const seekerProfileService = {
 
     // Last 7 days chart data
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const chartDataMap = new Map<string, number>(days.map((d) => [d, 0]));
-    
+    const applicationsMap = new Map<string, number>(days.map((d) => [d, 0]));
+    const viewsMap = new Map<string, number>(days.map((d) => [d, 0]));
+
     const last7DaysApps = await prisma.application.findMany({
       where: {
         seekerId: userId,
@@ -499,19 +562,35 @@ export const seekerProfileService = {
 
     last7DaysApps.forEach((app) => {
       const dayName = days[app.appliedAt.getDay()] as string;
-      chartDataMap.set(dayName, chartDataMap.get(dayName)! + 1);
+      applicationsMap.set(dayName, applicationsMap.get(dayName)! + 1);
+    });
+
+    const last7DaysViews = await prisma.seekerProfileView.findMany({
+      where: {
+        seekerUserId: userId,
+        viewedAt: {
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+    });
+
+    last7DaysViews.forEach((view) => {
+      const dayName = days[view.viewedAt.getDay()] as string;
+      viewsMap.set(dayName, viewsMap.get(dayName)! + 1);
     });
 
     const chartData = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
       (d) => ({
         name: d,
-        applications: chartDataMap.get(d) || 0,
+        applications: applicationsMap.get(d) || 0,
+        views: viewsMap.get(d) || 0,
       }),
     );
 
     return {
       totalApplications,
       savedJobsCount,
+      profileViews,
       activeInterviews,
       profileStrength: profile.profileStrength,
       recentApplications,

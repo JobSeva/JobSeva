@@ -28,6 +28,8 @@ model User {
   enrollments       Enrollment[]
   receivedMessages  Message[]       @relation("ReceivedMessages")
   sentMessages      Message[]       @relation("SentMessages")
+  seekerProfileViewsGiven    SeekerProfileView[] @relation("SeekerProfileViewsGiven")
+  seekerProfileViewsReceived SeekerProfileView[] @relation("SeekerProfileViewsReceived")
   ngoProfile        NgoProfile?
   notifications     Notification[]
   refreshTokens     RefreshToken[]
@@ -250,4 +252,17 @@ model RefreshToken {
   createdAt DateTime @default(now())
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SeekerProfileView {
+  id          String   @id @default(uuid())
+  seekerUserId String
+  viewerUserId String
+  viewerRole  String
+  viewedAt    DateTime @default(now())
+  seekerUser  User     @relation("SeekerProfileViewsReceived", fields: [seekerUserId], references: [id], onDelete: Cascade)
+  viewerUser  User     @relation("SeekerProfileViewsGiven", fields: [viewerUserId], references: [id], onDelete: Cascade)
+
+  @@index([seekerUserId, viewedAt])
+  @@index([viewerUserId, viewedAt])
 }

@@ -135,6 +135,30 @@ export interface SeekerProfile {
   updatedAt: string;
 }
 
+export interface PublicSeekerProfile {
+  userId: string;
+  name: string;
+  headline: string;
+  bio: string;
+  location: string;
+  avatarUrl?: string;
+  skills: string[];
+  languages: string[];
+  experiences: SeekerExperience[];
+  education: SeekerEducation[];
+  resumeUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  portfolioUrl?: string;
+  updatedAt: string;
+}
+
+export interface SeekerDashboardChartPoint {
+  name: string;
+  applications: number;
+  views: number;
+}
+
 export interface SavedJob {
   seekerId: string;
   jobId: string;
