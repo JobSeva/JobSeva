@@ -57,9 +57,10 @@ const notifySeekersAboutNewJob = async (job: any): Promise<void> => {
     return;
   }
 
-  const frontendBaseUrl =
-    (process.env.FRONTEND_URL || "http://localhost:8080").replace(/\/$/, "");
-  const jobUrl = `${frontendBaseUrl}/jobs/${job.id}`;
+  const frontendBaseUrl = (
+    process.env.FRONTEND_URL || "http://localhost:8080"
+  ).replace(/\/$/, "");
+  const jobUrl = `${frontendBaseUrl}/app/jobs/${job.id}`;
 
   const deliveryResults = await Promise.allSettled(
     seekers.map((recipient) =>
@@ -90,7 +91,9 @@ const getCompanyProfile = async (ownerUserId: string) => {
   });
 
   if (!profile) {
-    console.error(`[CRITICAL] Company profile missing for user: ${ownerUserId}. Job operations will fail.`);
+    console.error(
+      `[CRITICAL] Company profile missing for user: ${ownerUserId}. Job operations will fail.`,
+    );
     throw new AppError(
       409,
       "Company profile not found. Please complete your company onboarding first.",
@@ -143,13 +146,18 @@ const jobToDto = (job: any): Job => {
     description: job.description,
     responsibilities: safeJsonParse(job.responsibilitiesRaw),
     applicants: job.applicantsCount,
-    postedAt: job.postedAt ? job.postedAt.toISOString() : new Date().toISOString(),
+    postedAt: job.postedAt
+      ? job.postedAt.toISOString()
+      : new Date().toISOString(),
     active: job.active,
     education: job.education || undefined,
     experience: job.experience || undefined,
     workMode: job.workMode || undefined,
     openings: job.openings,
-    deadline: (job.deadline && !isNaN(job.deadline.getTime())) ? job.deadline.toISOString() : undefined,
+    deadline:
+      job.deadline && !isNaN(job.deadline.getTime())
+        ? job.deadline.toISOString()
+        : undefined,
   };
 };
 
@@ -158,7 +166,13 @@ export const companyJobsService = {
     ownerUserId: string,
     page: number,
     limit: number,
-  ): Promise<{ items: Job[]; total: number; page: number; limit: number; totalPages: number }> {
+  ): Promise<{
+    items: Job[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
     const profile = await getCompanyProfile(ownerUserId);
 
     const total = await prisma.job.count({
@@ -182,10 +196,7 @@ export const companyJobsService = {
     };
   },
 
-  async create(
-    ownerUserId: string,
-    payload: CompanyJobPayload,
-  ): Promise<Job> {
+  async create(ownerUserId: string, payload: CompanyJobPayload): Promise<Job> {
     const profile = await getCompanyProfile(ownerUserId);
 
     const job = await prisma.job.create({
@@ -206,7 +217,10 @@ export const companyJobsService = {
         experience: payload.experience || null,
         workMode: payload.workMode || "onsite",
         openings: payload.openings || 1,
-        deadline: (payload.deadline && !isNaN(Date.parse(payload.deadline))) ? new Date(payload.deadline) : null,
+        deadline:
+          payload.deadline && !isNaN(Date.parse(payload.deadline))
+            ? new Date(payload.deadline)
+            : null,
       },
       include: { company: true },
     });
@@ -258,11 +272,10 @@ export const companyJobsService = {
     if (patch.description !== undefined)
       updateData.description = patch.description;
     if (patch.responsibilities !== undefined)
-      updateData.responsibilitiesRaw = JSON.stringify(
-        patch.responsibilities,
-      );
+      updateData.responsibilitiesRaw = JSON.stringify(patch.responsibilities);
     if (patch.education !== undefined) updateData.education = patch.education;
-    if (patch.experience !== undefined) updateData.experience = patch.experience;
+    if (patch.experience !== undefined)
+      updateData.experience = patch.experience;
     if (patch.workMode !== undefined) updateData.workMode = patch.workMode;
     if (patch.openings !== undefined) updateData.openings = patch.openings;
     if (patch.deadline !== undefined)
