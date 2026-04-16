@@ -110,5 +110,9 @@ companyJobsRouter.put(
   validate({ params: paramsApplicationSchema, body: applicationRatingSchema }),
   asyncHandler(companyJobsController.updateApplicationRating),
 );
+companyJobsRouter.get(
+  "/applicants",
+  asyncHandler(companyJobsController.listAllApplicants),
+);
 
 export { companyJobsRouter };

@@ -25,6 +25,7 @@ interface ApplicantView {
   seekerId: string;
   name: string;
   email: string;
+  phone?: string;
   headline: string;
   skills: string[];
   resumeUrl?: string;
@@ -317,7 +318,14 @@ export const companyJobsService = {
       where: { jobId },
       include: {
         seeker: {
-          include: { seekerProfile: true },
+          include: {
+            seekerProfile: {
+              include: {
+                experiences: true,
+                education: true,
+              },
+            },
+          },
         },
       },
       orderBy: { updatedAt: "desc" },
@@ -334,6 +342,7 @@ export const companyJobsService = {
         seekerId: app.seekerId,
         name: app.seeker.name,
         email: app.seeker.email,
+        phone: seekerProfile?.phone || "",
         headline: seekerProfile?.headline || "",
         resumeUrl: app.resumeUrl || seekerProfile?.resumeUrl,
         skills,
@@ -416,5 +425,57 @@ export const companyJobsService = {
     });
 
     return updated;
+  },
+
+  async listAllApplicants(ownerUserId: string): Promise<ApplicantView[]> {
+    const profile = await getCompanyProfile(ownerUserId);
+
+    const applications = await prisma.application.findMany({
+      where: {
+        job: {
+          companyId: profile.companyId,
+        },
+      },
+      include: {
+        seeker: {
+          include: {
+            seekerProfile: {
+              include: {
+                experiences: true,
+                education: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { appliedAt: "desc" },
+    });
+
+    return applications.map((app: any) => {
+      const seekerProfile = app.seeker.seekerProfile;
+      const skills = seekerProfile?.skillsRaw
+        ? JSON.parse(seekerProfile.skillsRaw)
+        : [];
+
+      return {
+        applicationId: app.id,
+        seekerId: app.seekerId,
+        name: app.seeker.name,
+        email: app.seeker.email,
+        phone: seekerProfile?.phone || "",
+        headline: seekerProfile?.headline || "",
+        resumeUrl: app.resumeUrl || seekerProfile?.resumeUrl,
+        skills,
+        experienceCount: seekerProfile?.experiences?.length || 0,
+        status: app.status as ApplicationStatus,
+        matchScore: app.matchScore,
+        recruiterRating: app.recruiterRating || undefined,
+        recruiterNote: app.recruiterNote || undefined,
+        appliedAt: app.appliedAt.toISOString(),
+        updatedAt: app.updatedAt.toISOString(),
+        education: seekerProfile?.education || [],
+        experiences: seekerProfile?.experiences || [],
+      };
+    });
   },
 };

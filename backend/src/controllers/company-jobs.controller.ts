@@ -133,4 +133,13 @@ export const companyJobsController = {
 
     res.status(200).json(success(application));
   },
+
+  async listAllApplicants(
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> {
+    const companyUserId = requireCompanyAuth(req);
+    const applicants = await companyJobsService.listAllApplicants(companyUserId);
+    res.status(200).json(success(applicants));
+  },
 };

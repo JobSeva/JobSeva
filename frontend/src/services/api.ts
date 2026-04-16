@@ -121,6 +121,11 @@ export const getCompanyJobApplicants = async (jobId: string) => {
   return response.data;
 };
 
+export const getAllCompanyApplicants = async () => {
+  const response = await api.get(`/company/applicants`);
+  return response.data;
+};
+
 export const updateSettings = async (data: {
   emailNotifications?: boolean;
   marketingEmails?: boolean;
