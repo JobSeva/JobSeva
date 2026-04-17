@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -7,9 +7,11 @@ import {
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PublicNavbar from "@/components/PublicNavbar";
+import api, { RAW_BASE_URL } from "@/lib/api";
 
 interface Company {
   name: string;
+  logoImg?: string;
   logo: string;
   logoColor: string;
   rating: number;
@@ -24,358 +26,66 @@ interface Company {
   nature: string;
 }
 
-const companies: Company[] = [
-  {
-    name: "Reliance Retail",
-    logoImg: "/logos/reliance.png",
-    rating: 3.9,
-    reviews: "37.2K+",
-    type: "Indian MNC",
-    sector: ["Retail"],
-    industry: "Retail & E-Commerce",
-    description: "Building India's largest retail company.",
-    activeJobs: 245,
-    headquarters: "Mumbai, India",
-    employees: "2,00,000+",
-    nature: "B2C",
-  },
-  {
-    name: "Cognizant",
-    logoImg: "/logos/cognizant.png",
-    rating: 3.7,
-    reviews: "41K+",
-    type: "Foreign MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Leading IT company with global presence.",
-    activeJobs: 532,
-    headquarters: "Teaneck, NJ",
-    employees: "3,50,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Infosys",
-    logoImg: "/logos/infosys.png",
-    rating: 3.6,
-    reviews: "58K+",
-    type: "Indian MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Global leader in next-gen digital services & consulting.",
-    activeJobs: 678,
-    headquarters: "Bengaluru, India",
-    employees: "3,40,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Amazon",
-    logoImg: "/logos/amazon.png",
-    rating: 4.1,
-    reviews: "25K+",
-    type: "Foreign MNC",
-    sector: ["Technology", "Retail"],
-    industry: "Internet & E-Commerce",
-    description: "World's largest internet based company by revenue.",
-    activeJobs: 412,
-    headquarters: "Seattle, WA",
-    employees: "15,00,000+",
-    nature: "B2C",
-  },
-  {
-    name: "TCS",
-    logoImg: "/logos/tcs.png",
-    rating: 3.7,
-    reviews: "82K+",
-    type: "Indian MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Pioneering innovation in IT services and digital transformation globally.",
-    activeJobs: 890,
-    headquarters: "Mumbai, India",
-    employees: "6,00,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Wipro",
-    logoImg: "/logos/wipro.png",
-    rating: 3.5,
-    reviews: "39K+",
-    type: "Indian MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Leading global IT, consulting and business process services.",
-    activeJobs: 345,
-    headquarters: "Bengaluru, India",
-    employees: "2,50,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Capgemini",
-    logoImg: "/logos/capgemini.png",
-    rating: 3.8,
-    reviews: "27K+",
-    type: "Foreign MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Global leader in consulting and technology services.",
-    activeJobs: 289,
-    headquarters: "Paris, France",
-    employees: "3,60,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Airtel",
-    logoImg: "/logos/airtel.png",
-    rating: 3.9,
-    reviews: "12K+",
-    type: "Indian MNC",
-    sector: ["Telecom"],
-    industry: "Telecom & Networking",
-    description: "Leading global telecom company serving millions of customers.",
-    activeJobs: 134,
-    headquarters: "New Delhi, India",
-    employees: "30,000+",
-    nature: "B2C",
-  },
-  {
-    name: "ICICI Bank",
-    logoImg: "/logos/icici.png",
-    rating: 3.8,
-    reviews: "22K+",
-    type: "Indian MNC",
-    sector: ["BFSI"],
-    industry: "Banking & Financial Services",
-    description: "Leading private sector bank offering wide financial services.",
-    activeJobs: 198,
-    headquarters: "Mumbai, India",
-    employees: "1,15,000+",
-    nature: "B2C",
-  },
-  {
-    name: "JPMorgan Chase",
-    logo: "JP",
-    logoColor: "bg-slate-800",
-    rating: 4.0,
-    reviews: "15K+",
-    type: "Foreign MNC",
-    sector: ["BFSI"],
-    industry: "Banking & Financial Services",
-    description: "Leader in financial services and global banking.",
-    activeJobs: 267,
-    headquarters: "New York, NY",
-    employees: "2,90,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Genpact",
-    logo: "GP",
-    logoColor: "bg-emerald-600",
-    rating: 3.5,
-    reviews: "19K+",
-    type: "Indian MNC",
-    sector: ["BPM"],
-    industry: "IT Services & Consulting",
-    description: "Global professional services firm focused on digital transformation.",
-    activeJobs: 178,
-    headquarters: "New York, NY",
-    employees: "1,15,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Siemens",
-    logo: "SI",
-    logoColor: "bg-teal-600",
-    rating: 4.0,
-    reviews: "8K+",
-    type: "Foreign MNC",
-    sector: ["Technology"],
-    industry: "Manufacturing & Engineering",
-    description: "Creating a better tomorrow with electrification & automation.",
-    activeJobs: 156,
-    headquarters: "Munich, Germany",
-    employees: "3,20,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Schneider Electric",
-    logo: "SE",
-    logoColor: "bg-green-700",
-    rating: 4.1,
-    reviews: "6K+",
-    type: "Foreign MNC",
-    sector: ["Technology"],
-    industry: "Manufacturing & Engineering",
-    description: "Indian multinational offering energy and automation solutions.",
-    activeJobs: 98,
-    headquarters: "Rueil-Malmaison, France",
-    employees: "1,35,000+",
-    nature: "B2B",
-  },
-  {
-    name: "FIS",
-    logo: "FIS",
-    logoColor: "bg-indigo-700",
-    rating: 3.6,
-    reviews: "4.5K+",
-    type: "Foreign MNC",
-    sector: ["BFSI"],
-    industry: "FinTech & Payments",
-    description: "Global leader in financial technology solutions.",
-    activeJobs: 112,
-    headquarters: "Jacksonville, FL",
-    employees: "65,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Optum",
-    logo: "OP",
-    logoColor: "bg-orange-600",
-    rating: 3.9,
-    reviews: "10K+",
-    type: "Foreign MNC",
-    sector: ["Technology"],
-    industry: "Healthcare & Life Sciences",
-    description: "Leading digital health tech and analytics company.",
-    activeJobs: 234,
-    headquarters: "Eden Prairie, MN",
-    employees: "1,90,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Empower",
-    logo: "EM",
-    logoColor: "bg-cyan-600",
-    rating: 4.2,
-    reviews: "3K+",
-    type: "Foreign MNC",
-    sector: ["BFSI"],
-    industry: "Financial Services",
-    description: "We're a financial services company with fresh ideas.",
-    activeJobs: 67,
-    headquarters: "Greenwood Village, CO",
-    employees: "17,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Coforge",
-    logo: "CF",
-    logoColor: "bg-violet-600",
-    rating: 3.4,
-    reviews: "5.7K+",
-    type: "Indian MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Global digital services and solutions provider.",
-    activeJobs: 145,
-    headquarters: "Greater Noida, India",
-    employees: "23,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Persistent Systems",
-    logo: "PS",
-    logoColor: "bg-rose-600",
-    rating: 3.6,
-    reviews: "5.1K+",
-    type: "Indian MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Trusted global solutions company for product engineering.",
-    activeJobs: 112,
-    headquarters: "Pune, India",
-    employees: "22,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Avalara Technologies",
-    logo: "AV",
-    logoColor: "bg-amber-600",
-    rating: 3.9,
-    reviews: "1.2K+",
-    type: "Foreign MNC",
-    sector: ["Technology"],
-    industry: "Software Products",
-    description: "Simplifying tax compliance through technology.",
-    activeJobs: 45,
-    headquarters: "Seattle, WA",
-    employees: "6,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Bread Financial",
-    logo: "BF",
-    logoColor: "bg-violet-800",
-    rating: 3.7,
-    reviews: "2K+",
-    type: "Foreign MNC",
-    sector: ["BFSI"],
-    industry: "FinTech & Payments",
-    description: "Personalizing payment experiences with tech.",
-    activeJobs: 38,
-    headquarters: "Columbus, OH",
-    employees: "7,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Amgen",
-    logo: "AM",
-    logoColor: "bg-blue-800",
-    rating: 4.0,
-    reviews: "3.5K+",
-    type: "Foreign MNC",
-    sector: ["Healthcare"],
-    industry: "Healthcare & Life Sciences",
-    description: "One. Will. Infinite — pioneering biotechnology.",
-    activeJobs: 78,
-    headquarters: "Thousand Oaks, CA",
-    employees: "27,000+",
-    nature: "B2B",
-  },
-  {
-    name: "bp",
-    logo: "bp",
-    logoColor: "bg-green-600",
-    rating: 4.1,
-    reviews: "2.8K+",
-    type: "Foreign MNC",
-    sector: ["Energy"],
-    industry: "Oil, Gas & Energy",
-    description: "We're with you. Reimagining energy for people and planet.",
-    activeJobs: 56,
-    headquarters: "London, UK",
-    employees: "65,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Deloitte",
-    logo: "DL",
-    logoColor: "bg-emerald-700",
-    rating: 3.9,
-    reviews: "32K+",
-    type: "Foreign MNC",
-    sector: ["IT Services"],
-    industry: "IT Services & Consulting",
-    description: "Making an impact that matters through professional services.",
-    activeJobs: 356,
-    headquarters: "London, UK",
-    employees: "4,15,000+",
-    nature: "B2B",
-  },
-  {
-    name: "Flipkart",
-    logoImg: "/logos/flipkart.png",
-    rating: 4.0,
-    reviews: "10K+",
-    type: "Indian MNC",
-    sector: ["Retail", "Technology"],
-    industry: "Internet & E-Commerce",
-    description: "India's leading e-commerce marketplace transforming shopping.",
-    activeJobs: 189,
-    headquarters: "Bengaluru, India",
-    employees: "45,000+",
-    nature: "B2C",
-  },
+type JobItem = {
+  companyId?: string;
+  company?: string;
+  companyLogo?: string;
+  location?: string;
+  type?: string;
+};
+
+const LOGO_BG_COLORS = [
+  "bg-slate-800",
+  "bg-emerald-600",
+  "bg-teal-600",
+  "bg-green-700",
+  "bg-indigo-700",
+  "bg-orange-600",
+  "bg-cyan-600",
+  "bg-violet-600",
+  "bg-rose-600",
+  "bg-amber-600",
+  "bg-blue-800",
 ];
+
+const getLogoColor = (companyName: string): string => {
+  let hash = 0;
+  for (let i = 0; i < companyName.length; i += 1) {
+    hash = (hash * 31 + companyName.charCodeAt(i)) >>> 0;
+  }
+  return LOGO_BG_COLORS[hash % LOGO_BG_COLORS.length];
+};
+
+const getInitials = (companyName: string): string => {
+  return companyName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("") || "CO";
+};
+
+const isImageLikeLogo = (logo?: string): boolean => {
+  if (!logo) return false;
+  const normalized = logo.toLowerCase();
+  return (
+    normalized.startsWith("http://") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("/") ||
+    normalized.includes(".")
+  );
+};
+
+const normalizeLogoUrl = (logo?: string): string | undefined => {
+  if (!logo || !isImageLikeLogo(logo)) return undefined;
+  if (logo.startsWith("http://") || logo.startsWith("https://")) {
+    return logo;
+  }
+  if (logo.startsWith("/")) {
+    return `${RAW_BASE_URL}${logo}`;
+  }
+  return `${RAW_BASE_URL}/${logo}`;
+};
 
 const sectors = ["IT Services", "BFSI", "Technology", "Retail", "BPM", "Telecom", "Healthcare", "Energy"];
 const companyTypes = ["Foreign MNC", "Indian MNC", "Corporate", "Startup"];
@@ -387,11 +97,97 @@ const fadeUp = {
 };
 
 export default function CompaniesPage() {
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedNatures, setSelectedNatures] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await api.get("/jobs", {
+          params: {
+            page: 1,
+            limit: 100,
+            sort: "newest",
+          },
+        });
+
+        const jobs: JobItem[] = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+
+        const byCompany = new Map<string, {
+          name: string;
+          logo?: string;
+          location?: string;
+          jobTypes: Set<string>;
+          activeJobs: number;
+        }>();
+
+        jobs.forEach((job) => {
+          const name = (job.company || "").trim();
+          if (!name) return;
+
+          const key = job.companyId || name;
+          const existing = byCompany.get(key);
+
+          if (existing) {
+            existing.activeJobs += 1;
+            if (!existing.logo && job.companyLogo) {
+              existing.logo = job.companyLogo;
+            }
+            if (!existing.location && job.location) {
+              existing.location = job.location;
+            }
+            if (job.type) {
+              existing.jobTypes.add(job.type);
+            }
+            return;
+          }
+
+          byCompany.set(key, {
+            name,
+            logo: job.companyLogo,
+            location: job.location,
+            jobTypes: new Set(job.type ? [job.type] : []),
+            activeJobs: 1,
+          });
+        });
+
+        const mappedCompanies: Company[] = Array.from(byCompany.values())
+          .map((entry) => {
+            const normalizedLogo = normalizeLogoUrl(entry.logo);
+            return {
+              name: entry.name,
+              logoImg: normalizedLogo,
+              logo: normalizedLogo ? "" : getInitials(entry.name),
+              logoColor: getLogoColor(entry.name),
+              rating: 0,
+              reviews: "0",
+              type: "Company",
+              sector: entry.jobTypes.size > 0 ? Array.from(entry.jobTypes) : ["Hiring"],
+              industry: "",
+              description: `Currently hiring for ${entry.activeJobs} role${entry.activeJobs > 1 ? "s" : ""}.`,
+              activeJobs: entry.activeJobs,
+              headquarters: entry.location || "Not specified",
+              employees: "N/A",
+              nature: "B2B",
+            };
+          })
+          .sort((a, b) => b.activeJobs - a.activeJobs);
+
+        setCompanies(mappedCompanies);
+      } catch (error) {
+        console.error("Failed to load companies:", error);
+        setCompanies([]);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   const toggleFilter = (list: string[], item: string, setter: (val: string[]) => void) => {
     setter(list.includes(item) ? list.filter((i) => i !== item) : [...list, item]);
