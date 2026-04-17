@@ -1,25 +1,86 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Search, LogIn, Briefcase, Sparkles, ArrowLeft, Shield,
-  MapPin, Clock, Bell, Users, Building2, CheckCircle, Star, Zap, TrendingUp,
+  Search,
+  LogIn,
+  Briefcase,
+  Sparkles,
+  ArrowLeft,
+  Shield,
+  MapPin,
+  Clock,
+  Bell,
+  Users,
+  Building2,
+  CheckCircle,
+  Star,
+  Zap,
+  TrendingUp,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PublicNavbar from "@/components/PublicNavbar";
 
 const features = [
-  { icon: Search, label: "Smart Search", desc: "Filter by role, location, salary & more" },
-  { icon: Sparkles, label: "AI Matching", desc: "Jobs matched to your skills & preferences" },
-  { icon: Zap, label: "One-Click Apply", desc: "Apply instantly with saved resume" },
-  { icon: Bell, label: "Real-time Alerts", desc: "Instant notifications on new openings" },
-  { icon: TrendingUp, label: "Track Progress", desc: "Monitor all your applications live" },
-  { icon: Shield, label: "Verified Only", desc: "Every company is vetted & verified" },
+  {
+    icon: Search,
+    label: "Smart Search",
+    desc: "Filter by role, location, salary & more",
+  },
+  {
+    icon: Sparkles,
+    label: "AI Matching",
+    desc: "Jobs matched to your skills & preferences",
+  },
+  {
+    icon: Zap,
+    label: "One-Click Apply",
+    desc: "Apply instantly with saved resume",
+  },
+  {
+    icon: Bell,
+    label: "Real-time Alerts",
+    desc: "Instant notifications on new openings",
+  },
+  {
+    icon: TrendingUp,
+    label: "Track Progress",
+    desc: "Monitor all your applications live",
+  },
+  {
+    icon: Shield,
+    label: "Verified Only",
+    desc: "Every company is vetted & verified",
+  },
 ];
 
 const floatingJobs = [
-  { company: "Infosys", logo: "IN", color: "bg-blue-700", title: "Frontend Developer", location: "Bengaluru", salary: "₹12-18 LPA", tags: ["React", "TypeScript"] },
-  { company: "Amazon", logo: "A", color: "bg-orange-500", title: "Product Manager", location: "Hyderabad", salary: "₹25-35 LPA", tags: ["Strategy", "Analytics"] },
-  { company: "TCS", logo: "TC", color: "bg-indigo-600", title: "Data Analyst", location: "Mumbai", salary: "₹8-14 LPA", tags: ["Python", "SQL"] },
+  {
+    company: "Infosys",
+    logo: "IN",
+    color: "bg-blue-700",
+    title: "Frontend Developer",
+    location: "Bengaluru",
+    salary: "₹12-18 LPA",
+    tags: ["React", "TypeScript"],
+  },
+  {
+    company: "Amazon",
+    logo: "A",
+    color: "bg-orange-500",
+    title: "Product Manager",
+    location: "Hyderabad",
+    salary: "₹25-35 LPA",
+    tags: ["Strategy", "Analytics"],
+  },
+  {
+    company: "TCS",
+    logo: "TC",
+    color: "bg-indigo-600",
+    title: "Data Analyst",
+    location: "Mumbai",
+    salary: "₹8-14 LPA",
+    tags: ["Python", "SQL"],
+  },
 ];
 
 export default function ExploreJobsGate() {
@@ -31,19 +92,38 @@ export default function ExploreJobsGate() {
           animate={{ x: [0, 40, 0], y: [0, -30, 0], scale: [1, 1.15, 1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           className="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, hsl(210 100% 45% / 0.7), transparent 70%)" }}
+          style={{
+            background:
+              "radial-gradient(circle, hsl(210 100% 45% / 0.7), transparent 70%)",
+          }}
         />
         <motion.div
           animate={{ x: [0, -30, 0], y: [0, 35, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.5,
+          }}
           className="absolute -top-20 -right-32 w-[30rem] h-[30rem] rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, hsl(195 90% 50% / 0.6), transparent 70%)" }}
+          style={{
+            background:
+              "radial-gradient(circle, hsl(195 90% 50% / 0.6), transparent 70%)",
+          }}
         />
         <motion.div
           animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          transition={{
+            duration: 14,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 3,
+          }}
           className="absolute bottom-20 left-1/3 w-72 h-72 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, hsl(210 100% 70% / 0.5), transparent 70%)" }}
+          style={{
+            background:
+              "radial-gradient(circle, hsl(210 100% 70% / 0.5), transparent 70%)",
+          }}
         />
       </div>
 
@@ -62,16 +142,26 @@ export default function ExploreJobsGate() {
           >
             <motion.div
               animate={{ y: [0, i % 2 === 0 ? -10 : 10, 0] }}
-              transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut" }}
+              transition={{
+                duration: 4 + i,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
               className={`w-56 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 p-4 shadow-xl ${i === 0 ? "rotate-[-5deg]" : i === 1 ? "rotate-[4deg]" : "rotate-[-3deg]"}`}
             >
               <div className="flex items-center gap-2.5 mb-2.5">
-                <div className={`w-9 h-9 rounded-xl ${job.color} flex items-center justify-center text-white text-[10px] font-heading font-bold`}>
+                <div
+                  className={`w-9 h-9 rounded-xl ${job.color} flex items-center justify-center text-white text-[10px] font-heading font-bold`}
+                >
                   {job.logo}
                 </div>
                 <div>
-                  <p className="text-xs font-heading font-semibold text-foreground">{job.title}</p>
-                  <p className="text-[10px] text-muted-foreground">{job.company}</p>
+                  <p className="text-xs font-heading font-semibold text-foreground">
+                    {job.title}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {job.company}
+                  </p>
                 </div>
               </div>
               <div className="space-y-1 mb-2.5">
@@ -84,7 +174,12 @@ export default function ExploreJobsGate() {
               </div>
               <div className="flex gap-1.5">
                 {job.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 text-[9px] rounded-md bg-primary/10 text-primary font-medium">{tag}</span>
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 text-[9px] rounded-md bg-primary/10 text-primary font-medium"
+                  >
+                    {tag}
+                  </span>
                 ))}
               </div>
               {/* Lock overlay */}
@@ -99,7 +194,7 @@ export default function ExploreJobsGate() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-32 pb-12 sm:pt-40 sm:pb-16 min-h-[calc(100vh-80px)]">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 pt-32 pb-12 sm:pt-40 sm:pb-16 min-h-[calc(100vh-80px)] mobile-content-padding md:pb-16">
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
@@ -110,18 +205,24 @@ export default function ExploreJobsGate() {
           <div
             className="relative rounded-3xl p-8 sm:p-12 border border-border/50 overflow-hidden text-center"
             style={{
-              background: "linear-gradient(145deg, hsl(var(--card) / 0.85), hsl(var(--card) / 0.65))",
+              background:
+                "linear-gradient(145deg, hsl(var(--card) / 0.85), hsl(var(--card) / 0.65))",
               backdropFilter: "blur(24px)",
               WebkitBackdropFilter: "blur(24px)",
-              boxShadow: "0 12px 48px hsl(var(--primary) / 0.1), 0 4px 16px hsl(0 0% 0% / 0.05)",
+              boxShadow:
+                "0 12px 48px hsl(var(--primary) / 0.1), 0 4px 16px hsl(0 0% 0% / 0.05)",
             }}
           >
             {/* Gradient accent line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
 
             {/* Inner glow */}
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-48 rounded-full opacity-8"
-              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 70%)" }}
+            <div
+              className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-48 rounded-full opacity-8"
+              style={{
+                background:
+                  "radial-gradient(circle, hsl(var(--primary) / 0.15), transparent 70%)",
+              }}
             />
 
             {/* Icon with animated ring */}
@@ -157,7 +258,8 @@ export default function ExploreJobsGate() {
               transition={{ delay: 0.3 }}
               className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-md mx-auto"
             >
-              Sign in as a Job Seeker to browse thousands of opportunities, apply instantly, and track your applications.
+              Sign in as a Job Seeker to browse thousands of opportunities,
+              apply instantly, and track your applications.
             </motion.p>
 
             {/* Features grid */}
@@ -178,8 +280,12 @@ export default function ExploreJobsGate() {
                   <div className="w-9 h-9 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
                     <item.icon className="w-4.5 h-4.5 text-primary" />
                   </div>
-                  <p className="text-xs font-heading font-semibold text-foreground mb-0.5">{item.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-snug">{item.desc}</p>
+                  <p className="text-xs font-heading font-semibold text-foreground mb-0.5">
+                    {item.label}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground leading-snug">
+                    {item.desc}
+                  </p>
                 </motion.div>
               ))}
             </motion.div>
@@ -192,7 +298,8 @@ export default function ExploreJobsGate() {
               className="mb-6"
             >
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/8 text-primary text-xs font-heading font-semibold border border-primary/15">
-                <Shield className="w-3.5 h-3.5" /> Login required to explore jobs
+                <Shield className="w-3.5 h-3.5" /> Login required to explore
+                jobs
               </span>
             </motion.div>
 
@@ -207,7 +314,8 @@ export default function ExploreJobsGate() {
                 to="/login/user"
                 className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-2xl font-heading font-semibold text-sm transition-all duration-300 text-white overflow-hidden hover:scale-[1.03]"
                 style={{
-                  background: "linear-gradient(135deg, hsl(239 84% 67%), hsl(210 100% 45%))",
+                  background:
+                    "linear-gradient(135deg, hsl(239 84% 67%), hsl(210 100% 45%))",
                   boxShadow: "0 4px 24px hsl(239 84% 67% / 0.35)",
                 }}
               >
@@ -241,8 +349,12 @@ export default function ExploreJobsGate() {
                 <div key={stat.label} className="flex items-center gap-2">
                   <stat.icon className="w-3.5 h-3.5 text-primary/50" />
                   <div>
-                    <span className="text-sm font-heading font-bold text-primary">{stat.value}</span>
-                    <span className="text-[10px] text-muted-foreground ml-1">{stat.label}</span>
+                    <span className="text-sm font-heading font-bold text-primary">
+                      {stat.value}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground ml-1">
+                      {stat.label}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -256,7 +368,10 @@ export default function ExploreJobsGate() {
             transition={{ delay: 0.8 }}
             className="mt-6 text-center text-xs text-muted-foreground"
           >
-            <Link to="/" className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+            >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to Home
             </Link>

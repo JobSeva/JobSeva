@@ -82,7 +82,7 @@ export default function ExploreJobs() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -149,7 +149,7 @@ export default function ExploreJobs() {
           ].map((tag) => (
             <button
               key={tag}
-              className="px-3 py-1 rounded-lg bg-muted text-xs text-muted-foreground hover:text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+              className="px-3 py-1 rounded-lg bg-muted text-xs text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
             >
               {tag}
             </button>

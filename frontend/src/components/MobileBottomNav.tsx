@@ -1,5 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Briefcase, User, Building2, BarChart3 } from "lucide-react";
+import {
+  Home,
+  Search,
+  Briefcase,
+  User,
+  Building2,
+  BarChart3,
+} from "lucide-react";
 import { useAppContext } from "@/contexts/AppContext";
 
 const seekerNav = [
@@ -27,11 +34,12 @@ export default function MobileBottomNav() {
   const { role } = useAppContext();
   const location = useLocation();
 
-  const nav = role === "seeker" ? seekerNav : role === "company" ? companyNav : adminNav;
+  const nav =
+    role === "seeker" ? seekerNav : role === "company" ? companyNav : adminNav;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card border-t border-border safe-area-bottom">
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="flex items-center justify-around h-[var(--mobile-bottom-nav-height,4rem)] px-2">
         {nav.map((item) => {
           const isActive = location.pathname === item.to;
           return (
@@ -42,7 +50,9 @@ export default function MobileBottomNav() {
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              <item.icon className={`w-5 h-5 ${isActive ? "text-primary" : ""}`} />
+              <item.icon
+                className={`w-5 h-5 ${isActive ? "text-primary" : ""}`}
+              />
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
           );

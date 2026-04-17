@@ -92,7 +92,7 @@ export default function JobDetails() {
 
   if (!job) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-20 mobile-content-padding md:pb-0">
         <h2 className="text-2xl font-heading font-bold mb-2">Job Not Found</h2>
         <p className="text-muted-foreground mb-4">
           This job listing may have been removed.
@@ -105,7 +105,7 @@ export default function JobDetails() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 mobile-content-padding md:pb-0">
       <Link
         to="/app/explore"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -242,11 +242,7 @@ export default function JobDetails() {
                 disabled={isApplying}
                 className="btn-primary w-full py-3 text-center disabled:opacity-50 flex justify-center items-center gap-2"
               >
-                {isApplying ? (
-                  <Loader size="sm" />
-                ) : (
-                  "Apply Now"
-                )}
+                {isApplying ? <Loader size="sm" /> : "Apply Now"}
               </button>
             )}
 

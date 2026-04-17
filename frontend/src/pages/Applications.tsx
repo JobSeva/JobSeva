@@ -67,7 +67,7 @@ export default function Applications() {
       } catch (err: any) {
         setError(
           err.response?.data?.error?.message ||
-          "An error occurred while loading applications",
+            "An error occurred while loading applications",
         );
       } finally {
         setIsLoading(false);
@@ -87,12 +87,16 @@ export default function Applications() {
   };
 
   if (isLoading) {
-    return <Loader message="Retrieving your applications..." />;
+    return (
+      <div className="mobile-content-padding md:pb-0">
+        <Loader message="Retrieving your applications..." />
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="flex h-[400px] items-center justify-center flex-col gap-2">
+      <div className="flex h-[400px] items-center justify-center flex-col gap-2 mobile-content-padding md:pb-0">
         <p className="text-destructive font-medium">{error}</p>
         <button
           onClick={() => window.location.reload()}
@@ -105,7 +109,7 @@ export default function Applications() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -186,10 +190,11 @@ export default function Applications() {
                           className="flex items-center gap-2"
                         >
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${isCompleted
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
+                              isCompleted
                                 ? stage.color
                                 : "bg-muted text-muted-foreground"
-                              }`}
+                            }`}
                           >
                             <stage.icon className="w-4 h-4" />
                           </div>

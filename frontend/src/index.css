@@ -61,6 +61,7 @@
     --brand-purple: 262 83% 58%;
     --brand-orange: 25 95% 53%;
     --glass-border: 214 32% 91%;
+    --mobile-bottom-nav-height: 4rem;
   }
 
   .dark {
@@ -303,7 +304,16 @@
   }
 
   .mobile-content-padding {
-    @apply pb-20 md:pb-0;
+    padding-bottom: calc(
+      var(--mobile-bottom-nav-height, 4rem) + 1rem +
+        env(safe-area-inset-bottom, 0px)
+    );
+  }
+
+  @media (min-width: 768px) {
+    .mobile-content-padding {
+      padding-bottom: 0;
+    }
   }
 
   .logo-hover {
