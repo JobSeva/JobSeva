@@ -7,7 +7,7 @@ const roles = [
     {
         key: "user",
         label: "Job Seeker",
-        desc: "Find your dream job with AI-powered matching",
+        desc: "Find jobs that fit you best",
         icon: Users,
         color: "from-indigo-500 to-blue-400",
         iconBg: "bg-indigo-500/10",
