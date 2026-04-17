@@ -3,19 +3,48 @@ import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import {
-  Sparkles, Zap, Shield, Clock, ArrowRight,
-  Briefcase, ChevronRight, ChevronLeft, Mail, Phone, Globe,
-  CheckCircle, Users, Building2, Star, LogIn,
+  Sparkles,
+  Zap,
+  Shield,
+  Clock,
+  ArrowRight,
+  Briefcase,
+  ChevronRight,
+  ChevronLeft,
+  Mail,
+  Phone,
+  Globe,
+  CheckCircle,
+  Users,
+  Building2,
+  Star,
+  LogIn,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PublicNavbar from "@/components/PublicNavbar";
 import PublicFooter from "@/components/PublicFooter";
 
 const features = [
-  { icon: Sparkles, title: "AI Job Matching", desc: "Smart algorithms find your perfect role based on your skills and preferences." },
-  { icon: Zap, title: "One-Click Apply", desc: "Apply to jobs instantly with your saved profile and resume." },
-  { icon: Clock, title: "Real-time Updates", desc: "Get instant notifications on application status changes." },
-  { icon: Shield, title: "Verified Companies", desc: "Every employer is vetted to ensure legitimate opportunities." },
+  {
+    icon: Sparkles,
+    title: "AI Job Matching",
+    desc: "Smart algorithms find your perfect role based on your skills and preferences.",
+  },
+  {
+    icon: Zap,
+    title: "One-Click Apply",
+    desc: "Apply to jobs instantly with your saved profile and resume.",
+  },
+  {
+    icon: Clock,
+    title: "Real-time Updates",
+    desc: "Get instant notifications on application status changes.",
+  },
+  {
+    icon: Shield,
+    title: "Verified Companies",
+    desc: "Every employer is vetted to ensure legitimate opportunities.",
+  },
 ];
 
 const hiringCategories = [
@@ -30,36 +59,110 @@ const hiringCategories = [
 ];
 
 const featuredCompanies = [
-  { name: "Google", logoImg: "/logos/google.png", rating: 4.5, desc: "Organizing the world's information." },
-  { name: "Amazon", logoImg: "/logos/amazon.png", rating: 4.1, desc: "Earth's most customer-centric company." },
-  { name: "Apple", logoImg: "/logos/apple.png", rating: 4.7, desc: "Innovation in technology and design." },
-  { name: "Meta", logoImg: "/logos/meta.png", rating: 4.0, desc: "Bringing the world closer together." },
-  { name: "Microsoft", logoImg: "/logos/microsoft.png", rating: 4.3, desc: "Empowering every person on the planet." },
-  { name: "Netflix", logoImg: "/logos/netflix.png", rating: 4.4, desc: "Unlimited movies and TV shows." },
-  { name: "Adobe", logoImg: "/logos/adobe.png", rating: 4.2, desc: "Changing the world through digital experiences." },
-  { name: "Spotify", logoImg: "/logos/spotify.png", rating: 4.5, desc: "Music for everyone." },
-  { name: "Flipkart", logoImg: "/logos/flipkart.png", rating: 4.0, desc: "India's leading e-commerce marketplace." },
-  { name: "TCS", logoImg: "/logos/tcs.png", rating: 3.8, desc: "Pioneering innovation in IT services globally." },
-  { name: "Infosys", logoImg: "/logos/infosys.png", rating: 3.7, desc: "Global leader in next-gen digital services." },
+  {
+    name: "Google",
+    logoImg: "/logos/google.png",
+    rating: 4.5,
+    desc: "Organizing the world's information.",
+  },
+  {
+    name: "Amazon",
+    logoImg: "/logos/amazon.png",
+    rating: 4.1,
+    desc: "Earth's most customer-centric company.",
+  },
+  {
+    name: "Apple",
+    logoImg: "/logos/apple.png",
+    rating: 4.7,
+    desc: "Innovation in technology and design.",
+  },
+  {
+    name: "Meta",
+    logoImg: "/logos/meta.png",
+    rating: 4.0,
+    desc: "Bringing the world closer together.",
+  },
+  {
+    name: "Microsoft",
+    logoImg: "/logos/microsoft.png",
+    rating: 4.3,
+    desc: "Empowering every person on the planet.",
+  },
+  {
+    name: "Netflix",
+    logoImg: "/logos/netflix.png",
+    rating: 4.4,
+    desc: "Unlimited movies and TV shows.",
+  },
+  {
+    name: "Adobe",
+    logoImg: "/logos/adobe.png",
+    rating: 4.2,
+    desc: "Changing the world through digital experiences.",
+  },
+  {
+    name: "Spotify",
+    logoImg: "/logos/spotify.png",
+    rating: 4.5,
+    desc: "Music for everyone.",
+  },
+  {
+    name: "Flipkart",
+    logoImg: "/logos/flipkart.png",
+    rating: 4.0,
+    desc: "India's leading e-commerce marketplace.",
+  },
+  {
+    name: "TCS",
+    logoImg: "/logos/tcs.png",
+    rating: 3.8,
+    desc: "Pioneering innovation in IT services globally.",
+  },
+  {
+    name: "Infosys",
+    logoImg: "/logos/infosys.png",
+    rating: 3.7,
+    desc: "Global leader in next-gen digital services.",
+  },
 ];
 
 const steps = [
-  { num: "01", title: "Create Profile", desc: "Set up your profile in minutes with guided onboarding." },
-  { num: "02", title: "Get AI Recommendations", desc: "Our algorithm finds jobs matching your skills perfectly." },
-  { num: "03", title: "Apply Instantly", desc: "One-click apply with your saved resume." },
-  { num: "04", title: "Get Hired", desc: "Track your progress and land your dream job faster." },
+  {
+    num: "01",
+    title: "Create Profile",
+    desc: "Set up your profile in minutes with guided onboarding.",
+  },
+  {
+    num: "02",
+    title: "Get AI Recommendations",
+    desc: "Our algorithm finds jobs matching your skills perfectly.",
+  },
+  {
+    num: "03",
+    title: "Apply Instantly",
+    desc: "One-click apply with your saved resume.",
+  },
+  {
+    num: "04",
+    title: "Get Hired",
+    desc: "Track your progress and land your dream job faster.",
+  },
 ];
-
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5 },
+  }),
 };
 
 function TopCompaniesSection() {
   const allLogos = [
-    ...featuredCompanies.map(c => ({ name: c.name, logoImg: c.logoImg })),
-    ...featuredCompanies.map(c => ({ name: c.name, logoImg: c.logoImg })) // Double for infinite loop
+    ...featuredCompanies.map((c) => ({ name: c.name, logoImg: c.logoImg })),
+    ...featuredCompanies.map((c) => ({ name: c.name, logoImg: c.logoImg })), // Double for infinite loop
   ];
 
   return (
@@ -82,9 +185,15 @@ function TopCompaniesSection() {
                 className="flex-shrink-0 w-44 h-24 clean-card flex flex-col items-center justify-center p-4 hover:scale-105 transition-all duration-500 cursor-pointer bg-card/50 backdrop-blur-sm"
               >
                 <div className="w-16 h-16 flex items-center justify-center mb-2">
-                  <img src={company.logoImg} alt={company.name} className="max-w-full max-h-full object-contain" />
+                  <img
+                    src={company.logoImg}
+                    alt={company.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
                 </div>
-                <span className="text-[10px] font-heading font-semibold text-muted-foreground truncate w-full text-center">{company.name}</span>
+                <span className="text-[10px] font-heading font-semibold text-muted-foreground truncate w-full text-center">
+                  {company.name}
+                </span>
               </div>
             ))}
           </div>
@@ -118,19 +227,36 @@ export default function LandingPage() {
             animate={{ x: [0, 30, 0], y: [0, -20, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -top-20 -left-20 w-72 h-72 sm:w-96 sm:h-96 rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, #7C3AED, transparent 70%)" }}
+            style={{
+              background: "radial-gradient(circle, #7C3AED, transparent 70%)",
+            }}
           />
           <motion.div
             animate={{ x: [0, -25, 0], y: [0, 25, 0], scale: [1, 1.15, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1,
+            }}
             className="absolute -top-10 -right-20 w-80 h-80 sm:w-[28rem] sm:h-[28rem] rounded-full opacity-15"
-            style={{ background: "radial-gradient(circle, #F97316, transparent 70%)" }}
+            style={{
+              background: "radial-gradient(circle, #F97316, transparent 70%)",
+            }}
           />
           <motion.div
             animate={{ x: [0, 15, 0], y: [0, -15, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
             className="absolute bottom-10 left-1/4 w-64 h-64 rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, hsl(210 100% 70% / 0.6), transparent 70%)" }}
+            style={{
+              background:
+                "radial-gradient(circle, hsl(210 100% 70% / 0.6), transparent 70%)",
+            }}
           />
         </div>
 
@@ -148,7 +274,9 @@ export default function LandingPage() {
               className="w-52 rounded-2xl bg-card/60 backdrop-blur-sm border border-border/50 p-4 shadow-lg rotate-[-6deg]"
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">IN</div>
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                  IN
+                </div>
                 <div>
                   <div className="h-2.5 w-24 bg-muted rounded-full" />
                   <div className="h-2 w-16 bg-muted rounded-full mt-1" />
@@ -173,11 +301,18 @@ export default function LandingPage() {
           >
             <motion.div
               animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
               className="w-52 rounded-2xl bg-card/60 backdrop-blur-sm border border-border/50 p-4 shadow-lg rotate-[5deg]"
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center text-[10px] font-bold text-secondary">TC</div>
+                <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center text-[10px] font-bold text-secondary">
+                  TC
+                </div>
                 <div>
                   <div className="h-2.5 w-20 bg-muted rounded-full" />
                   <div className="h-2 w-14 bg-muted rounded-full mt-1" />
@@ -202,11 +337,18 @@ export default function LandingPage() {
           >
             <motion.div
               animate={{ y: [0, 6, 0], rotate: [-3, -1, -3] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1,
+              }}
               className="w-44 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/40 p-3 shadow-md rotate-[-3deg]"
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center text-[9px] font-bold text-accent">AM</div>
+                <div className="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center text-[9px] font-bold text-accent">
+                  AM
+                </div>
                 <div className="h-2.5 w-20 bg-muted rounded-full" />
               </div>
               <div className="h-2 w-full bg-muted rounded-full" />
@@ -218,9 +360,14 @@ export default function LandingPage() {
         {/* Main CTA Content */}
         <div className="max-w-3xl mx-auto text-center relative z-10">
           {/* Badge */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mt-10 sm:mt-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mt-10 sm:mt-12"
+          >
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 border border-primary/20">
-              <Sparkles className="w-4 h-4" /> AI-Powered Job Matching
+              <Sparkles className="w-4 h-4" /> Finding jobs made easy
             </span>
           </motion.div>
 
@@ -231,8 +378,7 @@ export default function LandingPage() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-4xl sm:text-5xl lg:text-7xl font-heading font-extrabold leading-[1.1] tracking-tight mb-6"
           >
-            Find the Right Job,{" "}
-            <br className="hidden sm:block" />
+            Find the Right Job, <br className="hidden sm:block" />
             <span className="text-primary hover-glow">Faster with JobSeva</span>
           </motion.h1>
 
@@ -242,7 +388,8 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-4"
           >
-            Connecting talent with real opportunities through smart matching and verified companies.
+            Connecting talent with real opportunities through smart matching and
+            verified companies.
           </motion.p>
 
           {/* Glassmorphism CTA Card */}
@@ -255,17 +402,23 @@ export default function LandingPage() {
             <div
               className="relative rounded-3xl p-8 sm:p-10 border border-border/50 overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6))",
+                background:
+                  "linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6))",
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
-                boxShadow: "0 8px 32px hsl(var(--primary) / 0.08), 0 2px 8px hsl(0 0% 0% / 0.04)",
+                boxShadow:
+                  "0 8px 32px hsl(var(--primary) / 0.08), 0 2px 8px hsl(0 0% 0% / 0.04)",
               }}
             >
               {/* Inner glow */}
 
               {/* Inner glow */}
-              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-40 rounded-full opacity-10"
-                style={{ background: "radial-gradient(circle, hsl(var(--primary)), transparent 70%)" }}
+              <div
+                className="absolute -top-20 left-1/2 -translate-x-1/2 w-60 h-40 rounded-full opacity-10"
+                style={{
+                  background:
+                    "radial-gradient(circle, hsl(var(--primary)), transparent 70%)",
+                }}
               />
 
               {/* Inside Heading */}
@@ -284,7 +437,8 @@ export default function LandingPage() {
                 transition={{ delay: 0.45 }}
                 className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8 max-w-sm mx-auto"
               >
-                Join thousands of professionals already using JobSeva to find their next opportunity.
+                Join thousands of professionals already using JobSeva to find
+                their next opportunity.
               </motion.p>
 
               {/* Lock badge */}
@@ -295,12 +449,14 @@ export default function LandingPage() {
                 className="mb-5 flex justify-center"
               >
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-heading font-semibold border border-primary/15">
-                  <Shield className="w-3.5 h-3.5" /> Login required to explore jobs
+                  <Shield className="w-3.5 h-3.5" /> Login required to explore
+                  jobs
                 </span>
               </motion.div>
 
               <p className="text-sm text-muted-foreground mb-7 leading-relaxed max-w-sm mx-auto">
-                Login to start exploring jobs, apply instantly, and track your applications in real-time.
+                Login to start exploring jobs, apply instantly, and track your
+                applications in real-time.
               </p>
 
               {/* CTA Buttons */}
@@ -341,12 +497,19 @@ export default function LandingPage() {
               { value: "50K+", label: "Candidates", icon: Users },
               { value: "95%", label: "Success Rate", icon: CheckCircle },
             ].map((stat) => (
-              <div key={stat.label} className="text-center group cursor-default p-4 rounded-2xl hover:bg-primary/5 transition-colors">
+              <div
+                key={stat.label}
+                className="text-center group cursor-default p-4 rounded-2xl hover:bg-primary/5 transition-colors"
+              >
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <stat.icon className="w-4 h-4 text-primary/60 group-hover:text-primary group-hover:scale-125 transition-all duration-300 group-hover:-translate-y-1" />
-                  <p className="text-2xl sm:text-3xl font-heading font-bold text-primary group-hover:-translate-y-1 transition-transform duration-300">{stat.value}</p>
+                  <p className="text-2xl sm:text-3xl font-heading font-bold text-primary group-hover:-translate-y-1 transition-transform duration-300">
+                    {stat.value}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{stat.label}</p>
+                <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  {stat.label}
+                </p>
               </div>
             ))}
           </motion.div>
@@ -356,12 +519,26 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} custom={0} className="text-3xl sm:text-4xl font-heading font-bold">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={fadeUp}
+              custom={0}
+              className="text-3xl sm:text-4xl font-heading font-bold"
+            >
               Why <span className="text-primary">JobSeva</span>?
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="mt-4 text-muted-foreground max-w-lg mx-auto">
-              Everything you need to supercharge your job search or hiring process.
+            <motion.p
+              variants={fadeUp}
+              custom={1}
+              className="mt-4 text-muted-foreground max-w-lg mx-auto"
+            >
+              Everything you need to supercharge your job search or hiring
+              process.
             </motion.p>
           </motion.div>
 
@@ -379,7 +556,9 @@ export default function LandingPage() {
                 <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300">
                   <f.icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <h3 className="font-heading font-semibold text-lg mb-2">{f.title}</h3>
+                <h3 className="font-heading font-semibold text-lg mb-2">
+                  {f.title}
+                </h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </motion.div>
             ))}
@@ -390,12 +569,23 @@ export default function LandingPage() {
       {/* Top Companies Hiring Now */}
       <TopCompaniesSection />
 
-
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
+      <section
+        id="how-it-works"
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30"
+      >
         <div className="max-w-5xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} custom={0} className="text-3xl sm:text-4xl font-heading font-bold">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={fadeUp}
+              custom={0}
+              className="text-3xl sm:text-4xl font-heading font-bold"
+            >
               How It <span className="text-primary">Works</span>
             </motion.h2>
           </motion.div>
@@ -412,9 +602,13 @@ export default function LandingPage() {
                 className="text-center relative group cursor-default"
               >
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 shadow-sm group-hover:shadow-md">
-                  <span className="font-heading font-bold text-xl text-primary">{step.num}</span>
+                  <span className="font-heading font-bold text-xl text-primary">
+                    {step.num}
+                  </span>
                 </div>
-                <h3 className="font-heading font-semibold mb-2">{step.title}</h3>
+                <h3 className="font-heading font-semibold mb-2">
+                  {step.title}
+                </h3>
                 <p className="text-sm text-muted-foreground">{step.desc}</p>
                 {i < steps.length - 1 && (
                   <ChevronRight className="hidden lg:block absolute top-8 -right-4 w-6 h-6 text-border" />
@@ -424,8 +618,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-
 
       {/* Footer */}
       <PublicFooter />
