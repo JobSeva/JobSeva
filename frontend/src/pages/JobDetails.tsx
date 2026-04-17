@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   MapPin,
   Briefcase,
@@ -11,8 +11,11 @@ import {
   Share2,
   Loader2,
   AlertCircle,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
 
@@ -36,17 +39,27 @@ type Job = {
 
 export default function JobDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [job, setJob] = useState<Job | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
       try {
         const res = await api.get(`/jobs/${id}`);
         setJob(res.data.data);
+        
+        // Check if saved
+        const savedRes = await api.get("/saved-jobs");
+        if (savedRes.data?.success) {
+          const isJobSaved = (savedRes.data.data || []).some((sj: any) => sj.job.id === id);
+          setIsSaved(isJobSaved);
+        }
       } catch (err: any) {
         console.error("Job details fetch error:", err);
       } finally {
@@ -63,11 +76,47 @@ export default function JobDetails() {
     try {
       await api.post("/applications", { jobId: job.id });
       setApplySuccess(true);
+      // Wait a moment so the user sees the success state, then redirect to dashboard
+      setTimeout(() => {
+        navigate("/app/dashboard");
+      }, 1500);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to apply");
+      const errorMsg = err.response?.data?.error || "Failed to apply";
+      if (err.response?.status === 409 || errorMsg.includes("already applied")) {
+        setError("You have already applied for this job.");
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       setIsApplying(false);
     }
+  };
+
+  const handleSave = async () => {
+    if (!job) return;
+    setIsSaving(true);
+    try {
+      if (isSaved) {
+        await api.delete(`/saved-jobs/${job.id}`);
+        setIsSaved(false);
+        toast.success("Job removed from saved jobs");
+      } else {
+        await api.post(`/saved-jobs/${job.id}`);
+        setIsSaved(true);
+        toast.success("Job saved for later!");
+      }
+    } catch (err) {
+      console.error("Save job error:", err);
+      toast.error("Failed to update saved status");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleShare = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    toast.success("Job link copied to clipboard!");
   };
 
   const formatCurrency = (amount: number) => {
@@ -250,7 +299,34 @@ export default function JobDetails() {
               </button>
             )}
 
-            <button className="w-full py-3 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all flex items-center justify-center gap-2">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className={`w-full py-3 rounded-xl border text-sm transition-all flex items-center justify-center gap-2 ${
+                isSaved 
+                ? "bg-warning/10 border-warning/30 text-warning" 
+                : "border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+              }`}
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isSaved ? (
+                <>
+                  <BookmarkCheck className="w-4 h-4 fill-current" />
+                  Saved
+                </>
+              ) : (
+                <>
+                  <Bookmark className="w-4 h-4" />
+                  Save Job
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="w-full py-3 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all flex items-center justify-center gap-2"
+            >
               <Share2 className="w-4 h-4" /> Share Job
             </button>
           </div>

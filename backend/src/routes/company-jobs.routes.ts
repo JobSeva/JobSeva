@@ -115,4 +115,10 @@ companyJobsRouter.get(
   asyncHandler(companyJobsController.listAllApplicants),
 );
 
+companyJobsRouter.delete(
+  "/applications/:applicationId",
+  validate({ params: paramsApplicationSchema }),
+  asyncHandler(companyJobsController.deleteApplication),
+);
+
 export { companyJobsRouter };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileText, Loader2, BookmarkCheck } from "lucide-react";
+import { FileText, Loader2, BookmarkCheck, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
@@ -11,7 +11,8 @@ interface Job {
   company: string;
   companyLogo: string;
   location: string;
-  salary: { min: number; max: number; currency: string };
+  salaryMin: number;
+  salaryMax: number;
 }
 
 interface SavedJob {
@@ -32,7 +33,8 @@ export default function SavedJobs() {
     try {
       const res = await api.get("/saved-jobs");
       if (res.data?.success) {
-        setSavedJobs(res.data.data?.items || []);
+        // Backend returns the array directly in 'data'
+        setSavedJobs(res.data.data || []);
       } else {
         setError(res.data?.error?.message || "Failed to load saved jobs");
       }
@@ -54,13 +56,9 @@ export default function SavedJobs() {
     }
   };
 
-  const formatSalary = (salary?: {
-    min: number;
-    max: number;
-    currency: string;
-  }) => {
-    if (!salary) return "Salary not disclosed";
-    return `${salary.currency}${salary.min.toLocaleString()} - ${salary.max.toLocaleString()}`;
+  const formatSalary = (min?: number, max?: number) => {
+    if (min === undefined || max === undefined) return "Salary not disclosed";
+    return `₹${min.toLocaleString()} - ₹${max.toLocaleString()}`;
   };
 
   if (isLoading) {
@@ -119,7 +117,7 @@ export default function SavedJobs() {
                     {saved.job.company} · {saved.job.location}
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {formatSalary(saved.job.salary)}
+                    {formatSalary(saved.job.salaryMin, saved.job.salaryMax)}
                   </p>
                 </div>
                 <button
@@ -136,11 +134,19 @@ export default function SavedJobs() {
       </div>
 
       {savedJobs.length === 0 && (
-        <div className="clean-card p-12 text-center">
-          <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground">
-            No saved jobs yet. Start exploring!
-          </p>
+        <div className="clean-card p-12 text-center space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto">
+            <BookmarkCheck className="w-8 h-8 text-muted-foreground opacity-20" />
+          </div>
+          <div>
+            <h3 className="font-heading font-semibold text-lg text-foreground">No saved jobs yet</h3>
+            <p className="text-muted-foreground text-sm max-w-[250px] mx-auto mt-1">
+              Start exploring and bookmarking opportunities that interest you!
+            </p>
+          </div>
+          <Link to="/app/explore" className="btn-primary inline-flex items-center gap-2">
+            Browse Jobs <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       )}
     </div>

@@ -487,6 +487,7 @@ export const seekerProfileService = {
     chartData: SeekerDashboardChartPoint[];
   }> {
     const profile = await getOrCreateProfile(userId);
+    console.log(`[Dashboard] Fetching stats for seeker: ${userId}`);
 
     const totalApplications = await prisma.application.count({
       where: { seekerId: userId },
@@ -507,6 +508,8 @@ export const seekerProfileService = {
       where: { seekerUserId: userId },
     });
 
+    console.log(`[Dashboard] Found stats: apps=${totalApplications}, saved=${savedJobsCount}, interviews=${activeInterviews}, views=${profileViews}`);
+
     const recentApplicationsRaw = await prisma.application.findMany({
       where: { seekerId: userId },
       include: { job: { include: { company: true } } },
@@ -516,11 +519,11 @@ export const seekerProfileService = {
 
     const recentApplications = recentApplicationsRaw.map((app) => ({
       id: app.id,
-      jobTitle: app.job.title,
-      company: app.job.company.name,
-      companyLogo: app.job.company.logo,
+      jobTitle: app.job?.title || app.jobTitle,
+      company: app.job?.company?.name || app.company,
+      companyLogo: app.job?.company?.logo || app.companyLogo,
       status: app.status,
-      appliedAt: app.appliedAt.toISOString(),
+      appliedAt: new Date(app.appliedAt).toISOString(),
     }));
 
     // Simple recommendation engine: active jobs with most applicants first (or just recent)
@@ -561,8 +564,9 @@ export const seekerProfileService = {
     });
 
     last7DaysApps.forEach((app) => {
-      const dayName = days[app.appliedAt.getDay()] as string;
-      applicationsMap.set(dayName, applicationsMap.get(dayName)! + 1);
+      const date = new Date(app.appliedAt);
+      const dayName = days[date.getDay()] as string;
+      applicationsMap.set(dayName, (applicationsMap.get(dayName) || 0) + 1);
     });
 
     const last7DaysViews = await prisma.seekerProfileView.findMany({

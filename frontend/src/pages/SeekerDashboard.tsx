@@ -37,11 +37,15 @@ export default function SeekerDashboard() {
   });
   const [chartData, setChartData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const res = await api.get("/seeker/profile/dashboard");
+        console.log("[Dashboard] Fetch Response:", res.data);
         if (res.data?.success) {
           const d = res.data.data;
           setApplications(d.recentApplications || []);
@@ -53,18 +57,54 @@ export default function SeekerDashboard() {
             activeInterviews: d.activeInterviews,
           });
           setChartData(d.chartData || []);
+        } else {
+          setError(res.data?.error?.message || "Failed to load dashboard data");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Dashboard fetch error:", err);
+        setError(
+          err.response?.data?.error?.message ||
+            "An unexpected error occurred. Please try again."
+        );
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchData();
+
+    // Re-fetch when window gains focus for a "real-time" feel
+    // This ensures data is up-to-date if you return from another tab after applying
+    const handleFocus = () => {
+      console.log("[Dashboard] Focus detected, refreshing...");
+      fetchData();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   if (isLoading) {
     return <Loader message="Loading your personal dashboard..." />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-[400px] items-center justify-center flex-col gap-4 text-center">
+        <div className="p-4 rounded-full bg-destructive/10 text-destructive">
+          <Clock className="w-8 h-8" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold font-heading">Something went wrong</h2>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">{error}</p>
+        </div>
+        <button
+          onClick={() => window.location.reload()}
+          className="btn-primary"
+        >
+          Reload Dashboard
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -259,12 +299,14 @@ export default function SeekerDashboard() {
                   <span
                     className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${
                       app.status === "hired"
-                        ? "bg-success/20 text-success"
+                        ? "bg-success/20 text-success shadow-[0_0_10px_rgba(34,197,94,0.1)]"
                         : app.status === "interview"
-                          ? "bg-primary/20 text-primary"
+                          ? "bg-primary/20 text-primary shadow-[0_0_10px_rgba(var(--primary),0.1)]"
                           : app.status === "shortlisted"
-                            ? "bg-warning/20 text-warning"
-                            : "bg-muted text-muted-foreground"
+                            ? "bg-warning/20 text-warning shadow-[0_0_10px_rgba(234,179,8,0.1)]"
+                            : app.status === "rejected"
+                              ? "bg-destructive/10 text-destructive grayscale-[0.5]"
+                              : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {app.status || "Pending"}

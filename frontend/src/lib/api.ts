@@ -3,12 +3,17 @@ import axios from "axios";
 // Access Vite environment variables or default to localhost for DEV mode
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 
+// Base URL for static assets (removes /api suffix if present)
+const RAW_BASE_URL = API_URL.replace(/\/api$/, "");
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+export { RAW_BASE_URL };
 
 // Request interceptor to attach JWT token
 api.interceptors.request.use((config) => {

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import Loader from "@/components/Loader";
-import { getPublicSeekerProfile } from "@/services/api";
+import { getPublicSeekerProfile, RAW_BASE_URL } from "@/services/api";
 
 interface PublicSeekerProfile {
   userId: string;
@@ -113,7 +113,7 @@ export default function SeekerPublicProfile() {
 
         {profile.resumeUrl ? (
           <a
-            href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${profile.resumeUrl}`}
+            href={`${RAW_BASE_URL}${profile.resumeUrl}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"

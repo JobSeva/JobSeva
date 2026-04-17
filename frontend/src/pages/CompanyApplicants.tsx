@@ -8,6 +8,7 @@ import {
   Loader2,
   RefreshCw,
   FileText,
+  Trash2,
 } from "lucide-react";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
@@ -105,8 +106,24 @@ export default function CompanyApplicants() {
           );
         }
       }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteApplication = async (applicationId: string) => {
+    if (!window.confirm("Are you sure you want to permanently remove this applicant? This action cannot be undone.")) return;
+    
+    setIsUpdating(true);
+    try {
+      const res = await api.delete(`/company/applications/${applicationId}`);
+      if (res.data?.success) {
+        setCandidates((prev) => prev.filter((c) => c.applicationId !== applicationId));
+        setSelectedCandidate(null);
+      }
     } catch (err) {
-      console.error("Failed to update status", err);
+      console.error("Failed to delete application", err);
+      alert("Failed to remove applicant. Please try again.");
     } finally {
       setIsUpdating(false);
     }
@@ -182,8 +199,15 @@ export default function CompanyApplicants() {
                           </p>
                         </div>
                       </div>
-                      <button className="p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground flex-shrink-0">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteApplication(c.applicationId);
+                        }}
+                        className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive flex-shrink-0"
+                        title="Remove Applicant"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                     <div className="flex items-center justify-between gap-2 overflow-hidden">
@@ -294,7 +318,7 @@ export default function CompanyApplicants() {
                   </div>
                 </div>
                 <a
-                  href={`${import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:4000"}${selectedCandidate.resumeUrl}`}
+                  href={`${RAW_BASE_URL}${selectedCandidate.resumeUrl}`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-lg hover:shadow-primary/20 transition-all shadow-sm"
@@ -443,6 +467,12 @@ export default function CompanyApplicants() {
                       Reject
                     </button>
                   )}
+                <button
+                  onClick={() => handleDeleteApplication(selectedCandidate.applicationId)}
+                  className="px-3 py-1.5 rounded-xl bg-destructive/10 text-xs text-destructive hover:bg-destructive hover:text-white transition-all font-bold"
+                >
+                  Remove Applicant
+                </button>
               </div>
             </div>
           </motion.div>

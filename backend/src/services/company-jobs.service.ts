@@ -293,19 +293,17 @@ export const companyJobsService = {
 
   async remove(ownerUserId: string, jobId: string): Promise<void> {
     const profile = await getCompanyProfile(ownerUserId);
-    const job = await getOwnedJob(ownerUserId, jobId);
+    await getOwnedJob(ownerUserId, jobId);
 
-    if (job.active) {
-      await prisma.job.update({
+    await prisma.$transaction([
+      prisma.job.delete({
         where: { id: jobId },
-        data: { active: false },
-      });
-
-      await prisma.companyProfile.update({
+      }),
+      prisma.companyProfile.update({
         where: { companyId: profile.companyId },
         data: { openPositions: { decrement: 1 } },
-      });
-    }
+      }),
+    ]);
   },
 
   async listApplicants(
@@ -477,5 +475,36 @@ export const companyJobsService = {
         experiences: seekerProfile?.experiences || [],
       };
     });
+  },
+
+  async deleteApplication(ownerUserId: string, applicationId: string): Promise<void> {
+    const profile = await getCompanyProfile(ownerUserId);
+
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: { job: true },
+    });
+
+    if (!application) {
+      throw new AppError(404, "Application not found", "APPLICATION_NOT_FOUND");
+    }
+
+    if (application.job.companyId !== profile.companyId) {
+      throw new AppError(
+        403,
+        "Not allowed to delete this application",
+        "FORBIDDEN",
+      );
+    }
+
+    await prisma.$transaction([
+      prisma.application.delete({
+        where: { id: applicationId },
+      }),
+      prisma.job.update({
+        where: { id: application.jobId },
+        data: { applicantsCount: { decrement: 1 } },
+      }),
+    ]);
   },
 };
