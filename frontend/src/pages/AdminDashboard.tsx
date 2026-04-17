@@ -108,7 +108,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -139,10 +139,10 @@ export default function AdminDashboard() {
               </div>
               <div
                 className={`p-2 rounded-xl ${stat.variant === "purple"
-                    ? "bg-primary/10 text-primary"
-                    : stat.variant === "orange"
-                      ? "bg-warning/10 text-warning"
-                      : "bg-success/10 text-success"
+                  ? "bg-primary/10 text-primary"
+                  : stat.variant === "orange"
+                    ? "bg-warning/10 text-warning"
+                    : "bg-success/10 text-success"
                   }`}
               >
                 <stat.icon className="w-5 h-5" />

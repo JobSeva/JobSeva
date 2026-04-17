@@ -130,7 +130,7 @@ export default function NgoProfile() {
     }
 
     return (
-        <div className="space-y-6 max-w-4xl w-full px-0 sm:px-0 mx-auto pb-10">
+        <div className="space-y-6 max-w-4xl w-full px-0 sm:px-0 mx-auto mobile-content-padding md:pb-10">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

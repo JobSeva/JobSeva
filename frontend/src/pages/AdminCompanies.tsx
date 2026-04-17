@@ -89,7 +89,7 @@ export default function AdminCompanies() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

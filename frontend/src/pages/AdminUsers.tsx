@@ -95,7 +95,7 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,8 +176,8 @@ export default function AdminUsers() {
                     <td className="px-5 py-4">
                       <span
                         className={`px-2.5 py-1 rounded-full text-[10px] font-medium border ${user.status === "active"
-                            ? "bg-success/10 text-success border-success/20"
-                            : "bg-destructive/10 text-destructive border-destructive/20"
+                          ? "bg-success/10 text-success border-success/20"
+                          : "bg-destructive/10 text-destructive border-destructive/20"
                           }`}
                       >
                         {user.status === "active" ? "Active" : "Suspended"}
@@ -187,8 +187,8 @@ export default function AdminUsers() {
                       <div className="flex items-center justify-end">
                         <button
                           className={`p-2 rounded-lg transition-colors border ${user.status === "active"
-                              ? "text-destructive hover:bg-destructive/10 border-transparent hover:border-destructive/20"
-                              : "text-success hover:bg-success/10 border-transparent hover:border-success/20"
+                            ? "text-destructive hover:bg-destructive/10 border-transparent hover:border-destructive/20"
+                            : "text-success hover:bg-success/10 border-transparent hover:border-success/20"
                             } disabled:opacity-50`}
                           onClick={() => toggleStatus(user.id, user.status)}
                           disabled={isToggling === user.id}

@@ -107,7 +107,7 @@ export default function TrainingPage() {
     });
 
     return (
-        <div className={`min-h-screen bg-background ${isAppView ? "pb-10" : "pt-20"}`}>
+        <div className={`min-h-screen bg-background ${isAppView ? "mobile-content-padding md:pb-10" : "pt-20"}`}>
             {!isAppView && <PublicNavbar />}
             {/* Dark Modern Hero */}
             <section className="relative py-24 px-4 overflow-hidden bg-[#0A0118]">

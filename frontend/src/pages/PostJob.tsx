@@ -62,6 +62,7 @@ export default function PostJob() {
   const [deadline, setDeadline] = useState("");
   const [responsibilities, setResponsibilities] = useState<string[]>([]);
   const [newResp, setNewResp] = useState("");
+  const [newSkill, setNewSkill] = useState("");
   const [loading, setLoading] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<any>(null);
 
@@ -115,6 +116,15 @@ export default function PostJob() {
     setSelectedSkills((prev) =>
       prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
     );
+  };
+
+  const addSkill = () => {
+    if (newSkill.trim() && !selectedSkills.includes(newSkill.trim())) {
+      setSelectedSkills([...selectedSkills, newSkill.trim()]);
+      setNewSkill("");
+    } else if (newSkill.trim()) {
+      setNewSkill("");
+    }
   };
 
   const addResponsibility = () => {
@@ -176,7 +186,7 @@ export default function PostJob() {
 
   return (
     <div className="flex justify-center w-full px-4 sm:px-6">
-      <div className="w-full max-w-6xl py-10 space-y-8">
+      <div className="w-full max-w-6xl py-10 space-y-8 mobile-content-padding pb-32 md:pb-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -522,15 +532,47 @@ export default function PostJob() {
                   {selectedSkills.length} Selected
                 </span>
               </div>
+
+              <div className="flex gap-3">
+                <div className="relative flex-1 group">
+                  <Wand2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Add a required skill..."
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                    className="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-muted/30 border border-border text-xs outline-none focus:border-primary focus:bg-background transition-all"
+                  />
+                </div>
+                <button
+                  onClick={addSkill}
+                  type="button"
+                  className="p-3.5 bg-primary text-white rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+
               <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto p-1 custom-scrollbar">
-                {suggestedSkills.map((skill) => (
+                {/* Show all selected skills first */}
+                {selectedSkills.map((skill) => (
                   <button
                     key={skill}
                     onClick={() => toggleSkill(skill)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border ${selectedSkills.includes(skill)
-                      ? "bg-primary text-white border-primary"
-                      : "bg-muted/20 text-muted-foreground border-border hover:bg-muted/40"
-                      }`}
+                    className="px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border bg-primary text-white border-primary flex items-center gap-1.5"
+                  >
+                    {skill}
+                    <X className="w-3 h-3" />
+                  </button>
+                ))}
+
+                {/* Then show suggested skills that aren't selected */}
+                {suggestedSkills.filter(s => !selectedSkills.includes(s)).map((skill) => (
+                  <button
+                    key={skill}
+                    onClick={() => toggleSkill(skill)}
+                    className="px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all border bg-muted/20 text-muted-foreground border-border hover:bg-muted/40"
                   >
                     {skill}
                   </button>

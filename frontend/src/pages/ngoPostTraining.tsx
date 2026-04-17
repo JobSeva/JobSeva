@@ -94,7 +94,7 @@ export default function NgoPostTraining() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="max-w-4xl mx-auto py-8 px-4 mobile-content-padding pb-32 md:pb-8">
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <Link to="/app/ngo/courses" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2">

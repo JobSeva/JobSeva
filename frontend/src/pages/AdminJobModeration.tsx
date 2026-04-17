@@ -89,7 +89,7 @@ export default function AdminJobModeration() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -133,8 +133,8 @@ export default function AdminJobModeration() {
                     </h3>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${job.active
-                          ? "bg-success/10 text-success border-success/20"
-                          : "bg-warning/10 text-warning border-warning/20"
+                        ? "bg-success/10 text-success border-success/20"
+                        : "bg-warning/10 text-warning border-warning/20"
                         }`}
                     >
                       {job.active ? "Active" : "Hidden"}

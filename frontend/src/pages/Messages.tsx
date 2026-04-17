@@ -87,7 +87,7 @@ export default function Messages() {
     (c) => c.id === selectedUserId,
   );
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -97,7 +97,7 @@ export default function Messages() {
         </h1>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-220px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-[calc(100vh-280px)] lg:h-[calc(100vh-220px)]">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

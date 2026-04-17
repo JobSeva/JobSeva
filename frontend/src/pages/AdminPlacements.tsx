@@ -61,7 +61,7 @@ export default function AdminPlacements() {
   const pendingCount = placements.filter((p) => p.status === "pending").length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -156,8 +156,8 @@ export default function AdminPlacements() {
                   <td className="p-4">
                     <span
                       className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${p.status === "confirmed"
-                          ? "bg-success/10 text-success"
-                          : "bg-warning/10 text-warning"
+                        ? "bg-success/10 text-success"
+                        : "bg-warning/10 text-warning"
                         }`}
                     >
                       {p.status}

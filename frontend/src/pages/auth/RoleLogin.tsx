@@ -284,11 +284,11 @@ export default function RoleLogin() {
                   placeholder="name@example.com"
                   autoComplete="email"
                   className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${emailError ||
-                      (error &&
-                        (error.toLowerCase().includes("email") ||
-                          error.toLowerCase().includes("invalid")))
-                      ? "border-destructive focus:border-destructive focus:ring-destructive/10"
-                      : "border-border/60 focus:border-primary shadow-sm"
+                    (error &&
+                      (error.toLowerCase().includes("email") ||
+                        error.toLowerCase().includes("invalid")))
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/10"
+                    : "border-border/60 focus:border-primary shadow-sm"
                     }`}
                 />
                 {/* Valid email indicator */}
@@ -296,7 +296,7 @@ export default function RoleLogin() {
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2"
+                    className="absolute right-4 inset-y-0 flex items-center"
                   >
                     <CheckCircle2 className="w-5 h-5 text-green-500 fill-green-500/5" />
                   </motion.div>
@@ -343,10 +343,10 @@ export default function RoleLogin() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                   className={`w-full pl-11 pr-11 py-3.5 rounded-[1.25rem] border bg-muted/40 focus:bg-card focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium ${error &&
-                      (error.toLowerCase().includes("password") ||
-                        error.toLowerCase().includes("invalid"))
-                      ? "border-destructive focus:border-destructive focus:ring-destructive/10"
-                      : "border-border/60 focus:border-primary shadow-sm"
+                    (error.toLowerCase().includes("password") ||
+                      error.toLowerCase().includes("invalid"))
+                    ? "border-destructive focus:border-destructive focus:ring-destructive/10"
+                    : "border-border/60 focus:border-primary shadow-sm"
                     }`}
                 />
                 <button
@@ -372,8 +372,8 @@ export default function RoleLogin() {
                 aria-checked={rememberMe}
                 onClick={() => setRememberMe(!rememberMe)}
                 className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all shrink-0 ${rememberMe
-                    ? "bg-primary border-primary"
-                    : "border-border hover:border-primary/60"
+                  ? "bg-primary border-primary"
+                  : "border-border hover:border-primary/60"
                   }`}
               >
                 {rememberMe && (

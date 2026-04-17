@@ -49,7 +49,7 @@ export default function NgoDashboard() {
     ];
 
     return (
-        <div className="space-y-10 pb-10">
+        <div className="space-y-10 mobile-content-padding md:pb-10">
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>

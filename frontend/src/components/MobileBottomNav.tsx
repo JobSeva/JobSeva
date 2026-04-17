@@ -30,12 +30,25 @@ const adminNav = [
   { to: "/app/admin/reports", icon: BarChart3, label: "Reports" },
 ];
 
+const ngoNav = [
+  { to: "/app", icon: Home, label: "Home" },
+  { to: "/app/ngo/post-training", icon: Briefcase, label: "Post" },
+  { to: "/app/ngo/courses", icon: Building2, label: "Courses" },
+  { to: "/app/ngo/enrollments", icon: User, label: "Users" },
+];
+
 export default function MobileBottomNav() {
   const { role } = useAppContext();
   const location = useLocation();
 
   const nav =
-    role === "seeker" ? seekerNav : role === "company" ? companyNav : adminNav;
+    role === "seeker"
+      ? seekerNav
+      : role === "company"
+        ? companyNav
+        : role === "ngo"
+          ? ngoNav
+          : adminNav;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card border-t border-border safe-area-bottom">

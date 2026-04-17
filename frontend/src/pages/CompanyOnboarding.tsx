@@ -116,12 +116,12 @@ function BasicInfoStep({ data, updateData }: { data: CompanyProfileData, updateD
     <div className="space-y-6">
       <div className="space-y-1.5">
         <label className="text-xs font-heading font-semibold text-foreground">Company Logo <span className="text-destructive">*</span></label>
-        <div 
+        <div
           onClick={() => fileInputRef.current?.click()}
           className="relative overflow-hidden w-full h-32 rounded-2xl border-2 border-dashed border-border bg-muted/30 hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer group"
         >
           {data.logo ? (
-             <img src={data.logo} alt="Logo preview" className="absolute inset-0 w-full h-full object-contain p-2" />
+            <img src={data.logo} alt="Logo preview" className="absolute inset-0 w-full h-full object-contain p-2" />
           ) : (
             <>
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
@@ -140,28 +140,28 @@ function BasicInfoStep({ data, updateData }: { data: CompanyProfileData, updateD
         </div>
       </div>
 
-      <FormInput 
-        label="Company Name" 
-        value={data.name} 
-        onChange={(e: any) => updateData({ name: e.target.value })} 
-        placeholder="e.g. Acme Corporation" 
-        icon={Building2} 
-        required 
-      />
-      
-      <FormInput 
-        label="Tagline" 
-        value={data.tagline} 
-        onChange={(e: any) => updateData({ tagline: e.target.value })} 
-        placeholder="e.g. Innovating the future of work" 
+      <FormInput
+        label="Company Name"
+        value={data.name}
+        onChange={(e: any) => updateData({ name: e.target.value })}
+        placeholder="e.g. Acme Corporation"
+        icon={Building2}
+        required
       />
 
-      <FormInput 
-        label="About Company" 
+      <FormInput
+        label="Tagline"
+        value={data.tagline}
+        onChange={(e: any) => updateData({ tagline: e.target.value })}
+        placeholder="e.g. Innovating the future of work"
+      />
+
+      <FormInput
+        label="About Company"
         type="textarea"
-        value={data.about} 
-        onChange={(e: any) => updateData({ about: e.target.value })} 
-        placeholder="Describe what your company does..." 
+        value={data.about}
+        onChange={(e: any) => updateData({ about: e.target.value })}
+        placeholder="Describe what your company does..."
         required
       />
     </div>
@@ -173,8 +173,8 @@ function CompanyDetailsStep({ data, updateData }: { data: CompanyProfileData, up
     <div className="space-y-6">
       <div className="space-y-1.5">
         <label className="text-xs font-heading font-semibold text-foreground">Industry <span className="text-destructive">*</span></label>
-        <select 
-          value={data.industry} 
+        <select
+          value={data.industry}
           onChange={(e) => updateData({ industry: e.target.value })}
           className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-sm outline-none transition-all duration-300 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 appearance-none"
         >
@@ -190,8 +190,8 @@ function CompanyDetailsStep({ data, updateData }: { data: CompanyProfileData, up
 
       <div className="space-y-1.5">
         <label className="text-xs font-heading font-semibold text-foreground">Company Size <span className="text-destructive">*</span></label>
-        <select 
-          value={data.size} 
+        <select
+          value={data.size}
           onChange={(e) => updateData({ size: e.target.value })}
           className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-sm outline-none transition-all duration-300 focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 appearance-none"
         >
@@ -205,28 +205,28 @@ function CompanyDetailsStep({ data, updateData }: { data: CompanyProfileData, up
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <FormInput 
-          label="Founded Year" 
+        <FormInput
+          label="Founded Year"
           type="number"
-          value={data.founded} 
-          onChange={(e: any) => updateData({ founded: e.target.value })} 
-          placeholder="e.g. 2012" 
+          value={data.founded}
+          onChange={(e: any) => updateData({ founded: e.target.value })}
+          placeholder="e.g. 2012"
         />
-        <FormInput 
-          label="Headquarters" 
-          value={data.hq} 
-          onChange={(e: any) => updateData({ hq: e.target.value })} 
-          placeholder="e.g. San Francisco, CA" 
+        <FormInput
+          label="Headquarters"
+          value={data.hq}
+          onChange={(e: any) => updateData({ hq: e.target.value })}
+          placeholder="e.g. San Francisco, CA"
           icon={MapPin}
           required
         />
       </div>
 
-      <FormInput 
-        label="Website URL" 
-        value={data.website} 
-        onChange={(e: any) => updateData({ website: e.target.value })} 
-        placeholder="https://example.com" 
+      <FormInput
+        label="Website URL"
+        value={data.website}
+        onChange={(e: any) => updateData({ website: e.target.value })}
+        placeholder="https://example.com"
         icon={Globe}
       />
     </div>
@@ -236,21 +236,21 @@ function CompanyDetailsStep({ data, updateData }: { data: CompanyProfileData, up
 function ContactInfoStep({ data, updateData }: { data: CompanyProfileData, updateData: (partial: Partial<CompanyProfileData>) => void }) {
   return (
     <div className="space-y-6">
-      <FormInput 
-        label="Official Email" 
+      <FormInput
+        label="Official Email"
         type="email"
-        value={data.email} 
-        onChange={(e: any) => updateData({ email: e.target.value })} 
-        placeholder="contact@company.com" 
+        value={data.email}
+        onChange={(e: any) => updateData({ email: e.target.value })}
+        placeholder="contact@company.com"
         icon={Mail}
         required
       />
-      <FormInput 
-        label="Phone Number" 
+      <FormInput
+        label="Phone Number"
         type="tel"
-        value={data.phone} 
-        onChange={(e: any) => updateData({ phone: e.target.value })} 
-        placeholder="+1 (555) 000-0000" 
+        value={data.phone}
+        onChange={(e: any) => updateData({ phone: e.target.value })}
+        placeholder="+1 (555) 000-0000"
         icon={Phone}
       />
     </div>
@@ -260,25 +260,25 @@ function ContactInfoStep({ data, updateData }: { data: CompanyProfileData, updat
 function SocialLinksStep({ data, updateData }: { data: CompanyProfileData, updateData: (partial: Partial<CompanyProfileData>) => void }) {
   return (
     <div className="space-y-6">
-      <FormInput 
-        label="LinkedIn Profile" 
-        value={data.linkedin} 
-        onChange={(e: any) => updateData({ linkedin: e.target.value })} 
-        placeholder="https://linkedin.com/company/yourcompany" 
+      <FormInput
+        label="LinkedIn Profile"
+        value={data.linkedin}
+        onChange={(e: any) => updateData({ linkedin: e.target.value })}
+        placeholder="https://linkedin.com/company/yourcompany"
         icon={Linkedin}
       />
-      <FormInput 
-        label="Twitter Profile" 
-        value={data.twitter} 
-        onChange={(e: any) => updateData({ twitter: e.target.value })} 
-        placeholder="https://twitter.com/yourcompany" 
+      <FormInput
+        label="Twitter Profile"
+        value={data.twitter}
+        onChange={(e: any) => updateData({ twitter: e.target.value })}
+        placeholder="https://twitter.com/yourcompany"
         icon={Twitter}
       />
-      <FormInput 
-        label="Instagram Profile" 
-        value={data.instagram} 
-        onChange={(e: any) => updateData({ instagram: e.target.value })} 
-        placeholder="https://instagram.com/yourcompany" 
+      <FormInput
+        label="Instagram Profile"
+        value={data.instagram}
+        onChange={(e: any) => updateData({ instagram: e.target.value })}
+        placeholder="https://instagram.com/yourcompany"
         icon={Instagram}
       />
     </div>
@@ -288,19 +288,19 @@ function SocialLinksStep({ data, updateData }: { data: CompanyProfileData, updat
 function RecruiterInfoStep({ data, updateData }: { data: CompanyProfileData, updateData: (partial: Partial<CompanyProfileData>) => void }) {
   return (
     <div className="space-y-6">
-      <FormInput 
-        label="Contact Person Name" 
-        value={data.recruiterName} 
-        onChange={(e: any) => updateData({ recruiterName: e.target.value })} 
-        placeholder="e.g. Jane Doe" 
+      <FormInput
+        label="Contact Person Name"
+        value={data.recruiterName}
+        onChange={(e: any) => updateData({ recruiterName: e.target.value })}
+        placeholder="e.g. Jane Doe"
         icon={User}
         required
       />
-      <FormInput 
-        label="Designation" 
-        value={data.recruiterDesignation} 
-        onChange={(e: any) => updateData({ recruiterDesignation: e.target.value })} 
-        placeholder="e.g. Senior Technical Recruiter" 
+      <FormInput
+        label="Designation"
+        value={data.recruiterDesignation}
+        onChange={(e: any) => updateData({ recruiterDesignation: e.target.value })}
+        placeholder="e.g. Senior Technical Recruiter"
         icon={Briefcase}
         required
       />
@@ -316,12 +316,12 @@ function HiringDetailsStep({ data, updateData }: { data: CompanyProfileData, upd
           <h4 className="font-heading font-semibold text-sm">Hiring Status</h4>
           <p className="text-xs text-muted-foreground mt-0.5">Are you currently accepting applications?</p>
         </div>
-        <button 
+        <button
           onClick={() => updateData({ isHiring: !data.isHiring })}
           className={`w-12 h-6 rounded-full flex items-center transition-colors px-1 ${data.isHiring ? "bg-primary" : "bg-border"}`}
         >
-          <motion.div 
-            layout 
+          <motion.div
+            layout
             className="w-4 h-4 rounded-full bg-white shadow-sm"
             animate={{ x: data.isHiring ? 24 : 0 }}
             transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -331,17 +331,17 @@ function HiringDetailsStep({ data, updateData }: { data: CompanyProfileData, upd
 
       <AnimatePresence>
         {data.isHiring && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
           >
-           <FormInput 
-              label="Number of Open Positions" 
+            <FormInput
+              label="Number of Open Positions"
               type="number"
-              value={data.openPositions} 
-              onChange={(e: any) => updateData({ openPositions: e.target.value })} 
-              placeholder="e.g. 5" 
+              value={data.openPositions}
+              onChange={(e: any) => updateData({ openPositions: e.target.value })}
+              placeholder="e.g. 5"
             />
           </motion.div>
         )}
@@ -364,30 +364,30 @@ function LivePreviewCard({ data }: { data: CompanyProfileData }) {
       <div className="flex-1 flex flex-col">
         {/* Banner Area (Mocked visually) */}
         <div className="h-24 w-full rounded-t-2xl bg-gradient-to-r from-primary/20 via-primary/10 to-transparent relative mb-16">
-           <div className="absolute -bottom-12 left-6">
-             <div className="w-32 h-32 rounded-2xl bg-card border-4 border-card shadow-lg flex items-center justify-center overflow-hidden">
-                {data.logo ? (
-                  <img src={data.logo} alt="Logo" className="w-full h-full object-contain" />
-                ) : (
-                  <Building2 className="w-12 h-12 text-muted-foreground/30" />
-                )}
-             </div>
-           </div>
+          <div className="absolute -bottom-12 left-6">
+            <div className="w-32 h-32 rounded-2xl bg-card border-4 border-card shadow-lg flex items-center justify-center overflow-hidden">
+              {data.logo ? (
+                <img src={data.logo} alt="Logo" className="w-full h-full object-contain" />
+              ) : (
+                <Building2 className="w-12 h-12 text-muted-foreground/30" />
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="px-2">
           <h2 className="text-xl font-heading font-bold break-words">{data.name || "Company Name"}</h2>
           <p className="text-sm text-primary font-medium mt-1 mb-4">{data.tagline || "Your inspiring tagline goes here"}</p>
-          
+
           <div className="flex flex-wrap gap-2 mb-6">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
-               <Briefcase className="w-3.5 h-3.5" /> {data.industry || "Industry"}
+              <Briefcase className="w-3.5 h-3.5" /> {data.industry || "Industry"}
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
-               <Users className="w-3.5 h-3.5" /> {data.size || "Size"}
+              <Users className="w-3.5 h-3.5" /> {data.size || "Size"}
             </span>
             {data.hq && (
-               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" /> {data.hq}
               </span>
             )}
@@ -399,7 +399,7 @@ function LivePreviewCard({ data }: { data: CompanyProfileData }) {
 
           {data.isHiring && (
             <div className="mt-6 flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-primary text-sm font-medium">
-              <CheckCircle className="w-4 h-4" /> 
+              <CheckCircle className="w-4 h-4" />
               Actively Hiring {data.openPositions ? `for ${data.openPositions} roles` : ""}
             </div>
           )}
@@ -429,7 +429,7 @@ export default function CompanyOnboarding() {
       toast.error("Please fill in the required layout details.");
       return;
     }
-    
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
@@ -458,26 +458,26 @@ export default function CompanyOnboarding() {
   ][currentStep];
 
   if (isSubmitted) {
-     return (
-       <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-         <motion.div
-           initial={{ opacity: 0, scale: 0.8 }}
-           animate={{ opacity: 1, scale: 1 }}
-           className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary"
-         >
-           <CheckCircle className="w-10 h-10" />
-         </motion.div>
-         <h2 className="text-3xl font-heading font-bold mb-3">Profile Created!</h2>
-         <p className="text-muted-foreground mb-8 max-w-sm">
-           Your company profile is completely set up. Redirecting you to the dashboard...
-         </p>
-         <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-       </div>
-     );
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary"
+        >
+          <CheckCircle className="w-10 h-10" />
+        </motion.div>
+        <h2 className="text-3xl font-heading font-bold mb-3">Profile Created!</h2>
+        <p className="text-muted-foreground mb-8 max-w-sm">
+          Your company profile is completely set up. Redirecting you to the dashboard...
+        </p>
+        <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto pb-12">
+    <div className="max-w-6xl mx-auto mobile-content-padding md:pb-12">
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-heading font-bold mb-2">Company <span className="text-primary">Registration</span></h1>
         <p className="text-sm text-muted-foreground">Setup your employer brand to attract top talent.</p>
@@ -491,12 +491,11 @@ export default function CompanyOnboarding() {
             <div className="flex justify-between items-center relative z-10">
               {steps.map((step, idx) => (
                 <div key={step} className="flex flex-col items-center gap-2 w-16">
-                  <div 
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                      idx < currentStep ? "bg-primary text-white" : 
-                      idx === currentStep ? "bg-primary/20 text-primary border-2 border-primary" : 
-                      "bg-muted text-muted-foreground"
-                    }`}
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${idx < currentStep ? "bg-primary text-white" :
+                        idx === currentStep ? "bg-primary/20 text-primary border-2 border-primary" :
+                          "bg-muted text-muted-foreground"
+                      }`}
                   >
                     {idx < currentStep ? <CheckCircle className="w-4 h-4" /> : idx + 1}
                   </div>
@@ -508,12 +507,12 @@ export default function CompanyOnboarding() {
             </div>
             {/* Connecting line */}
             <div className="absolute left-[8%] right-[8%] top-[38px] h-[2px] bg-muted z-0 hidden sm:block">
-               <motion.div 
-                 className="h-full bg-primary" 
-                 initial={{ width: "0%" }}
-                 animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-                 transition={{ duration: 0.4 }}
-               />
+              <motion.div
+                className="h-full bg-primary"
+                initial={{ width: "0%" }}
+                animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+                transition={{ duration: 0.4 }}
+              />
             </div>
           </div>
 
@@ -523,7 +522,7 @@ export default function CompanyOnboarding() {
               <div className="w-2 h-6 rounded-full bg-primary" />
               {steps[currentStep]}
             </h2>
-            
+
             <div className="flex-1">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -541,15 +540,15 @@ export default function CompanyOnboarding() {
             {/* Actions */}
             <div className="flex items-center gap-4 mt-8 pt-6 border-t border-border">
               {currentStep > 0 && (
-                <button 
+                <button
                   onClick={handleBack}
                   className="px-6 py-2.5 rounded-xl border border-border text-foreground text-sm font-semibold hover:bg-muted transition-colors flex items-center gap-2"
                 >
                   <ChevronLeft className="w-4 h-4" /> Back
                 </button>
               )}
-              
-              <button 
+
+              <button
                 onClick={handleNext}
                 className="ml-auto px-8 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-sm hover:shadow"
               >

@@ -64,7 +64,7 @@ export default function SeekerDashboard() {
         console.error("Dashboard fetch error:", err);
         setError(
           err.response?.data?.error?.message ||
-            "An unexpected error occurred. Please try again."
+          "An unexpected error occurred. Please try again."
         );
       } finally {
         setIsLoading(false);
@@ -108,7 +108,7 @@ export default function SeekerDashboard() {
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 mobile-content-padding md:pb-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -297,8 +297,7 @@ export default function SeekerDashboard() {
                 </div>
                 <div className="text-right shrink-0">
                   <span
-                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${
-                      app.status === "hired"
+                    className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter ${app.status === "hired"
                         ? "bg-success/20 text-success shadow-[0_0_10px_rgba(34,197,94,0.1)]"
                         : app.status === "interview"
                           ? "bg-primary/20 text-primary shadow-[0_0_10px_rgba(var(--primary),0.1)]"
@@ -307,7 +306,7 @@ export default function SeekerDashboard() {
                             : app.status === "rejected"
                               ? "bg-destructive/10 text-destructive grayscale-[0.5]"
                               : "bg-muted text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {app.status || "Pending"}
                   </span>

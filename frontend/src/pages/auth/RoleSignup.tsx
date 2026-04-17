@@ -380,8 +380,8 @@ export default function RoleSignup() {
                         onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => setEmailTouched(true)}
                         className={`block w-full pl-11 pr-11 py-3 bg-muted/40 border rounded-[1.25rem] text-sm font-medium focus:ring-4 outline-none transition-all duration-200 placeholder:text-muted-foreground/60 shadow-sm ${emailError
-                            ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
-                            : "border-border/60 focus:ring-primary/10 focus:border-primary"
+                          ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
+                          : "border-border/60 focus:ring-primary/10 focus:border-primary"
                           }`}
                         placeholder="name@example.com"
                         autoComplete="email"
@@ -390,7 +390,7 @@ export default function RoleSignup() {
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2"
+                          className="absolute right-4 inset-y-0 flex items-center"
                         >
                           <CheckCircle2 className="w-4.5 h-4.5 text-green-500 fill-green-500/5" />
                         </motion.div>
@@ -445,8 +445,8 @@ export default function RoleSignup() {
                             <div
                               key={seg}
                               className={`h-1 flex-1 rounded-full transition-all duration-300 ${passwordStrength.score >= seg
-                                  ? passwordStrength.bgColor
-                                  : "bg-muted"
+                                ? passwordStrength.bgColor
+                                : "bg-muted"
                                 }`}
                             />
                           ))}
@@ -480,8 +480,8 @@ export default function RoleSignup() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         onBlur={() => setConfirmTouched(true)}
                         className={`block w-full pl-11 pr-11 py-3 bg-muted/40 border rounded-[1.25rem] text-sm font-medium focus:ring-4 outline-none transition-all duration-200 placeholder:text-muted-foreground/60 shadow-sm ${confirmError
-                            ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
-                            : "border-border/60 focus:ring-primary/10 focus:border-primary"
+                          ? "border-destructive focus:ring-destructive/20 focus:border-destructive"
+                          : "border-border/60 focus:ring-primary/10 focus:border-primary"
                           }`}
                         placeholder="Re-enter your password"
                         autoComplete="new-password"

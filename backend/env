@@ -1,0 +1,18 @@
+DATABASE_URL="postgresql://postgres.btqdvynxekdacdqnpsdg:D6u4zixwMhWwjyv6@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.btqdvynxekdacdqnpsdg:D6u4zixwMhWwjyv6@aws-1-ap-south-1.pooler.supabase.com:5432/postgres"
+
+# Server
+PORT=4000
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080
+
+# JWT Secrets
+JWT_ACCESS_SECRET=jobseva_access_secret_super_long_and_secure_2024
+JWT_REFRESH_SECRET=jobseva_refresh_secret_super_long_and_secure_2024
+ACCESS_TOKEN_TTL=15m
+REFRESH_TOKEN_TTL=7d
+
+# Email Configuration
+EMAIL_USER=ninadkeni2016@gmail.com
+EMAIL_PASS=zwmebzrtymxtthyg
+FRONTEND_URL="http://localhost:8080"

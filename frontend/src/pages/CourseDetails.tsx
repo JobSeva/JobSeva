@@ -78,7 +78,7 @@ export default function CourseDetails() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-10">
+        <div className="max-w-4xl mx-auto space-y-8 mobile-content-padding md:pb-10">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <button
                     onClick={() => navigate(-1)}

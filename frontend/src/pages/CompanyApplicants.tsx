@@ -18,6 +18,7 @@ import {
   getCompanyJobs,
   getCompanyJobApplicants,
   getAllCompanyApplicants,
+  RAW_BASE_URL,
 } from "@/services/api";
 
 const columns = [
@@ -113,7 +114,7 @@ export default function CompanyApplicants() {
 
   const handleDeleteApplication = async (applicationId: string) => {
     if (!window.confirm("Are you sure you want to permanently remove this applicant? This action cannot be undone.")) return;
-    
+
     setIsUpdating(true);
     try {
       const res = await api.delete(`/company/applications/${applicationId}`);
@@ -134,7 +135,7 @@ export default function CompanyApplicants() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mobile-content-padding md:pb-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -199,7 +200,7 @@ export default function CompanyApplicants() {
                           </p>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteApplication(c.applicationId);

@@ -54,7 +54,7 @@ export default function NgoEnrollments() {
     );
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-8 mobile-content-padding md:pb-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-heading font-bold">Student <span className="text-primary">Enrollments</span></h1>
