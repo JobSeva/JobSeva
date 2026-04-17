@@ -19,6 +19,12 @@ export class CommunicationsController {
     }
   }
 
+  async getConversations(req: AuthenticatedRequest, res: Response) {
+    const userId = req.auth!.userId;
+    const convos = await commsService.getConversations(userId);
+    res.json(success(convos));
+  }
+
   async getUnreadMessagesCount(req: AuthenticatedRequest, res: Response) {
     const userId = req.auth!.userId;
     const count = await commsService.getUnreadMessagesCount(userId);

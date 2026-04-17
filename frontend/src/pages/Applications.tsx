@@ -37,6 +37,12 @@ const stages = [
     icon: Trophy,
     color: "text-success bg-success/10",
   },
+  {
+    key: "rejected",
+    label: "Rejected",
+    icon: Clock,
+    color: "text-destructive bg-destructive/10",
+  },
 ];
 
 interface Application {
@@ -60,7 +66,8 @@ export default function Applications() {
       try {
         const res = await api.get("/applications");
         if (res.data?.success) {
-          setApplications(res.data.data?.items || []);
+          // The backend returns the items array directly as 'data' when called with 'success(result, meta)'
+          setApplications(res.data.data || []);
         } else {
           setError(res.data?.error?.message || "Failed to load applications");
         }
@@ -178,34 +185,46 @@ export default function Applications() {
                     </p>
                   </div>
 
-                  <div className="hidden md:flex items-center gap-2">
-                    {stages.map((stage, si) => {
-                      const currentIndex = stages.findIndex(
-                        (s) => s.key === app.status,
-                      );
-                      const isCompleted = si <= currentIndex;
-                      return (
-                        <div
-                          key={stage.key}
-                          className="flex items-center gap-2"
-                        >
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
-                              isCompleted
-                                ? stage.color
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            <stage.icon className="w-4 h-4" />
-                          </div>
-                          {si < stages.length - 1 && (
+                  <div className="hidden md:flex items-center gap-1.5 flex-wrap">
+                    {app.status === "rejected" ? (
+                      <span className="px-3 py-1 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-wider border border-destructive/20 shadow-sm">
+                        Rejected
+                      </span>
+                    ) : (
+                      stages
+                        .filter((s) => s.key !== "rejected")
+                        .map((stage, si) => {
+                          const pipelineStages = stages.filter(
+                            (s) => s.key !== "rejected",
+                          );
+                          const currentIndex = pipelineStages.findIndex(
+                            (s) => s.key === app.status,
+                          );
+                          const isCompleted = si <= currentIndex;
+                          return (
                             <div
-                              className={`w-8 h-0.5 ${si < currentIndex ? "bg-primary" : "bg-muted"}`}
-                            />
-                          )}
-                        </div>
-                      );
-                    })}
+                              key={stage.key}
+                              className="flex items-center gap-1.5"
+                            >
+                              <div
+                                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] shadow-sm transition-all duration-300 ${
+                                  isCompleted
+                                    ? stage.color
+                                    : "bg-muted text-muted-foreground opacity-40"
+                                }`}
+                                title={stage.label}
+                              >
+                                <stage.icon className="w-3.5 h-3.5" />
+                              </div>
+                              {si < pipelineStages.length - 1 && (
+                                <div
+                                  className={`w-4 h-0.5 rounded-full ${si < currentIndex ? "bg-primary" : "bg-muted"}`}
+                                />
+                              )}
+                            </div>
+                          );
+                        })
+                    )}
                   </div>
 
                   <span className="text-xs text-muted-foreground">

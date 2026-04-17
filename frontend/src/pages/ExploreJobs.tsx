@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
+import { toast } from "sonner";
 
 type Job = {
   id: string;
@@ -38,13 +39,23 @@ export default function ExploreJobs() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [remoteOnly, setRemoteOnly] = useState(false);
+  const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Fetch live jobs from our new Express/Node Backend
     const fetchJobs = async () => {
       try {
-        const res = await api.get("/jobs");
-        setJobs(res.data.data);
+        const [jobsRes, savedRes] = await Promise.all([
+          api.get("/jobs"),
+          api.get("/saved-jobs")
+        ]);
+        
+        setJobs(jobsRes.data.data);
+        
+        if (savedRes.data?.success) {
+          const savedIds = new Set((savedRes.data.data || []).map((sj: any) => sj.job.id));
+          setSavedJobIds(savedIds);
+        }
       } catch (err) {
         console.error("Failed to load live jobs:", err);
       } finally {
@@ -205,16 +216,29 @@ export default function ExploreJobs() {
                       </div>
                       <button
                         className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-warning"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
-                          // Add save logic native hook here later
-                          api
-                            .post(`/saved-jobs/${job.id}`)
-                            .then(() => alert("Job Saved!"))
-                            .catch(console.error);
+                          const isSaved = savedJobIds.has(job.id);
+                          try {
+                            if (isSaved) {
+                              await api.delete(`/saved-jobs/${job.id}`);
+                              setSavedJobIds(prev => {
+                                const next = new Set(prev);
+                                next.delete(job.id);
+                                return next;
+                              });
+                              toast.success("Job removed from saved");
+                            } else {
+                              await api.post(`/saved-jobs/${job.id}`);
+                              setSavedJobIds(prev => new Set(prev).add(job.id));
+                              toast.success("Job saved!");
+                            }
+                          } catch (err) {
+                            toast.error("Failed to update saved status");
+                          }
                         }}
                       >
-                        <Bookmark className="w-4 h-4" />
+                        <Bookmark className={`w-4 h-4 ${savedJobIds.has(job.id) ? "fill-warning text-warning" : ""}`} />
                       </button>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-2">

@@ -25,6 +25,7 @@ interface ApplicantView {
   seekerId: string;
   name: string;
   email: string;
+  phone?: string;
   headline: string;
   skills: string[];
   resumeUrl?: string;
@@ -292,19 +293,17 @@ export const companyJobsService = {
 
   async remove(ownerUserId: string, jobId: string): Promise<void> {
     const profile = await getCompanyProfile(ownerUserId);
-    const job = await getOwnedJob(ownerUserId, jobId);
+    await getOwnedJob(ownerUserId, jobId);
 
-    if (job.active) {
-      await prisma.job.update({
+    await prisma.$transaction([
+      prisma.job.delete({
         where: { id: jobId },
-        data: { active: false },
-      });
-
-      await prisma.companyProfile.update({
+      }),
+      prisma.companyProfile.update({
         where: { companyId: profile.companyId },
         data: { openPositions: { decrement: 1 } },
-      });
-    }
+      }),
+    ]);
   },
 
   async listApplicants(
@@ -317,7 +316,14 @@ export const companyJobsService = {
       where: { jobId },
       include: {
         seeker: {
-          include: { seekerProfile: true },
+          include: {
+            seekerProfile: {
+              include: {
+                experiences: true,
+                education: true,
+              },
+            },
+          },
         },
       },
       orderBy: { updatedAt: "desc" },
@@ -334,6 +340,7 @@ export const companyJobsService = {
         seekerId: app.seekerId,
         name: app.seeker.name,
         email: app.seeker.email,
+        phone: seekerProfile?.phone || "",
         headline: seekerProfile?.headline || "",
         resumeUrl: app.resumeUrl || seekerProfile?.resumeUrl,
         skills,
@@ -416,5 +423,88 @@ export const companyJobsService = {
     });
 
     return updated;
+  },
+
+  async listAllApplicants(ownerUserId: string): Promise<ApplicantView[]> {
+    const profile = await getCompanyProfile(ownerUserId);
+
+    const applications = await prisma.application.findMany({
+      where: {
+        job: {
+          companyId: profile.companyId,
+        },
+      },
+      include: {
+        seeker: {
+          include: {
+            seekerProfile: {
+              include: {
+                experiences: true,
+                education: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { appliedAt: "desc" },
+    });
+
+    return applications.map((app: any) => {
+      const seekerProfile = app.seeker.seekerProfile;
+      const skills = seekerProfile?.skillsRaw
+        ? JSON.parse(seekerProfile.skillsRaw)
+        : [];
+
+      return {
+        applicationId: app.id,
+        seekerId: app.seekerId,
+        name: app.seeker.name,
+        email: app.seeker.email,
+        phone: seekerProfile?.phone || "",
+        headline: seekerProfile?.headline || "",
+        resumeUrl: app.resumeUrl || seekerProfile?.resumeUrl,
+        skills,
+        experienceCount: seekerProfile?.experiences?.length || 0,
+        status: app.status as ApplicationStatus,
+        matchScore: app.matchScore,
+        recruiterRating: app.recruiterRating || undefined,
+        recruiterNote: app.recruiterNote || undefined,
+        appliedAt: app.appliedAt.toISOString(),
+        updatedAt: app.updatedAt.toISOString(),
+        education: seekerProfile?.education || [],
+        experiences: seekerProfile?.experiences || [],
+      };
+    });
+  },
+
+  async deleteApplication(ownerUserId: string, applicationId: string): Promise<void> {
+    const profile = await getCompanyProfile(ownerUserId);
+
+    const application = await prisma.application.findUnique({
+      where: { id: applicationId },
+      include: { job: true },
+    });
+
+    if (!application) {
+      throw new AppError(404, "Application not found", "APPLICATION_NOT_FOUND");
+    }
+
+    if (application.job.companyId !== profile.companyId) {
+      throw new AppError(
+        403,
+        "Not allowed to delete this application",
+        "FORBIDDEN",
+      );
+    }
+
+    await prisma.$transaction([
+      prisma.application.delete({
+        where: { id: applicationId },
+      }),
+      prisma.job.update({
+        where: { id: application.jobId },
+        data: { applicantsCount: { decrement: 1 } },
+      }),
+    ]);
   },
 };

@@ -105,6 +105,8 @@ export default function RoleSignup() {
   const [emailTouched, setEmailTouched] = useState(false);
   const [confirmTouched, setConfirmTouched] = useState(false);
 
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
+
   if (!role || !roleConfig[role]) {
     return <Navigate to="/login" replace />;
   }
@@ -113,7 +115,6 @@ export default function RoleSignup() {
   const RoleIcon = config.icon;
 
   const isEmailValid = email.includes("@") && email.includes(".");
-  const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
   const passwordsMatch = password === confirmPassword;
 
   const handleSignup = async (e: React.FormEvent) => {

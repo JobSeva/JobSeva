@@ -133,4 +133,28 @@ export const companyJobsController = {
 
     res.status(200).json(success(application));
   },
+
+  async listAllApplicants(
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> {
+    const companyUserId = requireCompanyAuth(req);
+    const applicants = await companyJobsService.listAllApplicants(companyUserId);
+    res.status(200).json(success(applicants));
+  },
+
+  async deleteApplication(
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> {
+    const companyUserId = requireCompanyAuth(req);
+    const { applicationId } = req.params;
+
+    if (!applicationId) {
+      throw new AppError(400, "applicationId is required", "VALIDATION_ERROR");
+    }
+
+    await companyJobsService.deleteApplication(companyUserId, applicationId);
+    res.status(200).json(success({ message: "Application deleted" }));
+  },
 };

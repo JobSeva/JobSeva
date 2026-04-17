@@ -8,18 +8,24 @@ import {
   Loader2,
   RefreshCw,
   FileText,
+  Trash2,
 } from "lucide-react";
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getCompanyJobs, getCompanyJobApplicants } from "@/services/api";
+import {
+  getCompanyJobs,
+  getCompanyJobApplicants,
+  getAllCompanyApplicants,
+} from "@/services/api";
 
 const columns = [
   { key: "applied", label: "Applied", color: "border-muted-foreground/30" },
   { key: "shortlisted", label: "Shortlisted", color: "border-warning/50" },
   { key: "interview", label: "Interview", color: "border-primary/50" },
   { key: "hired", label: "Hired", color: "border-success/50" },
+  { key: "rejected", label: "Rejected", color: "border-destructive/30" },
 ];
 
 interface ApplicantView {
@@ -65,28 +71,10 @@ export default function CompanyApplicants() {
           setCandidates(appRes.data);
         }
       } else {
-        // Fetch all jobs first
-        const jobsRes = await getCompanyJobs();
-        if (jobsRes.success) {
-          const jobs = jobsRes.data?.items || [];
-          let all: ApplicantView[] = [];
-
-          for (const job of jobs) {
-            try {
-              const appRes = await getCompanyJobApplicants(job.id);
-              if (appRes.success && appRes.data) {
-                all = [...all, ...appRes.data];
-              }
-            } catch {
-              // Ignore individual job failure
-            }
-          }
-
-          all.sort(
-            (a, b) =>
-              new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
-          );
-          setCandidates(all);
+        // Fetch all candidates at once (much faster)
+        const appRes = await getAllCompanyApplicants();
+        if (appRes.success && appRes.data) {
+          setCandidates(appRes.data);
         }
       }
     } catch (err) {
@@ -118,8 +106,24 @@ export default function CompanyApplicants() {
           );
         }
       }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteApplication = async (applicationId: string) => {
+    if (!window.confirm("Are you sure you want to permanently remove this applicant? This action cannot be undone.")) return;
+    
+    setIsUpdating(true);
+    try {
+      const res = await api.delete(`/company/applications/${applicationId}`);
+      if (res.data?.success) {
+        setCandidates((prev) => prev.filter((c) => c.applicationId !== applicationId));
+        setSelectedCandidate(null);
+      }
     } catch (err) {
-      console.error("Failed to update status", err);
+      console.error("Failed to delete application", err);
+      alert("Failed to remove applicant. Please try again.");
     } finally {
       setIsUpdating(false);
     }
@@ -195,8 +199,15 @@ export default function CompanyApplicants() {
                           </p>
                         </div>
                       </div>
-                      <button className="p-1 rounded-md hover:bg-muted transition-colors text-muted-foreground flex-shrink-0">
-                        <MoreHorizontal className="w-4 h-4" />
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteApplication(c.applicationId);
+                        }}
+                        className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive flex-shrink-0"
+                        title="Remove Applicant"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                     <div className="flex items-center justify-between gap-2 overflow-hidden">
@@ -307,7 +318,7 @@ export default function CompanyApplicants() {
                   </div>
                 </div>
                 <a
-                  href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${selectedCandidate.resumeUrl}`}
+                  href={`${RAW_BASE_URL}${selectedCandidate.resumeUrl}`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:shadow-lg hover:shadow-primary/20 transition-all shadow-sm"
@@ -456,6 +467,12 @@ export default function CompanyApplicants() {
                       Reject
                     </button>
                   )}
+                <button
+                  onClick={() => handleDeleteApplication(selectedCandidate.applicationId)}
+                  className="px-3 py-1.5 rounded-xl bg-destructive/10 text-xs text-destructive hover:bg-destructive hover:text-white transition-all font-bold"
+                >
+                  Remove Applicant
+                </button>
               </div>
             </div>
           </motion.div>

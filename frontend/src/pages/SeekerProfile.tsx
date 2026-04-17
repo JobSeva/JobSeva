@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 import { useAppContext } from "@/contexts/AppContext";
-import { getSeekerProfile } from "@/services/api";
+import { getSeekerProfile, RAW_BASE_URL } from "@/services/api";
 import EditProfileModal from "@/components/EditProfileModal";
 import { uploadResume, deleteSeekerResume } from "@/services/api";
 import { toast } from "sonner";
@@ -479,7 +479,7 @@ export default function SeekerProfile() {
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <a
-                    href={`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}${profile.resumeUrl}`}
+                    href={`${RAW_BASE_URL}${profile.resumeUrl}`}
                     target="_blank"
                     rel="noreferrer"
                     className="btn-primary py-2.5 px-8 text-xs font-bold flex items-center gap-2"

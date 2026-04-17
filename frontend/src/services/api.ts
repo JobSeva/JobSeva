@@ -1,4 +1,5 @@
-import api from "@/lib/api";
+import api, { RAW_BASE_URL } from "@/lib/api";
+export { RAW_BASE_URL };
 
 // ─── Profile Services ───
 export const getSeekerProfile = async () => {
@@ -118,6 +119,11 @@ export const getApplicants = async (jobId: string) => {
 
 export const getCompanyJobApplicants = async (jobId: string) => {
   const response = await api.get(`/company/jobs/${jobId}/applicants`);
+  return response.data;
+};
+
+export const getAllCompanyApplicants = async () => {
+  const response = await api.get(`/company/applicants`);
   return response.data;
 };
 
